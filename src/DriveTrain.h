@@ -5,9 +5,10 @@
 #include "Encoder.h"
 #include "RobotDrive.h"
 #include "AnalogGyro.h"
+#include "AnalogAccelerometer.h"
+#include <CrevoRobot.h>
 #include <Math.h>
 
-//namespace DriveTrain
 //{
  class DriveTrain
     {
@@ -38,8 +39,12 @@
 
 	          AnalogGyro *gyro;
 
+	          AnalogAccelerometer *accel;
+
 	          Encoder *leftEnc,
 	                  *rightEnc;
+
+	          CrevoRobot crvbot;
 
 	          int distanceToCounts(double distance);
 	          int angleToCounts(double angle, double radius);
@@ -47,8 +52,11 @@
 
  	 public:
 	          enum Direction {Forward, Reverse};
-	          void initMotors(CANTalon *rightFront, CANTalon *rightRear, CANTalon *leftFront, CANTalon *leftRear);
+	          struct Speed { double FULL = 1; double THREEQUARTER = 0.75; double HALF = 0.5; double QUARTER = 0.25; double OFF = 0; } Speed;
 	          void init(RobotDrive *robotDrvInit, AnalogGyro *gyroInit, Encoder *leftEncInit, Encoder *rightEncInit);
+	          void initMotors(CANTalon *rightFront, CANTalon *rightRear, CANTalon *leftFront, CANTalon *leftRear);
+	          void initDrive(RobotDrive *robotDrvInit);
+	          void initAccel(AnalogAccelerometer *accelInit);
 	          void moveRobot(double lPwr, double rPwr);
 	          void moveRobot(double Pwr);
 	          void stopRobot(void);

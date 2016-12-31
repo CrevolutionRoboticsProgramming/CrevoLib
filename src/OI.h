@@ -19,35 +19,35 @@ private:
 	bool inputSlow;
 
 public:
-	enum btn {
-					kXButton = 1,
-					kAButton = 2,
-					kYButton = 3,
-					kBButton = 0,
-					kLBummber = 0,
-					kRBummber = 0,
-					kLTrigger = 7,
-					kRTrigger = 8,
-					kLStick_Button = 0,
-					kRStick_Button = 0,
-					kBack = 0,
-					kStart = 0,
-					kDPAD_UP = 0,
-					kDPAD_DOWN = 0,
-					kDPAD_RIGHT = 0,
-					kDPAD_LEFT = 0,
+	enum Button {
+					X = 1,
+					A = 2,
+					Y = 3,
+					B = 4,
+					LeftBummber = 0,
+					RightBummber = 0,
+					LeftTrigger = 7,
+					RightTrigger = 8,
+					LeftStick = 0,
+					RrightStick = 0,
+					Back = 0,
+					Start = 0,
+					DPADUp = 0,
+					DPADDownN = 0,
+					DPADRight = 0,
+					DPADLeft = 0,
 
 		};
-	enum axes {
-					kRIGHT_X = 0,
-					kRIGHT_Y = 1,
-					kLEFT_X = 2,
-					kLEFT_Y = 3,
+	enum Axes {
+					RIGHT_X = 0,
+					RIGHT_Y = 1,
+					LEFT_X = 2,
+					LEFT_Y = 3,
 		};
 
-	bool controllerButton(Joystick *joystick, btn button);
-	double controllerJoystick(Joystick *joystick, axes axes);
-	double shape(double inValue);
+	bool controllerButton(Joystick *joystick, Button button);
+	float controllerJoystick(Joystick *joystick, Axes axes);
+	float shape(float inValue);
 	OI();
 	virtual ~OI();
 };

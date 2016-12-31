@@ -10,13 +10,15 @@
  {
 
  }
-
- int DriveTrain::distanceToCounts(double distance)
- {
-	 return (int)(distance * kCPI);
- }
-
     //use for testing
+
+ void DriveTrain::init(RobotDrive *robotDrvInit, AnalogGyro *gyroInit, Encoder *leftEncInit, Encoder *rightEncInit)
+  {
+ 	 robotDrive = robotDrvInit;
+     gyro = gyroInit;
+     leftEnc = leftEncInit;
+     rightEnc = rightEncInit;
+  }
 
  void DriveTrain::initMotors(CANTalon *rightFront, CANTalon *rightRear, CANTalon *leftFront, CANTalon *leftRear)
  {
@@ -26,12 +28,14 @@
 	 leftRearMotor = leftRear;
  }
 
- void DriveTrain::init(RobotDrive *robotDrvInit, AnalogGyro *gyroInit, Encoder *leftEncInit, Encoder *rightEncInit)
+ void DriveTrain::initDrive(RobotDrive *robotDrvInit)
  {
 	 robotDrive = robotDrvInit;
-     gyro = gyroInit;
-     leftEnc = leftEncInit;
-     rightEnc = rightEncInit;
+ }
+
+ void DriveTrain::initAccel(AnalogAccelerometer *accelInit)
+ {
+	 accel = accelInit;
  }
 
  void DriveTrain::moveRobot(double lPwr, double rPwr)
@@ -88,6 +92,11 @@
  {
 	 leftEnc->Reset();
 	 rightEnc->Reset();
+ }
+
+ int DriveTrain::distanceToCounts(double distance)
+ {
+	 return (int)(distance * kCPI);
  }
 
  void DriveTrain::stopAndReset()

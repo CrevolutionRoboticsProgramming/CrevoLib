@@ -18,35 +18,42 @@ OI::~OI() {
 	// TODO Auto-generated destructor stub
 }
 
-double OI::shape(double inValue)
+float OI::shape(float inValue)
 {
 	inputActive = (abs(inValue) > 0.1);
-		inputSlow = (abs(inValue) < 0.8);
+	inputSlow = (abs(inValue) < 0.8);
 
-		double sign = (inValue);
+	float sign = (inValue);
 
-		if(inputActive) {
-			if (OI::inputSlow) {
-				double output = sign * (abs(inValue));
-				return output;
-			} else {
-				double output = sign * (abs(inValue));
-				return output;
-			}
-		} else {
-			return 0;
+	if(inputActive)
+	{
+		if (OI::inputSlow)
+		{
+			float output = sign * (abs(inValue) * 4.0/7.0 - 0.4/7.0);
+			return output;
 		}
+		else
+		{
+			float output = sign * (abs(inValue) * 3.0 - 2.0);
+			return output;
+		}
+	}
+
+	else
+	{
+		return 0;
+	}
 }
 
 
 
-bool OI::controllerButton(Joystick *jStick, btn button)
+bool OI::controllerButton(Joystick *joystick, Button button)
 {
 	// selectController = jsStick;
-	 return (jStick->GetRawButton(button));
+	 return (joystick->GetRawButton(button));
 }
 
-double OI::controllerJoystick(Joystick *joystick, axes axes)
+float OI::controllerJoystick(Joystick *joystick, Axes axes)
 {
 	return (joystick->GetRawAxis(axes));
 }

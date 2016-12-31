@@ -10,9 +10,10 @@
 
 #include "CANTalon.h"
 #include "Talon.h"
+#include "AnalogAccelerometer.h"
 #include "AnalogGyro.h"
-#include "DigitalInput.h"
 #include "AnalogPotentiometer.h"
+#include "DigitalInput.h"
 #include "Encoder.h"
 #include "RobotDrive.h"
 //#include <>
@@ -41,6 +42,7 @@ private:
 		 enum AnalogPort{
 			 	 	GYRO = 0,
 					POTEIOMETER = 1,
+					ACCELEROMETER = 2,
 		 };
 
 		 enum DigitalPort{
@@ -74,6 +76,8 @@ public:
 		 AnalogGyro *gyro;
 
 		 AnalogPotentiometer *pot;
+
+		 AnalogAccelerometer *accel;
 
     void robotInit(void);
 	CrevoRobot();

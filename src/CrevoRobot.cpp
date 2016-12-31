@@ -33,6 +33,8 @@ void CrevoRobot::robotInit(void){
 
 	gyro = new AnalogGyro(AnalogPort::GYRO);
 
+	accel = new AnalogAccelerometer(AnalogPort::ACCELEROMETER);
+
 	robotDrive = new RobotDrive(leftFrontMotor,
 	                            leftRearMotor,
 	                            rightFrontMotor,
@@ -41,7 +43,7 @@ void CrevoRobot::robotInit(void){
 	robotDrive->SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
 	robotDrive->SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
 
-	robotDrive->IsSafetyEnabled();
+	robotDrive->SetSafetyEnabled(false);
 }
 
 //}
