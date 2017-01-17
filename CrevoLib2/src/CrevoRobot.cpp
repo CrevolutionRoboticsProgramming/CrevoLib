@@ -29,13 +29,13 @@ void CrevoRobot::robotInit(void){
 
 	//---------------Manipulators MotorControllers----------------
 	intakeRoller = new CANTalon(MotorCAN::INTAKE_MOTOR);
+	fuelManipulator = new CANTalon(MotorCAN::SHOOTER_MOTOR);
 	//------------------------------------------------------------
 
 	//---------------Configure MotorControlers--------------------
-	leftFrontMotor->SetInverted(true);
-	leftRearMotor->SetInverted(true);
-	rightFrontMotor->SetInverted(false);
-	rightRearMotor->SetInverted(false);
+
+	intakeRoller->SetInverted(false);
+	fuelManipulator->SetInverted(false);
 
 	leftFrontMotor->SetP(0.3);
 	leftFrontMotor->SetI(0.5);
@@ -44,12 +44,27 @@ void CrevoRobot::robotInit(void){
 
 	//-------------------RobotDrive-------------------------------
 	robotDrive =  new RobotDrive(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);
+
+	robotDrive->SetInvertedMotor(RobotDrive::kFrontLeftMotor, false);
+	robotDrive->SetInvertedMotor(RobotDrive::kRearLeftMotor, false);
+	robotDrive->SetInvertedMotor(RobotDrive::kFrontRightMotor, false);
+	robotDrive->SetInvertedMotor(RobotDrive::kRearRightMotor, false);
 	//------------------------------------------------------------
 
 
 	//--------------Configure Sensors-----------------------------
 	gyro = new AnalogGyro(AnalogPort::GYRO);
 	accel = new AnalogAccelerometer(AnalogPort::ACCELEROMETER);
+
+	fuelManipulatorEncoder = new Encoder(DigitalPort::FUEL_MANIPULATOR_ENCODER_1, DigitalPort::FUEL_MANIPULATOR_ENCODER_2);
+	leftEnc = new Encoder(DigitalPort::L_EN_1, DigitalPort::L_EN_2, true);
+	rightEnc = new Encoder(DigitalPort::R_EN_1, DigitalPort::R_EN_2, false);
+
+	leftEnc->SetSamplesToAverage(5);
+	rightEnc->SetSamplesToAverage(5);
+
+	leftEnc->SetDistancePerPulse(calcdistanceperPulse);
+	rightEnc->SetDistancePerPulse(calcdistanceperPulse);
 
 	//------------------------------------------------------------
 

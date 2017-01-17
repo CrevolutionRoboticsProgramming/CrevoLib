@@ -43,6 +43,7 @@
 	  	 	  int InverseMulti;
 	  	 	  int autonCounter = 0;
 
+	  	 	  bool FinishedPreviousTrial = false;
 	  	 	  bool leftCountsReached;
 	  	 	  bool rightCountsReached;
 	  	 	  bool IsMagEnc;
@@ -66,7 +67,6 @@
 	          void moveMotor(CANTalon *_selectedTalon, double speed);
 	          void stopRobot(void);
 	          void driveDistanceEncoder(double dst, double pwr, Direction dir);
-	          void doTurn(double angle);
 	          void driveByTime(double time, double pwr, Direction dir);
 	          void encoderTurn(double angle, double pwr);
 	          void gyroTurn(double angle, double pwr);

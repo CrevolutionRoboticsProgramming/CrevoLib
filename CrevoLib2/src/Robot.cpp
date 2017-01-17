@@ -6,6 +6,7 @@
 #include <Joystick.h>
 #include <Timer.h>
 #include <PIDController.h>
+#include <Preferences.h>
 
 #include <OI.h>
 #include <CrevoRobot.h>
@@ -22,9 +23,13 @@ public:
 	enum Autons{AutonMove, ForwardAndBackwards};
 
 	SendableChooser<std::string> chooser;
+
+	int AutonChooser;
+	double speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void RobotInit() {
-
+		driverGamepad = new Joystick(0);
+		operatorGamepad = new Joystick(1);
 		crvbot.robotInit();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -47,6 +52,8 @@ public:
 
 		//pidController.SetOutputRange(0, 5);
 		//pidController.SetSetpoint(kSetPoint[0]);
+
+		crvbot.robotDrive->StopMotor();
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -71,7 +78,6 @@ public:
 			}
 
 			}
-
 		}
 
 	}
@@ -80,21 +86,24 @@ public:
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	bool shooterPressed;
+	bool stillPressed;
+	bool toggled = false;
+	bool lastToggled = false;
 	void TeleopPeriodic() {
-		DriveCode();
-
-		if(controllerButton(driverGamepad, Button::A))
+		while(IsOperatorControl() && IsEnabled())
 		{
-			tankTrue = true;
-			driverGamepad->SetRumble(Joystick::RumbleType::kRightRumble, 0.5);
-		}
-		else if(controllerButton(driverGamepad, Button::B))
-		{
-			tankTrue = false;
-			driverGamepad->SetRumble(Joystick::RumbleType::kLeftRumble, 0.5);
-		}
-			//crvbot.armMotor->Set(Speed.Off);
 
+			DriveCode();
+			SpeedScale();
+
+			toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
+
+			SmartDashboard::PutNumber("SpeedShooter find me", speedShoot);
+			SmartDashboard::PutBoolean("DriveTrain State", tankTrue);
+
+			Wait(0.005);
+		}
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -108,38 +117,56 @@ public:
 			double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
 			double Right_X =  controllerJoystick(driverGamepad, Axes::RIGHT_X);
 
+			if(controllerButton(driverGamepad, Button::A))
+				tankTrue = true;
+			else if(controllerButton(driverGamepad, Button::B))
+				tankTrue = false;
+
 			if(tankTrue)
-			{
 				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y, Right_Y);
-			}
 			else
-			{
-				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y - Right_X, Left_Y + Right_X);
-			}
+				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y + Right_X, Left_Y - Right_X);
+
+
+			SmartDashboard::PutNumber("Driver Joystick Left Y Axis ", Left_Y);
+			SmartDashboard::PutNumber("Driver Joystick Right Y Axis ", Right_Y);
+			SmartDashboard::PutNumber("Driver Joystick Right X Axis ", Right_X);
 		}
 
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-	void CanTalonSetleftRightMotors(double leftValue, double rightValue)
-		 {
-			 crvbot.leftFrontMotor->Set(-leftValue);
-			 crvbot.leftRearMotor->Set(-leftValue);
-			 crvbot.rightFrontMotor->Set(rightValue);
-			 crvbot.rightRearMotor->Set(rightValue);
+	void SpeedScale()
+	{
+		if(controllerButton(driverGamepad, Button::A) && !stillPressed)
+		{
+			speedShoot = speedShoot - 0.05;
+			stillPressed = true;
+			Wait(0.5);
+		}
+		else if(controllerButton(driverGamepad, Button::B) && !stillPressed)
+		{
+			speedShoot = speedShoot + 0.05;
+			stillPressed = true;
+			Wait(0.5);
+		}
+		else
+		{
+			stillPressed = false;
+		}
+	}
 
-		 }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 private:
 	LiveWindow* lw = LiveWindow::GetInstance();
 
 	CrevoRobot crvbot;
-	//PIDController pidController;
+
 	Joystick *driverGamepad;
 	Joystick *operatorGamepad;
+	Preferences *prefs;
+
 
 	//constexpr std::array<double, 3> kSetPoint = {1.0, 2.6, 4.3};
 
-	int AutonChooser;
 
 	bool tankTrue = false;
 };

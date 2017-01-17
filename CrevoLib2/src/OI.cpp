@@ -58,4 +58,19 @@ float OI::controllerJoystick(Joystick *joystick, Axes axes)
 	return (joystick->GetRawAxis(axes));
 }
 
+void OI::toggleAction(bool Pressed, CANTalon *_motor, double speed)
+{
+	if(Pressed && !lastToggled)
+	{
+		toggled = !toggled;
+
+		if(toggled)
+			_motor->Set(speed);
+		else
+			_motor->Set(0.0);
+		_motor->Set(0.0);
+	}
+	lastToggled = Pressed;
+}
+
 //}

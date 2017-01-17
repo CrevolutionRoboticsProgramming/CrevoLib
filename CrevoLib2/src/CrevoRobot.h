@@ -32,12 +32,13 @@ private:
 		 };
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 		 enum MotorCAN{
-			 	 	RIGHT_FRONT_PORT = 3,
-					RIGHT_REAR_PORT = 4,
-					LEFT_FRONT_PORT = 1,
-					LEFT_REAR_PORT = 2,
+			 	 	RIGHT_FRONT_PORT = 1,
+					RIGHT_REAR_PORT = 2,
+					LEFT_FRONT_PORT = 3,
+					LEFT_REAR_PORT = 4,
 					FRONT_RECLUSE_MOTOR = 5,
 					REAR_RECLUSE_MOTOR = 6,
+					SHOOTER_MOTOR = 7,
 					INTAKE_MOTOR = 8,
 					//ARM_MOTOR = 7,
 
@@ -59,6 +60,8 @@ private:
 		 enum DigitalPort{
 			 	 	LIMIT_SWITCH_1 = 0,
 					LIMIT_SWITCH_2 = 1,
+					FUEL_MANIPULATOR_ENCODER_1 = 0,
+					FUEL_MANIPULATOR_ENCODER_2 = 1,
 					R_EN_1 = 3,
 					R_EN_2 = 4,
 					L_EN_1 = 5,
@@ -82,6 +85,7 @@ public:
 		 CANTalon *leftFrontMotor;
 		 CANTalon *leftRearMotor;
 		 CANTalon *intakeRoller;
+		 CANTalon *fuelManipulator;
 		 CANTalon *armMotor;
 
 		 RobotDrive *robotDrive;
@@ -91,6 +95,7 @@ public:
 		 DigitalInput *limitSwitch1;
 		 DigitalInput *limitSwitch2;
 
+		 Encoder *fuelManipulatorEncoder;
 		 Encoder *rightEnc;
 		 Encoder *leftEnc;
 
@@ -98,14 +103,14 @@ public:
 		 AnalogPotentiometer *pot;
 		 AnalogAccelerometer *accel;
 
-		 DoubleSolenoid *leftDriveSwitch;
-
 		 //Length of current year's robot
 		 const double robotLentgh = 0;
 		 //Width of current year's robot
 		 const double robotWidth = 0;
 		 //Encoder Counts per Revolution
 		 const double encoderCPR = 1024;
+
+		 double calcdistanceperPulse = (1.0 / encoderCPR * 2.0 * 3.1415 * 3);
 
 		 void robotInit(void);
 		 CrevoRobot();

@@ -9,6 +9,7 @@
 #define OI_H_
 
 #include <Joystick.h>
+#include <CANTalon.h>
 //namespace OI {
 
 class OI {
@@ -17,6 +18,9 @@ private:
 	Joystick *selectController;
 	bool inputActive;
 	bool inputSlow;
+	bool stillPressed;
+	bool toggled = false;
+	bool lastToggled = false;
 
 public:
 	enum Button {
@@ -41,8 +45,8 @@ public:
 
 		};
 	enum Axes {
-					RIGHT_X = 5,
-					RIGHT_Y = 4,
+					RIGHT_X = 4,
+					RIGHT_Y = 5,
 					LEFT_X = 0,
 					LEFT_Y = 1,
 		};
@@ -50,6 +54,7 @@ public:
 	bool controllerButton(Joystick *joystick, Button button);
 	float controllerJoystick(Joystick *joystick, Axes axes);
 	float shape(float inValue);
+	void toggleAction(bool Pressed, CANTalon *_motor, double speed);
 	OI();
 	virtual ~OI();
 };

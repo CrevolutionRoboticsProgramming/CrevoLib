@@ -119,11 +119,18 @@
 		 pwr *= -1;
 	 }
 
+	 if(FinishedPreviousTrial)
+	 {
+		 autonCounter = 0;
+		 FinishedPreviousTrial = false;
+	 }
+
 	 while(autonCounter < timeValue)
 	 {
 		 moveRobot(pwr);
 		 autonCounter++;
 	 }
+	 FinishedPreviousTrial = true;
 	 moveRobot(0);
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
