@@ -1,16 +1,25 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 
+#include <WPILib.h>
 #include <IterativeRobot.h>
 #include <Joystick.h>
 #include <Timer.h>
 #include <PIDController.h>
 #include <Preferences.h>
+#include <CameraServer.h>
+#include <IterativeRobot.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/core/types.hpp>
+
 
 #include <OI.h>
 #include <CrevoRobot.h>
 #include <DriveTrain.h>
+#include <Vision.h>
 
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
@@ -22,15 +31,24 @@ public:
 	//Put AutonNames here
 	enum Autons{AutonMove, ForwardAndBackwards};
 
-	SendableChooser<std::string> chooser;
+	//SendableChooser<std::string> chooser;
+
+	bool streamON = true;
 
 	int AutonChooser;
-	double speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
+	double speedShoot;
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void RobotInit() {
+
 		driverGamepad = new Joystick(0);
 		operatorGamepad = new Joystick(1);
-		crvbot.robotInit();
+
+
+		//speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
+
+		vs.initStream(streamON);
+		//crvbot.robotInit();
+
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*
@@ -43,17 +61,17 @@ public:
 	 * You can add additional auto modes by adding additional comparisons to the
 	 * if-else structure below with additional strings. If using the
 	 * SendableChooser make sure to add them to the chooser code above as well.
-	 */
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+//	 */
+///*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousInit() override {
 
 		AutonChooser = Autons::ForwardAndBackwards;
-		initDrive(crvbot.robotDrive);
+		//initDrive(crvbot.robotDrive);
 
 		//pidController.SetOutputRange(0, 5);
 		//pidController.SetSetpoint(kSetPoint[0]);
 
-		crvbot.robotDrive->StopMotor();
+		//crvbot.robotDrive->StopMotor();
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -85,8 +103,7 @@ public:
 	void TeleopInit() {
 
 	}
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-	bool shooterPressed;
+/*/----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/	bool shooterPressed;
 	bool stillPressed;
 	bool toggled = false;
 	bool lastToggled = false;
@@ -105,12 +122,12 @@ public:
 			Wait(0.005);
 		}
 	}
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
+///*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+//
 	void TestPeriodic() {
 		lw->Run();
 	}
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+///*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void DriveCode()
 		{
 			double Left_Y = controllerJoystick(driverGamepad, Axes::LEFT_Y);
@@ -122,10 +139,10 @@ public:
 			else if(controllerButton(driverGamepad, Button::B))
 				tankTrue = false;
 
-			if(tankTrue)
-				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y, Right_Y);
-			else
-				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y + Right_X, Left_Y - Right_X);
+		//	if(tankTrue)
+				//crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y, Right_Y);
+			//else
+				//crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y + Right_X, Left_Y - Right_X);
 
 
 			SmartDashboard::PutNumber("Driver Joystick Left Y Axis ", Left_Y);
@@ -150,7 +167,7 @@ public:
 		else
 		{
 			stillPressed = false;
-		}
+	}
 	}
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -159,6 +176,7 @@ private:
 	LiveWindow* lw = LiveWindow::GetInstance();
 
 	CrevoRobot crvbot;
+	Vision vs;
 
 	Joystick *driverGamepad;
 	Joystick *operatorGamepad;

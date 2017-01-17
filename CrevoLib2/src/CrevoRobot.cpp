@@ -19,7 +19,7 @@ CrevoRobot::~CrevoRobot(){
 //}
 
 void CrevoRobot::robotInit(void){
-
+/*
 	//---------------Drive MotorControllers-----------------------
 	leftFrontMotor = new CANTalon(MotorCAN::LEFT_FRONT_PORT);
 	leftRearMotor = new CANTalon(MotorCAN::LEFT_REAR_PORT);
@@ -68,7 +68,7 @@ void CrevoRobot::robotInit(void){
 
 	//------------------------------------------------------------
 
-
+*/
 }
 
 //}

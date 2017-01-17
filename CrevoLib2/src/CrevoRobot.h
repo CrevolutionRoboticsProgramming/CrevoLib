@@ -87,7 +87,7 @@ public:
 		 CANTalon *intakeRoller;
 		 CANTalon *fuelManipulator;
 		 CANTalon *armMotor;
-
+/*
 		 RobotDrive *robotDrive;
 
 		 Compressor *compressor;
@@ -102,7 +102,7 @@ public:
 		 AnalogGyro *gyro;
 		 AnalogPotentiometer *pot;
 		 AnalogAccelerometer *accel;
-
+*/
 		 //Length of current year's robot
 		 const double robotLentgh = 0;
 		 //Width of current year's robot
