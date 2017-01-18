@@ -79,7 +79,7 @@
 
  void DriveTrain::driveDistanceEncoder(double dst, double pwr, Direction dir)
   {
-	 double counts = distanceToCounts(dst)
+	 double counts = distanceToCounts(dst);
 	 if (dir == DriveTrain::Reverse)
      {
 		 counts *= -1;
@@ -98,10 +98,10 @@
 	 }
 	 else
 	 {
-		 int lft_target = leftEnc->GetRaw + counts;
-		 int rgt_target = rightEnc->GetRaw + counts;
+		 int lft_target = leftEnc->GetRaw() + counts;
+		 int rgt_target = rightEnc->GetRaw() + counts;
 
-		 while(lft_target  != leftEnc->GetRaw && rgt_target != rightEnc->GetRaw)
+		 while(lft_target  != leftEnc->GetRaw() && rgt_target != rightEnc->GetRaw())
 		 {
 			 moveRobot(pwr);
 		 }

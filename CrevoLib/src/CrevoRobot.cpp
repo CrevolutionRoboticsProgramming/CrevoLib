@@ -102,8 +102,8 @@ void CrevoRobot::robotInit(void){
 	rightEnc->SetSamplesToAverage(5);
 
 	//--Setting the distance for the encoders connected to the roborios IO port. --
-	leftEnc->SetDistancePerPulse(calcdistanceperPulse);
-	rightEnc->SetDistancePerPulse(calcdistanceperPulse);
+	//leftEnc->SetDistancePerPulse(calcdistanceperPulse);
+	//rightEnc->SetDistancePerPulse(calcdistanceperPulse);
 
 	/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 

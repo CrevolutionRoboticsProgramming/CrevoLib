@@ -44,7 +44,7 @@
 	  	 	  int autonCounter = 0;
 
 	  	 	  bool FinishedPreviousTrial = false;
-	  	 	  bool turnTo heading
+	  	 	  bool turnToheading;
 	  	 	  bool leftCountsReached;
 	  	 	  bool rightCountsReached;
 	  	 	  bool IsMagEnc;

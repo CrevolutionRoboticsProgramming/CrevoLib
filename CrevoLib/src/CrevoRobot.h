@@ -124,7 +124,7 @@ public:
 		  * Encoder ticks = (360 / circumference) * Distance to travel
 		  */
 
-		 double calcdistanceperPulse = ((wheelCircumfrence ) / encoderCPR );
+		 //double calcdistanceperPulse = ((wheelCircumfrence ) / encoderCPR );
 
 		 void robotInit(void);
 		 CrevoRobot();
