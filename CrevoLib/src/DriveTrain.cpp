@@ -79,8 +79,7 @@
 
  void DriveTrain::driveDistanceEncoder(double dst, double pwr, Direction dir)
   {
-	 int counts = distanceToCounts(dst);
-
+	 double counts = distanceToCounts(dst)
 	 if (dir == DriveTrain::Reverse)
      {
 		 counts *= -1;
@@ -99,16 +98,58 @@
 	 }
 	 else
 	 {
-		 int lft_target = leftEnc->GetRaw() + counts;
-		 int rgt_target = rightEnc->GetRaw() + counts;
+		 int lft_target = leftEnc->GetRaw + counts;
+		 int rgt_target = rightEnc->GetRaw + counts;
 
-		 while(lft_target  != leftEnc->GetRaw() && rgt_target != rightEnc->GetRaw())
+		 while(lft_target  != leftEnc->GetRaw && rgt_target != rightEnc->GetRaw)
 		 {
 			 moveRobot(pwr);
 		 }
 	 }
-	 stopRobot();
+	 stopAndReset();
  }
+
+ void DriveTrain::driveCountEncoder(double enct, double pwr, Direction dir)
+ {
+
+
+
+	 	 if(IsMagEnc)
+	 	 {
+	 		// int lft_target = leftFrontMotor->GetEncPosition(CANTalon::) + counts;
+	 //		 int rgt_target = rightFrontMotor->GetEncPosition() + counts;
+	 //
+	 //		 while(lft_target  != leftFrontMotor->GetEncPosition() && rgt_target != rightFrontMotor->GetEncPosition())
+	 //		 {
+	 //			 moveRobot(pwr);
+	 //		 }
+	 	 }
+	 	 else
+	 	 {
+	 		int lft_target = leftEnc->GetRaw() + enct;
+	 		int rgt_target = rightEnc->GetRaw() + enct;
+	 		if (dir == DriveTrain::Reverse)
+	 		{
+	 			lft_target *= -1;
+	 			rgt_target *= -1;
+	 			pwr *= -1;
+	 			while(lft_target  <= leftEnc->GetRaw() && rgt_target <= rightEnc->GetRaw())
+	 			{
+	 				moveRobot(pwr);
+	 			}
+	 		}
+
+	 		else
+	 		{
+	 			 while(lft_target  >= leftEnc->GetRaw() && rgt_target >= rightEnc->GetRaw())
+	 			 {
+	 				 moveRobot(pwr);
+	 			 }
+	 		}
+	 	 }
+	 	 stopAndReset();
+ }
+
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::driveByTime(double timeValue, double pwr, Direction dir)
  {
@@ -131,7 +172,7 @@
 		 autonCounter++;
 	 }
 	 FinishedPreviousTrial = true;
-	 moveRobot(0);
+	 stopRobot();
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::encoderTurn(double angle, double pwr)
@@ -147,8 +188,17 @@
 	 }
 	 stopRobot();
  }
+ /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+ void DriveTrain::turnToHeading(int heading, double pwr)
+ {
+	 heading = round(heading - 0.0);
+	 while(gyroTurn(heading, pwr));
+	 stopAndReset();
+ }
+
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
- void DriveTrain::gyroTurn(double angle, double pwr)
+ bool DriveTrain::gyroTurn(double angle, double pwr)
  {
 	 double error;
 	 double steer;
@@ -167,8 +217,14 @@
 	 }
 	 else
 	 {
-		// steer = g
+		 steer = getSteer(error, PADJ_TURN);
+		 rgtPwr = pwr * steer;
+		 errorClip(rgtPwr, -1, 1);
+		 lftPwr = -rgtPwr;
 	 }
+
+	 moveRobot(lftPwr, rgtPwr);
+	 return onTarget;
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -190,6 +246,20 @@
 	 return (int)(distance * CPI);
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+ double DriveTrain::getSteer(double error, double Pcoefficent)
+ {
+	 return errorClip(error * Pcoefficent , -1, 1);
+ }
+
+ double DriveTrain::errorClip(double number , double min, double max)
+ {
+	 if(number < min)
+		 return min;
+	 if(number > max)
+		 return max;
+	 return number;
+ }
 
  void DriveTrain::stopAndReset()
  {

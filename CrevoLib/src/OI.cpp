@@ -47,15 +47,15 @@ float OI::shape(float inValue)
 
 
 
-bool OI::controllerButton(Joystick *joystick, Button button)
+bool OI::controllerButton(Joystick *_joystick, Button button)
 {
 	// selectController = jsStick;
-	 return (joystick->GetRawButton(button));
+	 return (_joystick->GetRawButton(button));
 }
 
-float OI::controllerJoystick(Joystick *joystick, Axes axes)
+float OI::controllerJoystick(Joystick *_joystick, Axes axes)
 {
-	return (joystick->GetRawAxis(axes));
+	return (_joystick->GetRawAxis(axes));
 }
 
 void OI::toggleAction(bool Pressed, CANTalon *_motor, double speed)

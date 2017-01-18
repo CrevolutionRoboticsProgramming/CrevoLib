@@ -44,13 +44,17 @@
 	  	 	  int autonCounter = 0;
 
 	  	 	  bool FinishedPreviousTrial = false;
+	  	 	  bool turnTo heading
 	  	 	  bool leftCountsReached;
 	  	 	  bool rightCountsReached;
 	  	 	  bool IsMagEnc;
 
 	          int distanceToCounts(double distance);
 	          int angleToCounts(double angle, double radius);
+	          bool gyroTurn(double angle, double pwr);
+	          double getSteer(double error, double Pcoefficent);
 	          double getGyroError(int targetHdg);
+	          double errorClip(double number , double min, double max);
 
 
  	 public:
@@ -67,10 +71,10 @@
 	          void moveMotor(CANTalon *_selectedTalon, double speed);
 	          void stopRobot(void);
 	          void driveDistanceEncoder(double dst, double pwr, Direction dir);
+	          void driveCountEncoder(double enct, double pwr, Direction dir);
 	          void driveByTime(double time, double pwr, Direction dir);
 	          void encoderTurn(double angle, double pwr);
-	          void gyroTurn(double angle, double pwr);
-	          void turnToHeading(int heading);
+	          void turnToHeading(int heading, double pwr);
 	          void stopAndReset(void);
 	          void resetEncouderCounts(void);
 	          DriveTrain();

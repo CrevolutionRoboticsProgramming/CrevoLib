@@ -87,7 +87,7 @@ public:
 		 CANTalon *intakeRoller;
 		 CANTalon *fuelManipulator;
 		 CANTalon *armMotor;
-/*
+
 		 RobotDrive *robotDrive;
 
 		 Compressor *compressor;
@@ -102,7 +102,7 @@ public:
 		 AnalogGyro *gyro;
 		 AnalogPotentiometer *pot;
 		 AnalogAccelerometer *accel;
-*/
+
 		 //Length of current year's robot
 		 const double robotLentgh = 0;
 		 //Width of current year's robot
@@ -110,7 +110,21 @@ public:
 		 //Encoder Counts per Revolution
 		 const double encoderCPR = 1024;
 
-		 double calcdistanceperPulse = (1.0 / encoderCPR * 2.0 * 3.1415 * 3);
+		 const double magicCPR = 4096;
+
+
+		 /*
+		  * Distance traveled = Wheel rotations * circumference
+		  * or
+		  * Distance traveled = (Degrees turned / 360) * circumference
+		  * or
+		  * Distance traveled = ( Encoder ticks / 360) * circumference
+		  *
+		  * which Leads to:
+		  * Encoder ticks = (360 / circumference) * Distance to travel
+		  */
+
+		 double calcdistanceperPulse = ((wheelCircumfrence ) / encoderCPR );
 
 		 void robotInit(void);
 		 CrevoRobot();

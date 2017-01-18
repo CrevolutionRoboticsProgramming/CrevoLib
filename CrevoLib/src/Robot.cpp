@@ -1,20 +1,12 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <thread>
 
-#include <WPILib.h>
 #include <IterativeRobot.h>
 #include <Joystick.h>
 #include <Timer.h>
 #include <PIDController.h>
 #include <Preferences.h>
-#include <CameraServer.h>
-#include <IterativeRobot.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/core/types.hpp>
-
 
 #include <OI.h>
 #include <CrevoRobot.h>
@@ -31,23 +23,29 @@ public:
 	//Put AutonNames here
 	enum Autons{AutonMove, ForwardAndBackwards};
 
-	//SendableChooser<std::string> chooser;
-
-	bool streamON = true;
+	SendableChooser<std::string> chooser;
 
 	int AutonChooser;
 	double speedShoot;
+	bool tankTrue = false;
+
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void RobotInit() {
-
 		driverGamepad = new Joystick(0);
 		operatorGamepad = new Joystick(1);
-
-
 		//speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
+		crvbot.robotInit();
+		/*
+		 * Calibrates Gyro, needs two seconds in order to calibrate correctly.
+		 */
+		crvbot.gyro->Calibrate();
+		Wait(2);
+		/*
+		 *	Command to start up the stream from the usb camera. Can be disabled through SmartDashboard by setting the streamOn boolean to false.
+		 */
+		vs.startStream();
 
-		vs.initStream(streamON);
-		//crvbot.robotInit();
+		prefs = Preferences::GetInstance();
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -61,21 +59,27 @@ public:
 	 * You can add additional auto modes by adding additional comparisons to the
 	 * if-else structure below with additional strings. If using the
 	 * SendableChooser make sure to add them to the chooser code above as well.
-//	 */
-///*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	 */
+/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousInit() override {
-
+		/*
+		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
+		 */
 		AutonChooser = Autons::ForwardAndBackwards;
-		//initDrive(crvbot.robotDrive);
+		/*
+		 * Initializes the robots settings into the DriveTrain class to use its functions.
+		 */
+		initDrive(crvbot.robotDrive);
 
-		//pidController.SetOutputRange(0, 5);
-		//pidController.SetSetpoint(kSetPoint[0]);
 
-		//crvbot.robotDrive->StopMotor();
+		crvbot.gyro->Reset();
+		crvbot.robotDrive->StopMotor();
+
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousPeriodic() {
+
 		while(IsAutonomous() && IsEnabled())
 		{
 			switch(AutonMove)
@@ -101,9 +105,13 @@ public:
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void TeleopInit() {
+		speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
+		tankTrue = prefs->GetBoolean("Is tankDrive on?", true);
+		prefs->Save();
 
 	}
-/*/----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/	bool shooterPressed;
+/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	bool shooterPressed;
 	bool stillPressed;
 	bool toggled = false;
 	bool lastToggled = false;
@@ -117,17 +125,16 @@ public:
 			toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
 
 			SmartDashboard::PutNumber("SpeedShooter find me", speedShoot);
-			SmartDashboard::PutBoolean("DriveTrain State", tankTrue);
-
+			SmartDashboard::PutBoolean(" TankDrive ", tankTrue);
 			Wait(0.005);
 		}
 	}
-///*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-//
+/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 	void TestPeriodic() {
 		lw->Run();
 	}
-///*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void DriveCode()
 		{
 			double Left_Y = controllerJoystick(driverGamepad, Axes::LEFT_Y);
@@ -139,15 +146,11 @@ public:
 			else if(controllerButton(driverGamepad, Button::B))
 				tankTrue = false;
 
-		//	if(tankTrue)
-				//crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y, Right_Y);
-			//else
-				//crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y + Right_X, Left_Y - Right_X);
+			if(tankTrue)
+				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y, Right_Y);
+			else
+				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y + Right_X, Left_Y - Right_X);
 
-
-			SmartDashboard::PutNumber("Driver Joystick Left Y Axis ", Left_Y);
-			SmartDashboard::PutNumber("Driver Joystick Right Y Axis ", Right_Y);
-			SmartDashboard::PutNumber("Driver Joystick Right X Axis ", Right_X);
 		}
 
 	void SpeedScale()
@@ -167,7 +170,7 @@ public:
 		else
 		{
 			stillPressed = false;
-	}
+		}
 	}
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -176,17 +179,12 @@ private:
 	LiveWindow* lw = LiveWindow::GetInstance();
 
 	CrevoRobot crvbot;
-	Vision vs;
 
 	Joystick *driverGamepad;
 	Joystick *operatorGamepad;
 	Preferences *prefs;
 
-
-	//constexpr std::array<double, 3> kSetPoint = {1.0, 2.6, 4.3};
-
-
-	bool tankTrue = false;
+	Vision vs;
 };
 
 START_ROBOT_CLASS(Robot)
