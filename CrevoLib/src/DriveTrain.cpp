@@ -193,7 +193,7 @@
  void DriveTrain::turnToHeading(int heading, double pwr)
  {
 	 heading = round(heading - 0.0);
-	 while(gyroTurn(heading, pwr));
+	 while(!gyroTurn(heading, pwr));
 	 stopAndReset();
  }
 

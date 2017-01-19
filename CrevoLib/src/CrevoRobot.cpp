@@ -17,9 +17,9 @@ CrevoRobot::~CrevoRobot(){
 
 void CrevoRobot::robotInit(void){
 
-	/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	/*________________________________________________________________________________________________________________________________*/
 
-	//---------------Drive MotorControllers-----------------------
+	//___________________ Drive MotorControllers ___________________
 
 	//--Left Side--
 	leftFrontMotor 	= new CANTalon(MotorCAN::LEFT_FRONT_PORT);
@@ -39,23 +39,23 @@ void CrevoRobot::robotInit(void){
 	rightRearMotor->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
 	rightRearMotor->Set(rightFrontMotor->GetDeviceID());
 
-	//------------------------------------------------------------
+	//________________________________________________________________
 
-	/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	/*________________________________________________________________________________________________________________________________*/
 
 
-	//---------------Manipulators MotorControllers----------------
+	//___________________ Manipulators MotorControllers ___________________
 	intakeRoller    = new CANTalon(MotorCAN::INTAKE_MOTOR);
 	fuelManipulator = new CANTalon(MotorCAN::SHOOTER_MOTOR);
 
 
-	/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	/*________________________________________________________________________________________________________________________________*/
 
-	//---------------Configure MotorControlers--------------------
+	//___________________ Configure MotorControlers ___________________
 
 	//--Set Invert--
-	intakeRoller->SetInverted(false);
-	fuelManipulator->SetInverted(false);
+	if(intakeRoller    != NULL)    intakeRoller->SetInverted(false);
+	if(fuelManipulator != NULL) fuelManipulator->SetInverted(false);
 
 
 	/* CTRE Magnetic Encoder
@@ -66,17 +66,36 @@ void CrevoRobot::robotInit(void){
 	 * API: Pulse Width API						USes Quadrature API
 	 */
 
-	fuelManipulator->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
-	leftFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
-	rightFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
+	if(leftFrontMotor  != NULL)  leftFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
+	if(rightFrontMotor != NULL) rightFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
 
 	//--
-	leftFrontMotor->SetP(0.3);
-	leftFrontMotor->SetI(0.5);
+	//leftFrontMotor->SetP(0.3);
+	//leftFrontMotor->SetI(0.5);
 
-	/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	if(leftFrontMotor  != NULL)  leftFrontMotor->Set(0);
+	if(rightFrontMotor != NULL) rightFrontMotor->Set(0);
+	if(intakeRoller    != NULL)	   intakeRoller->Set(0);
+	if(fuelManipulator != NULL) fuelManipulator->Set(0);
 
-	//-------------------RobotDrive-------------------------------
+	//_____________________________ PID Configuration _____________________________
+
+	if(fuelManipulator != NULL) fuelManipulator->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
+
+	// These values are for PID control. Will be Adjusted later.
+
+	fuelManipulator->SetSensorDirection(false);
+	fuelManipulator->ConfigNominalOutputVoltage(0.0f, -0.0f);
+	fuelManipulator->ConfigPeakOutputVoltage(12.0f, 0.0f);
+
+	fuelManipulator->SetPID(0,0,0);
+
+
+
+
+	/*________________________________________________________________________________________________________________________________*/
+
+	//______________________________ RobotDrive ______________________________________
 	robotDrive = new RobotDrive(leftFrontMotor, rightFrontMotor);
 
 	robotDrive->SetInvertedMotor(RobotDrive::kFrontLeftMotor, false);
@@ -87,9 +106,9 @@ void CrevoRobot::robotInit(void){
 
 	//robotDrive->SetInvertedMotor(RobotDrive::kRearRightMotor, false);
 
-	/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	/*________________________________________________________________________________________________________________________________*/
 
-	//--------------Configure Sensors-----------------------------
+	//____________________________ Configure Sensors _____________________________________
 	gyro = new AnalogGyro(AnalogPort::GYRO);
 	accel = new AnalogAccelerometer(AnalogPort::ACCELEROMETER);
 
@@ -105,7 +124,7 @@ void CrevoRobot::robotInit(void){
 	//leftEnc->SetDistancePerPulse(calcdistanceperPulse);
 	//rightEnc->SetDistancePerPulse(calcdistanceperPulse);
 
-	/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	/*________________________________________________________________________________________________________________________________*/
 
 
 
