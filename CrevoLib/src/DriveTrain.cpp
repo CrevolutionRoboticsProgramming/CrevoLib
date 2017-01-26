@@ -1,5 +1,4 @@
 #include <DriveTrain.h>
-#include <Math.h>
 
  DriveTrain::DriveTrain()
  {
@@ -25,7 +24,7 @@
      {
     	 IsMagEnc = false;
      }
-
+     std::cout << "Robot Initialized" << std::endl;
   }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::initEncoder(Encoder *_leftEncInit, Encoder *_rightEncInit)
@@ -107,12 +106,11 @@
 		 }
 	 }
 	 stopAndReset();
+	 std::cout << "Crevobot | Action Completed With : Rgt Dst: " << rightEnc->GetDistance() << "Lft Dst: "<< rightEnc->GetDistance() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
  }
 
  void DriveTrain::driveCountEncoder(double enct, double pwr, Direction dir)
  {
-
-
 
 	 	 if(IsMagEnc)
 	 	 {
@@ -147,7 +145,8 @@
 	 			 }
 	 		}
 	 	 }
-	 	 stopAndReset();
+	 	stopAndReset();
+	 	std::cout << "Crevobot | Action Completed With : Rgt Enc: " << rightEnc->GetRaw() << "Lft Enc: "<< leftEnc->GetRaw() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
  }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -173,6 +172,8 @@
 	 }
 	 FinishedPreviousTrial = true;
 	 stopRobot();
+	 std::cout << "Crevobot | Action Completed With : TimeDriven: " << autonCounter << " Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
+
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::encoderTurn(double angle, double pwr)
@@ -187,6 +188,8 @@
 		 moveRobot(pwr);
 	 }
 	 stopRobot();
+	 std::cout << "Crevobot | Action Completed With: angle " << counts << "Speed: " << pwr << std::endl;
+
  }
  /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 

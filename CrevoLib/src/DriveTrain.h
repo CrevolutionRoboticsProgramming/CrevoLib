@@ -1,6 +1,10 @@
 #ifndef DRIVETRAIN_H
 #define DRIVETRAIN_H
 
+#include <iostream>
+#include <stdio.h>
+#include <unistd.h>
+
 #include <CANTalon.h>
 #include <Encoder.h>
 #include <RobotDrive.h>

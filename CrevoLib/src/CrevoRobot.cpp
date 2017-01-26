@@ -45,8 +45,13 @@ void CrevoRobot::robotInit(void){
 
 
 	//___________________ Manipulators MotorControllers ___________________
-	intakeRoller    = new CANTalon(MotorCAN::INTAKE_MOTOR);
-	fuelManipulator = new CANTalon(MotorCAN::SHOOTER_MOTOR);
+	intakeRoller   	 = new CANTalon(MotorCAN::INTAKE_MOTOR);
+
+	fuelManipulator  = new CANTalon(MotorCAN::SHOOTER_MOTOR_A);
+	fuelManipulator2 = new CANTalon(MotorCAN::SHOOTER_MOTOR_B);
+
+	fuelManipulator2->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
+	fuelManipulator2->Set(fuelManipulator->GetDeviceID());
 
 
 	/*________________________________________________________________________________________________________________________________*/

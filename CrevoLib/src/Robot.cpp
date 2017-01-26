@@ -25,11 +25,12 @@ class Robot: public IterativeRobot, public OI, public DriveTrain
 {
 public:
 	//Put AutonNames here
-	enum Autons{AutonMove, ForwardAndBackwards};
+	enum Autons{AutonMove, ForwardAndBackwards, EchyMemes, VisionProcessing};
 
 	int AutonChooser;
 	double speedShoot;
 	bool tankTrue = false;
+	bool Debug;
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void RobotInit() override {
@@ -78,6 +79,7 @@ public:
 		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
 		 */
 		AutonChooser = Autons::ForwardAndBackwards;
+		Debug = prefs->GetBoolean("Debug", false);
 		/*
 		 * Initializes the robots settings into the DriveTrain class to use its functions.
 		 */
@@ -92,6 +94,7 @@ public:
 		        /* Get published values from GRIP using NetworkTables */
 		 auto areas = grip->GetNumberArray("targets/area", llvm::ArrayRef<double>());
 
+
 		 for (auto area : areas) {
 			 std::cout << "Got contour with area=" << area << std::endl;
 		  }
@@ -99,6 +102,8 @@ public:
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousPeriodic() {
+
+		SmartDashboard::PutBoolean(" Debug: ", Debug);
 
 		while(IsAutonomous() && IsEnabled())
 		{
@@ -118,6 +123,14 @@ public:
 				Wait(2);
 				break;
 			}
+			case VisionProcessing:
+			{
+
+				auto grip = NetworkTable::GetTable("grip");
+				auto XValue = grip->GetNumberArray("centerX", llvm::ArrayRef<double>());
+				auto YValue = grip->GetNumberArray("centerY", llvm::ArrayRef<double>());
+
+			}
 
 			}
 		}
@@ -127,6 +140,7 @@ public:
 	void TeleopInit() {
 		speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
 		tankTrue = prefs->GetBoolean("Is tankDrive on?", true);
+		Debug = prefs->GetBoolean("Debug", false);
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
