@@ -7,13 +7,6 @@
 
 #include <Vision.h>
 
-#include <WPILib.h>
-#include <CameraServer.h>
-#include <IterativeRobot.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/core/types.hpp>
-
 Vision::Vision() {
 	// TODO Auto-generated constructor stub
 
@@ -58,4 +51,9 @@ void Vision::VisionTread()
 					// Give the output stream a new image to display
 			outputStream.PutFrame(mat);
 		}
+}
+
+void Vision::visionTrackingProcessing(void)
+{
+
 }

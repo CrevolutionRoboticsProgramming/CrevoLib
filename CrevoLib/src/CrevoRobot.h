@@ -20,6 +20,7 @@
 #include <RobotDrive.h>
 
 //#include <>
+#define NULL 0
 
 class CrevoRobot{
 
@@ -80,13 +81,13 @@ private:
 
 
 public:
-		 CANTalon *rightFrontMotor;
-		 CANTalon *rightRearMotor;
-		 CANTalon *leftFrontMotor;
-		 CANTalon *leftRearMotor;
-		 CANTalon *intakeRoller;
-		 CANTalon *fuelManipulator;
-		 CANTalon *armMotor;
+		 CANTalon *rightFrontMotor = NULL;
+		 CANTalon *rightRearMotor = NULL;
+		 CANTalon *leftFrontMotor = NULL;
+		 CANTalon *leftRearMotor = NULL;
+		 CANTalon *intakeRoller = NULL;
+		 CANTalon *fuelManipulator = NULL;
+		 CANTalon *armMotor = NULL;
 
 		 RobotDrive *robotDrive;
 

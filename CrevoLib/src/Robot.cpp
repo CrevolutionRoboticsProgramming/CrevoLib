@@ -1,12 +1,16 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <stdio.h>
+#include <unistd.h>
 
 #include <IterativeRobot.h>
 #include <Joystick.h>
 #include <Timer.h>
 #include <PIDController.h>
 #include <Preferences.h>
+#include <networktables/NetworkTable.h>
+#include "WPILib.h"
 
 #include <OI.h>
 #include <CrevoRobot.h>
@@ -23,27 +27,35 @@ public:
 	//Put AutonNames here
 	enum Autons{AutonMove, ForwardAndBackwards};
 
-	SendableChooser<std::string> chooser;
-
 	int AutonChooser;
 	double speedShoot;
 	bool tankTrue = false;
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-	void RobotInit() {
+	void RobotInit() override {
+
 		driverGamepad = new Joystick(0);
 		operatorGamepad = new Joystick(1);
 		//speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
-		crvbot.robotInit();
+		//crvbot.robotInit();
 		/*
 		 * Calibrates Gyro, needs two seconds in order to calibrate correctly.
 		 */
-		crvbot.gyro->Calibrate();
-		Wait(2);
+	//	crvbot.gyro->Calibrate();
+		//Wait(2);
 		/*
 		 *	Command to start up the stream from the usb camera. Can be disabled through SmartDashboard by setting the streamOn boolean to false.
 		 */
-		vs.startStream();
+
+		nTable = NetworkTable::GetTable("Grip/VSReporting");
+
+		if(fork() == 0)
+		{
+			system("/home/lvuser/grip &");
+		}
+
+
+	//	vs.startStream();
 
 		prefs = Preferences::GetInstance();
 
@@ -69,12 +81,20 @@ public:
 		/*
 		 * Initializes the robots settings into the DriveTrain class to use its functions.
 		 */
-		initDrive(crvbot.robotDrive);
+		//initDrive(crvbot.robotDrive);
 
 
-		crvbot.gyro->Reset();
-		crvbot.robotDrive->StopMotor();
+		//crvbot.gyro->Reset();
+		//crvbot.robotDrive->StopMotor();
 
+		 auto grip = NetworkTable::GetTable("grip");
+
+		        /* Get published values from GRIP using NetworkTables */
+		 auto areas = grip->GetNumberArray("targets/area", llvm::ArrayRef<double>());
+
+		 for (auto area : areas) {
+			 std::cout << "Got contour with area=" << area << std::endl;
+		  }
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -107,7 +127,6 @@ public:
 	void TeleopInit() {
 		speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
 		tankTrue = prefs->GetBoolean("Is tankDrive on?", true);
-		prefs->Save();
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -121,7 +140,6 @@ public:
 
 			DriveCode();
 			SpeedScale();
-
 			toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
 
 			SmartDashboard::PutNumber("SpeedShooter find me", speedShoot);
@@ -179,10 +197,10 @@ private:
 	LiveWindow* lw = LiveWindow::GetInstance();
 
 	CrevoRobot crvbot;
-
 	Joystick *driverGamepad;
 	Joystick *operatorGamepad;
 	Preferences *prefs;
+	std::shared_ptr<NetworkTable> nTable;
 
 	Vision vs;
 };

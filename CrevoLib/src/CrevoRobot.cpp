@@ -22,7 +22,7 @@ void CrevoRobot::robotInit(void){
 	//___________________ Drive MotorControllers ___________________
 
 	//--Left Side--
-	leftFrontMotor 	= new CANTalon(MotorCAN::LEFT_FRONT_PORT);
+    leftFrontMotor  = new CANTalon(MotorCAN::LEFT_FRONT_PORT);
 	leftRearMotor   = new CANTalon(MotorCAN::LEFT_REAR_PORT);
 	/*
 	 * Setting the Rear Motor as a Slave to the front motor, only needs to turn on one side)
