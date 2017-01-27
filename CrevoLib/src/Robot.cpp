@@ -10,7 +10,7 @@
 #include <PIDController.h>
 #include <Preferences.h>
 #include <networktables/NetworkTable.h>
-#include "WPILib.h"
+#include <CameraServer.h>
 
 #include <OI.h>
 #include <CrevoRobot.h>
@@ -30,7 +30,7 @@ public:
 	int AutonChooser;
 	double speedShoot;
 	bool tankTrue = false;
-	bool Debug;
+	bool visionDebug;
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void RobotInit() override {
@@ -44,19 +44,19 @@ public:
 		 */
 	//	crvbot.gyro->Calibrate();
 		//Wait(2);
-		/*
-		 *	Command to start up the stream from the usb camera. Can be disabled through SmartDashboard by setting the streamOn boolean to false.
-		 */
 
-		nTable = NetworkTable::GetTable("Grip/VSReporting");
-
+		//nTable = NetworkTable::GetTable("Grip/VSReporting");
+/*
 		if(fork() == 0)
 		{
 			system("/home/lvuser/grip &");
 		}
 
-
-	//	vs.startStream();
+*/
+		/*
+		 *	Command to start up the stream from the usb camera. Can be disabled through SmartDashboard by setting the streamOn boolean to false.
+		 */
+		vs.startStreamShooter();
 
 		prefs = Preferences::GetInstance();
 
@@ -79,7 +79,7 @@ public:
 		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
 		 */
 		AutonChooser = Autons::ForwardAndBackwards;
-		Debug = prefs->GetBoolean("Debug", false);
+		visionDebug = prefs->GetBoolean("Debug", false);
 		/*
 		 * Initializes the robots settings into the DriveTrain class to use its functions.
 		 */
@@ -103,7 +103,7 @@ public:
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousPeriodic() {
 
-		SmartDashboard::PutBoolean(" Debug: ", Debug);
+		SmartDashboard::PutBoolean(" Debug: ", visionDebug);
 
 		while(IsAutonomous() && IsEnabled())
 		{
@@ -140,7 +140,7 @@ public:
 	void TeleopInit() {
 		speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
 		tankTrue = prefs->GetBoolean("Is tankDrive on?", true);
-		Debug = prefs->GetBoolean("Debug", false);
+		visionDebug = prefs->GetBoolean("Debug", false);
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/

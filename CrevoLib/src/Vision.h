@@ -23,9 +23,15 @@ class Vision {
 
 private:
 	GripPipeline gp;
-	static void VisionTread();
+
+	const int PIXEL_HEIGHT = 720;
+	const int PIXEL_WIDTH  = 640;
+
+	static void VisionTreadShooterCamera(void);
+	static void VisionTreadGearCamera(void);
 public:
-	void startStream(void);
+	void startStreamShooter(void);
+	void startStreamGear(void);
 	void visionTrackingProcessing(void);
 	Vision();
 	virtual ~Vision();
