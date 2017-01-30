@@ -27,11 +27,9 @@ private:
 	const int PIXEL_HEIGHT = 720;
 	const int PIXEL_WIDTH  = 640;
 
-	static void VisionTreadShooterCamera(void);
-	static void VisionTreadGearCamera(void);
+	static void VisionTread(void);
 public:
-	void startStreamShooter(void);
-	void startStreamGear(void);
+	void startStream(void);
 	void visionTrackingProcessing(void);
 	Vision();
 	virtual ~Vision();

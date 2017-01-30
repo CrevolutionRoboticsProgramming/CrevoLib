@@ -39,12 +39,18 @@ void CrevoRobot::robotInit(void){
 	rightRearMotor->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
 	rightRearMotor->Set(rightFrontMotor->GetDeviceID());
 
+
+	leftFrontMotor->SetInverted(true);
+	rightFrontMotor->SetInverted(true);
+
+
 	//________________________________________________________________
 
 	/*________________________________________________________________________________________________________________________________*/
 
 
 	//___________________ Manipulators MotorControllers ___________________
+	/*
 	intakeRoller   	 = new CANTalon(MotorCAN::INTAKE_MOTOR);
 
 	fuelManipulator  = new CANTalon(MotorCAN::SHOOTER_MOTOR_A);
@@ -59,6 +65,7 @@ void CrevoRobot::robotInit(void){
 	//___________________ Configure MotorControlers ___________________
 
 	//--Set Invert--
+	/*
 	if(intakeRoller    != NULL)    intakeRoller->SetInverted(false);
 	if(fuelManipulator != NULL) fuelManipulator->SetInverted(false);
 
@@ -70,7 +77,7 @@ void CrevoRobot::robotInit(void){
 	 * Accuracy: 12 bits/rotation (4096)		Accuracy: 12 bits/rotation
 	 * API: Pulse Width API						USes Quadrature API
 	 */
-
+/*
 	if(leftFrontMotor  != NULL)  leftFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
 	if(rightFrontMotor != NULL) rightFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
 
@@ -103,11 +110,11 @@ void CrevoRobot::robotInit(void){
 	//______________________________ RobotDrive ______________________________________
 	robotDrive = new RobotDrive(leftFrontMotor, rightFrontMotor);
 
-	robotDrive->SetInvertedMotor(RobotDrive::kFrontLeftMotor, false);
+	//robotDrive->SetInvertedMotor(RobotDrive::kFrontLeftMotor, false);
 
 	//robotDrive->SetInvertedMotor(RobotDrive::kRearLeftMotor, false);
 
-	robotDrive->SetInvertedMotor(RobotDrive::kFrontRightMotor, false);
+	//robotDrive->SetInvertedMotor(RobotDrive::kFrontRightMotor, false);
 
 	//robotDrive->SetInvertedMotor(RobotDrive::kRearRightMotor, false);
 
@@ -117,7 +124,7 @@ void CrevoRobot::robotInit(void){
 	gyro = new AnalogGyro(AnalogPort::GYRO);
 	accel = new AnalogAccelerometer(AnalogPort::ACCELEROMETER);
 
-	fuelManipulatorEncoder = new Encoder(DigitalPort::FUEL_MANIPULATOR_ENCODER_1, DigitalPort::FUEL_MANIPULATOR_ENCODER_2);
+	//fuelManipulatorEncoder = new Encoder(DigitalPort::FUEL_MANIPULATOR_ENCODER_1, DigitalPort::FUEL_MANIPULATOR_ENCODER_2);
 
 	leftEnc = new Encoder(DigitalPort::L_EN_1, DigitalPort::L_EN_2, true, Encoder::EncodingType::k2X);
 	rightEnc = new Encoder(DigitalPort::R_EN_1, DigitalPort::R_EN_2, false, Encoder::EncodingType::k2X);

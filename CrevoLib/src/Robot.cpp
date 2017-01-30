@@ -38,11 +38,11 @@ public:
 		driverGamepad = new Joystick(0);
 		operatorGamepad = new Joystick(1);
 		//speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
-		//crvbot.robotInit();
+		crvbot.robotInit();
 		/*
 		 * Calibrates Gyro, needs two seconds in order to calibrate correctly.
 		 */
-	//	crvbot.gyro->Calibrate();
+		//crvbot.gyro->Calibrate();
 		//Wait(2);
 
 		//nTable = NetworkTable::GetTable("Grip/VSReporting");
@@ -56,9 +56,8 @@ public:
 		/*
 		 *	Command to start up the stream from the usb camera. Can be disabled through SmartDashboard by setting the streamOn boolean to false.
 		 */
-		vs.startStreamShooter();
-
-		prefs = Preferences::GetInstance();
+		//vs.startStream();
+		//prefs = Preferences::GetInstance();
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -79,15 +78,15 @@ public:
 		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
 		 */
 		AutonChooser = Autons::ForwardAndBackwards;
-		visionDebug = prefs->GetBoolean("Debug", false);
+		//visionDebug = prefs->GetBoolean("Debug", false);
 		/*
 		 * Initializes the robots settings into the DriveTrain class to use its functions.
 		 */
-		//initDrive(crvbot.robotDrive);
+		initDrive(crvbot.robotDrive);
 
 
-		//crvbot.gyro->Reset();
-		//crvbot.robotDrive->StopMotor();
+		crvbot.gyro->Reset();
+		crvbot.robotDrive->StopMotor();
 
 		 auto grip = NetworkTable::GetTable("grip");
 
@@ -138,9 +137,9 @@ public:
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void TeleopInit() {
-		speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
-		tankTrue = prefs->GetBoolean("Is tankDrive on?", true);
-		visionDebug = prefs->GetBoolean("Debug", false);
+		//speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
+		//tankTrue = prefs->GetBoolean("Is tankDrive on?", true);
+		//visionDebug = prefs->GetBoolean("Debug", false);
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -153,8 +152,8 @@ public:
 		{
 
 			DriveCode();
-			SpeedScale();
-			toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
+			//SpeedScale();
+			//toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
 
 			SmartDashboard::PutNumber("SpeedShooter find me", speedShoot);
 			SmartDashboard::PutBoolean(" TankDrive ", tankTrue);
@@ -181,7 +180,7 @@ public:
 			if(tankTrue)
 				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y, Right_Y);
 			else
-				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y + Right_X, Left_Y - Right_X);
+				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y - Right_X, Left_Y + Right_X);
 
 		}
 

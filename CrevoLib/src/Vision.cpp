@@ -16,28 +16,23 @@ Vision::~Vision() {
 	// TODO Auto-generated destructor stub
 }
 
-void Vision::startStreamShooter(void)
+void Vision::startStream(void)
 {
 
-	std::thread shooterStream(VisionTreadShooterCamera);
+	std::thread shooterStream(VisionTread);
 	shooterStream.detach();
 }
-void Vision::startStreamGear(void)
-{
-	std::thread gearStream(VisionTreadGearCamera);
-	gearStream.detach();
 
-}
-
-void Vision::VisionTreadShooterCamera(void)
+void Vision::VisionTread(void)
 {
 	cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture(0);
 				// Set the resolution
-	camera.SetResolution(640, 480);
+	camera.SetResolution(400, 250);
 				// Get a CvSink. This will capture Mats from the Camera
+/*
 	cs::CvSink cvSink = CameraServer::GetInstance()->GetVideo();
 				// Setup a CvSource. This will send images back to the Dashboard
-	cs::CvSource outputStream = CameraServer::GetInstance()->PutVideo("Shooter Stream Camera", 720, 640);
+	cs::CvSource outputStream = CameraServer::GetInstance()->PutVideo("Shooter Stream Camera", 600, 400);
 
 				// Mats are very memory expensive. Lets reuse this Mat.
 	cv::Mat mat;
@@ -54,34 +49,11 @@ void Vision::VisionTreadShooterCamera(void)
 					// Give the output stream a new image to display
 			outputStream.PutFrame(mat);
 		}
-}
+*/
 
-void Vision::VisionTreadGearCamera(void)
-{
-	cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture(1);
-				// Set the resolution
-	camera.SetResolution(640, 480);
+	cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(1);
+	camera2.SetResolution(400, 250);
 
-				// Get a CvSink. This will capture Mats from the Camera
-	cs::CvSink cvSink = CameraServer::GetInstance()->GetVideo();
-				// Setup a CvSource. This will send images back to the Dashboard
-	cs::CvSource outputStream = CameraServer::GetInstance()->PutVideo("Front Stream Camera", 720, 640);
-
-				// Mats are very memory expensive. Lets reuse this Mat.
-	cv::Mat mat;
-
-	while (true) {
-					// Tell the CvSink to grab a frame from the camera and put it
-					// in the source mat.  If there is an error notify the output.
-			if (cvSink.GrabFrame(mat) == 0) {
-						// Send the output the error.
-				outputStream.NotifyError(cvSink.GetError());
-						// skip the rest of the current iteration
-				continue;
-			}
-					// Give the output stream a new image to display
-			outputStream.PutFrame(mat);
-		}
 }
 
 void Vision::visionTrackingProcessing(void)
