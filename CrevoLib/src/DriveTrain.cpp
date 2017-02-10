@@ -152,7 +152,8 @@
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::driveByTime(double timeValue, double pwr, Direction dir)
  {
-	 timeValue *= 500;
+	 timeValue = driveTime->Get() + timeValue;
+	 driveTime->Start();
 
 	 if(dir == Direction::Reverse)
 	 {
@@ -161,19 +162,19 @@
 
 	 if(FinishedPreviousTrial)
 	 {
-		 autonCounter = 0;
 		 FinishedPreviousTrial = false;
 	 }
 
-	 while(autonCounter < timeValue)
+	 while(driveTime->Get() < timeValue)
 	 {
 		 moveRobot(pwr);
 		 autonCounter++;
 	 }
 	 FinishedPreviousTrial = true;
 	 stopRobot();
-	 std::cout << "Crevobot | Action Completed With : TimeDriven: " << autonCounter << " Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
+	 std::cout << "Crevobot | Action Completed With : Time Driven: " << driveTime->Get() << " Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
 
+	 driveTime->Stop();
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::encoderTurn(double angle, double pwr)

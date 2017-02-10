@@ -10,7 +10,6 @@
 
 #include <Joystick.h>
 #include <CANTalon.h>
-//namespace OI {
 
 class OI {
 

@@ -20,10 +20,12 @@ OI::~OI() {
 
 float OI::shape(float inValue)
 {
+	int sign;
 	inputActive = (abs(inValue) > 0.1);
 	inputSlow = (abs(inValue) < 0.8);
 
-	float sign = (inValue);
+	if(inValue > 0) sign = 1;
+	if(inValue < 0) sign = -1;
 
 	if(inputActive)
 	{
@@ -41,7 +43,7 @@ float OI::shape(float inValue)
 
 	else
 	{
-		return 0;
+		return 0.0;
 	}
 }
 
@@ -64,11 +66,8 @@ void OI::toggleAction(bool Pressed, CANTalon *_motor, double speed)
 	{
 		toggled = !toggled;
 
-		if(toggled)
-			_motor->Set(speed);
-		else
-			_motor->Set(0.0);
-		_motor->Set(0.0);
+		if(toggled) _motor->Set(speed);
+		else    	_motor->Set(0.0);
 	}
 	lastToggled = Pressed;
 }

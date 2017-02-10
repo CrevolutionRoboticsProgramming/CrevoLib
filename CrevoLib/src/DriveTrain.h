@@ -7,6 +7,7 @@
 
 #include <CANTalon.h>
 #include <Encoder.h>
+#include <Timer.h>
 #include <RobotDrive.h>
 #include <AnalogGyro.h>
 #include <AnalogAccelerometer.h>
@@ -25,6 +26,7 @@
 			  CANTalon *leftRearMotor;
 			  CANTalon *freeTalon;
 	  	  	  RobotDrive *robotDrive;
+	  	  	  Timer *driveTime;
      	 	  AnalogGyro *gyro;
      	 	  AnalogAccelerometer *accel;
      	 	  Encoder *leftEnc;

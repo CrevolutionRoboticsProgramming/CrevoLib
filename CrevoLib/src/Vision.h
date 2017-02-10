@@ -11,6 +11,7 @@
 #include <GripPipeline.h>
 
 #include <WPILib.h>
+#include <CrevoRobot.h>
 #include <CameraServer.h>
 #include <IterativeRobot.h>
 #include <GripPipeline.h>
@@ -23,12 +24,16 @@ class Vision {
 
 private:
 	GripPipeline gp;
+	CrevoRobot crvbot;
 
 	const int PIXEL_HEIGHT = 720;
 	const int PIXEL_WIDTH  = 640;
 
 	static void VisionTread(void);
+	double calcDistancePixel(double reflectiveTapeArea);
 public:
+	double distanceFromBoiler(void);
+	bool boilerDected(void);
 	void startStream(void);
 	void visionTrackingProcessing(void);
 	Vision();

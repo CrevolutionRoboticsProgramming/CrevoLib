@@ -25,7 +25,7 @@ class Robot: public IterativeRobot, public OI, public DriveTrain
 {
 public:
 	//Put AutonNames here
-	enum Autons{AutonMove, ForwardAndBackwards, EchyMemes, VisionProcessing};
+	enum Autons{AutonMove, ForwardAndBackwards, EchyMemes, InternalScreams, VisionProcessingData};
 
 	int AutonChooser;
 	double speedShoot;
@@ -35,9 +35,8 @@ public:
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void RobotInit() override {
 
-		driverGamepad = new Joystick(0);
+		driverGamepad   = new Joystick(0);
 		operatorGamepad = new Joystick(1);
-		//speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
 		crvbot.robotInit();
 		/*
 		 * Calibrates Gyro, needs two seconds in order to calibrate correctly.
@@ -45,19 +44,11 @@ public:
 		//crvbot.gyro->Calibrate();
 		//Wait(2);
 
-		//nTable = NetworkTable::GetTable("Grip/VSReporting");
-/*
-		if(fork() == 0)
-		{
-			system("/home/lvuser/grip &");
-		}
-
-*/
 		/*
-		 *	Command to start up the stream from the usb camera. Can be disabled through SmartDashboard by setting the streamOn boolean to false.
+		 *	Command to start up the stream from the USB camera.
 		 */
-		//vs.startStream();
-		//prefs = Preferences::GetInstance();
+		vs.startStream();
+		prefs = Preferences::GetInstance();
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -78,31 +69,21 @@ public:
 		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
 		 */
 		AutonChooser = Autons::ForwardAndBackwards;
-		//visionDebug = prefs->GetBoolean("Debug", false);
 		/*
 		 * Initializes the robots settings into the DriveTrain class to use its functions.
 		 */
-		initDrive(crvbot.robotDrive);
+		//initDrive(crvbot.robotDrive);
 
 
 		crvbot.gyro->Reset();
 		crvbot.robotDrive->StopMotor();
-
-		 auto grip = NetworkTable::GetTable("grip");
-
-		        /* Get published values from GRIP using NetworkTables */
-		 auto areas = grip->GetNumberArray("targets/area", llvm::ArrayRef<double>());
-
-
-		 for (auto area : areas) {
-			 std::cout << "Got contour with area=" << area << std::endl;
-		  }
-
+		std::cout << "Crevobot | In Autonomous Periodic Mode" << std::endl;
+		autonTimer->Start();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousPeriodic() {
 
-		SmartDashboard::PutBoolean(" Debug: ", visionDebug);
+		updateRobotStatus();
 
 		while(IsAutonomous() && IsEnabled())
 		{
@@ -122,43 +103,58 @@ public:
 				Wait(2);
 				break;
 			}
-			case VisionProcessing:
+			case VisionProcessingData:
 			{
-
-				auto grip = NetworkTable::GetTable("grip");
-				auto XValue = grip->GetNumberArray("centerX", llvm::ArrayRef<double>());
-				auto YValue = grip->GetNumberArray("centerY", llvm::ArrayRef<double>());
-
+				while(IsAutonomous()) { vs.distanceFromBoiler(); }
+				break;
+			}
+			case EchyMemes:
+			{
+				break;
+			}
+			case InternalScreams:
+			{
+				while(IsEnabled()) { moveRobot(0.5, -0.5); }
+				break;
+			}
+			default:
+			{
+				crvbot.robotDrive->StopMotor();
+				crvbot.fuelManipulator->StopMotor();
+				crvbot.intakeRoller->StopMotor();
+				crvbot.hangerMotor->StopMotor();
 			}
 
 			}
 		}
 
+		autonTimer->Stop();
+
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void TeleopInit() {
-		//speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
-		//tankTrue = prefs->GetBoolean("Is tankDrive on?", true);
-		//visionDebug = prefs->GetBoolean("Debug", false);
 
+		updateRobotStatus();
+		std::cout << "Crevobot | In TeleopPeriodi Mode" << std::endl;
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	bool shooterPressed;
 	bool stillPressed;
 	bool toggled = false;
 	bool lastToggled = false;
+
 	void TeleopPeriodic() {
+		teleopTimer->Start();
 		while(IsOperatorControl() && IsEnabled())
 		{
-
 			DriveCode();
-			//SpeedScale();
-			//toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
 
-			SmartDashboard::PutNumber("SpeedShooter find me", speedShoot);
-			SmartDashboard::PutBoolean(" TankDrive ", tankTrue);
+			SpeedScale();
+			//toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
+			updateRobotStatus();
 			Wait(0.005);
 		}
+		teleopTimer->Stop();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -168,19 +164,20 @@ public:
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void DriveCode()
 		{
-			double Left_Y = controllerJoystick(driverGamepad, Axes::LEFT_Y);
+			double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
 			double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
-			double Right_X =  controllerJoystick(driverGamepad, Axes::RIGHT_X);
+			double Right_X = shape(controllerJoystick(driverGamepad, Axes::RIGHT_X));
 
-			if(controllerButton(driverGamepad, Button::A))
-				tankTrue = true;
-			else if(controllerButton(driverGamepad, Button::B))
-				tankTrue = false;
+			if(controllerButton(driverGamepad, Button::A))  tankTrue = true;
+			if(controllerButton(driverGamepad, Button::B))  tankTrue = false;
 
-			if(tankTrue)
-				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y, Right_Y);
-			else
-				crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y - Right_X, Left_Y + Right_X);
+			/*_________ Sets DriverJoystick in Tank Drive orientation _________*/
+			if(tankTrue) crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y, Right_Y);
+			/*_________ Sets DriverJoystick in FirstPerosnDrive orientation _________*/
+			else         crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y - Right_X, Left_Y + Right_X);
+
+			driverGamepad->SetRumble(Joystick::RumbleType::kRightRumble, 0.5);
+
 
 		}
 
@@ -204,6 +201,21 @@ public:
 		}
 	}
 
+void updateRobotStatus(void)
+{
+	SmartDashboard::PutNumber("LeftMotor Current", crvbot.leftFrontMotor->GetOutputCurrent());
+	SmartDashboard::PutNumber("RightMotor Current", crvbot.rightFrontMotor->GetOutputCurrent());
+	SmartDashboard::PutNumber("LeftMotor Voltage", crvbot.leftFrontMotor->GetOutputVoltage());
+	SmartDashboard::PutNumber("RightMotor Voltage", crvbot.rightFrontMotor->GetOutputVoltage());
+	SmartDashboard::PutNumber("SpeedShooter", speedShoot);
+	SmartDashboard::PutBoolean(" Debug: ", visionDebug);
+	SmartDashboard::PutBoolean(" TankDrive ", tankTrue);
+
+	speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
+	tankTrue = prefs->GetBoolean("Is tankDrive on?", true);
+	visionDebug = prefs->GetBoolean("Debug", false);
+}
+
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 private:
@@ -213,7 +225,8 @@ private:
 	Joystick *driverGamepad;
 	Joystick *operatorGamepad;
 	Preferences *prefs;
-	std::shared_ptr<NetworkTable> nTable;
+	Timer *teleopTimer;
+	Timer *autonTimer;
 
 	Vision vs;
 };

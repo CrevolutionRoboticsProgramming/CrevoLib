@@ -7,7 +7,8 @@
 
 #ifndef SRC_CREVOROBOT_H_
 #define SRC_CREVOROBOT_H_
-
+#include <iostream>
+#include <stdio.h>
 #include <CANTalon.h>
 #include <Talon.h>
 #include <AnalogAccelerometer.h>
@@ -19,9 +20,9 @@
 #include <Compressor.h>
 #include <RobotDrive.h>
 
-//#include <>
-#define NULL 0
-
+#define PRAC_BOT
+//#define COMP_BOT
+#define NotDebug
 class CrevoRobot{
 
 private:
@@ -34,15 +35,36 @@ private:
 		 };
 /*________________________________________________________________________________________________________________________________*/
 
+#ifdef PRAC_BOT
 		enum MotorCAN{
-			 	 	RIGHT_FRONT_PORT = 1,
-					RIGHT_REAR_PORT = 2,
-					LEFT_FRONT_PORT = 3,
-					LEFT_REAR_PORT = 4,
-					SHOOTER_MOTOR_A = 5,
+			 	 	RIGHT_FRONT_PORT = 6,
+					RIGHT_REAR_PORT = 5,
+					LEFT_FRONT_PORT = 8,
+					LEFT_REAR_PORT = 9,
+					SHOOTER_MOTOR_A = 8,
 					SHOOTER_MOTOR_B = 6,
+					AGITATOR_MOTOR = 5,
 					INTAKE_MOTOR = 7,
 		 };
+
+#endif /*PRAC_BOT*/
+
+#ifdef COMP_BOT
+		enum MotorCAN{
+				RIGHT_FRONT_PORT = 6,
+				RIGHT_REAR_PORT = 5,
+				LEFT_FRONT_PORT = 8,
+				LEFT_REAR_PORT = 9,
+				SHOOTER_MOTOR_A = 8,
+				SHOOTER_MOTOR_B = 6,
+				INTAKE_MOTOR = 7,
+				 };
+
+#endif
+
+//#else
+	//	std::cout << "Need to Select Robot Configuration!!" << std:endl;
+		//std::cout << "Redownload porgram with corresponding robot." << std::endl;
 /*________________________________________________________________________________________________________________________________*/
 
 		 enum MotorPWM{
@@ -78,34 +100,38 @@ private:
 /*________________________________________________________________________________________________________________________________*/
 
 public:
-		 CANTalon *rightFrontMotor   = NULL;
-		 CANTalon *rightRearMotor 	 = NULL;
-		 CANTalon *leftFrontMotor	 = NULL;
-		 CANTalon *leftRearMotor	 = NULL;
-		 CANTalon *intakeRoller 	 = NULL;
-		 CANTalon *fuelManipulator   = NULL;
-		 CANTalon *fuelManipulator2  = NULL;
-		 CANTalon *armMotor 	     = NULL;
+		 CANTalon 	  *rightFrontMotor   = NULL;
+		 CANTalon 	  *rightRearMotor 	 = NULL;
+		 CANTalon 	  *leftFrontMotor	 = NULL;
+		 CANTalon 	  *leftRearMotor	 = NULL;
+		 CANTalon 	  *intakeRoller 	 = NULL;
+		 CANTalon 	  *fuelManipulator   = NULL;
+		 CANTalon 	  *fuelManipulator2  = NULL;
+		 CANTalon	  *agitatorMotor     = NULL;
+		 CANTalon	  *hangerMotor 	     = NULL;
 
-		 RobotDrive *robotDrive;
+		 RobotDrive   *robotDrive;
 
-		 Compressor *compressor;
+		 Compressor   *compressor;
 
 		 DigitalInput *limitSwitch1;
 		 DigitalInput *limitSwitch2;
 
-		 Encoder *fuelManipulatorEncoder;
-		 Encoder *rightEnc;
-		 Encoder *leftEnc;
+		 Encoder 	  *fuelManipulatorEncoder;
+		 Encoder 	  *rightEnc;
+		 Encoder 	  *leftEnc;
 
-		 AnalogGyro *gyro;
+		 AnalogGyro   *gyro;
 		 AnalogPotentiometer *pot;
 		 AnalogAccelerometer *accel;
 
+		 std::shared_ptr<NetworkTable> table;
+
+
 		 //Length of current year's robot
-		 const double robotLentgh = 0;
+		 const double robotLentgh = 28;
 		 //Width of current year's robot
-		 const double robotWidth = 0;
+		 const double robotWidth = 32.5;
 		 //Encoder Counts per Revolution
 		 const double encoderCPR = 1024;
 
@@ -129,7 +155,5 @@ public:
 		 CrevoRobot();
 		 virtual ~CrevoRobot();
 };
-
-//} /* namespace CrevoRobot */
 
 #endif /* SRC_CREVOROBOT_H_ */

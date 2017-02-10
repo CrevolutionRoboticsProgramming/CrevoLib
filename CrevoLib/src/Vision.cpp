@@ -19,6 +19,9 @@ Vision::~Vision() {
 void Vision::startStream(void)
 {
 
+	//cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(0);
+	//camera2.SetResolution(750, 640);
+
 	std::thread shooterStream(VisionTread);
 	shooterStream.detach();
 }
@@ -27,12 +30,12 @@ void Vision::VisionTread(void)
 {
 	cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture(0);
 				// Set the resolution
-	camera.SetResolution(400, 250);
+	camera.SetResolution(640, 480);
 				// Get a CvSink. This will capture Mats from the Camera
-/*
+
 	cs::CvSink cvSink = CameraServer::GetInstance()->GetVideo();
 				// Setup a CvSource. This will send images back to the Dashboard
-	cs::CvSource outputStream = CameraServer::GetInstance()->PutVideo("Shooter Stream Camera", 600, 400);
+	cs::CvSource outputStream = CameraServer::GetInstance()->PutVideo("Shooter Stream Camera", 640, 480);
 
 				// Mats are very memory expensive. Lets reuse this Mat.
 	cv::Mat mat;
@@ -49,11 +52,31 @@ void Vision::VisionTread(void)
 					// Give the output stream a new image to display
 			outputStream.PutFrame(mat);
 		}
-*/
 
-	cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(1);
-	camera2.SetResolution(400, 250);
+}
 
+double Vision::distanceFromBoiler(void)
+{
+	double Distance;
+	std::cout << "Areas: ";std::cout << "Areas: ";
+	std::vector<double> arr = crvbot.table->GetNumberArray("area", llvm::ArrayRef<double>());
+
+	for(unsigned int i = 0; i < arr.size(); i++) {
+			std::cout << " | " << arr[i] <<" | ";
+			arr[1] /= 40;
+			Distance = calcDistancePixel(arr[1]);
+			std::cout << " | Distance: " << Distance;
+	}
+	std::cout << std::endl;
+	Wait(0.05);
+
+	return Distance;
+	SmartDashboard::PutNumber("Distance From Boiler", Distance);
+}
+double Vision::calcDistancePixel(double reflectiveTapeArea)
+{
+	double calculatedDistance;
+	return calculatedDistance = 25.098*pow(reflectiveTapeArea, -0.428);
 }
 
 void Vision::visionTrackingProcessing(void)
