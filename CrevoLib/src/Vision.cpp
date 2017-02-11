@@ -35,12 +35,12 @@ void Vision::VisionTread(void)
 
 	cs::CvSink cvSink = CameraServer::GetInstance()->GetVideo();
 				// Setup a CvSource. This will send images back to the Dashboard
-	cs::CvSource outputStream = CameraServer::GetInstance()->PutVideo("Shooter Stream Camera", 640, 480);
+	cs::CvSource outputStream = CameraServer::GetInstance()->PutVideo("Hello On", 320, 280);
 
 				// Mats are very memory expensive. Lets reuse this Mat.
 	cv::Mat mat;
 
-	while (true) {
+	while (true){
 					// Tell the CvSink to grab a frame from the camera and put it
 					// in the source mat.  If there is an error notify the output.
 			if (cvSink.GrabFrame(mat) == 0) {

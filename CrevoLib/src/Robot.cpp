@@ -24,6 +24,16 @@
 class Robot: public IterativeRobot, public OI, public DriveTrain
 {
 public:
+
+	/*/
+	 * 1. Shoot from hopper
+	 * 2. Score gear right shoot from lift
+	 * 3. Score gear center, shoot from base line
+	 * 4. Score gear left, shooter from baseline
+	 * 5. Score gear left, knock down hoppers
+	 * 6. Hopper knock down
+	 /*/
+
 	//Put AutonNames here
 	enum Autons{AutonMove, ForwardAndBackwards, EchyMemes, InternalScreams, VisionProcessingData};
 
@@ -44,12 +54,15 @@ public:
 		//crvbot.gyro->Calibrate();
 		//Wait(2);
 
-		/*
+		/*/
 		 *	Command to start up the stream from the USB camera.
-		 */
+		/*/
 		vs.startStream();
 		prefs = Preferences::GetInstance();
 
+		std::cout << "____________________________________________________________________________________________________" << std::endl;
+		std::cout << "|| Crevobot || Robot completed initialize" << std::endl;
+		std::cout << "" << std::endl;
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*
@@ -68,17 +81,15 @@ public:
 		/*
 		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
 		 */
-		AutonChooser = Autons::ForwardAndBackwards;
+		AutonChooser = Autons::VisionProcessingData;
 		/*
 		 * Initializes the robots settings into the DriveTrain class to use its functions.
 		 */
 		//initDrive(crvbot.robotDrive);
-
-
-		crvbot.gyro->Reset();
-		crvbot.robotDrive->StopMotor();
-		std::cout << "Crevobot | In Autonomous Periodic Mode" << std::endl;
-		autonTimer->Start();
+		std::cout << "____________________________________________________________________________________________________" << std::endl;
+		std::cout << "|| Crevobot || In Autonomous Periodic Mode" << std::endl;
+		std::cout << "" << std::endl;
+		//autonTimer->Start();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousPeriodic() {
@@ -87,7 +98,7 @@ public:
 
 		while(IsAutonomous() && IsEnabled())
 		{
-			switch(AutonMove)
+			switch(AutonChooser)
 			{
 			case AutonMove:
 			{
@@ -105,8 +116,7 @@ public:
 			}
 			case VisionProcessingData:
 			{
-				while(IsAutonomous()) { vs.distanceFromBoiler(); }
-				break;
+				while(true) { vs.distanceFromBoiler(); }
 			}
 			case EchyMemes:
 			{
@@ -114,8 +124,9 @@ public:
 			}
 			case InternalScreams:
 			{
-				while(IsEnabled()) { moveRobot(0.5, -0.5); }
-				break;
+				while(1) {
+					crvbot.robotDrive->SetLeftRightMotorOutputs(0.5, -0.5); }
+
 			}
 			default:
 			{
@@ -134,8 +145,11 @@ public:
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void TeleopInit() {
 
-		updateRobotStatus();
-		std::cout << "Crevobot | In TeleopPeriodi Mode" << std::endl;
+		//updateRobotStatus();
+
+		std::cout << "____________________________________________________________________________________________________" << std::endl;
+		std::cout << "|| Crevobot || In TeleopPeriodic Mode" << std::endl;
+		std::cout << "" << std::endl;
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	bool shooterPressed;
@@ -144,17 +158,17 @@ public:
 	bool lastToggled = false;
 
 	void TeleopPeriodic() {
-		teleopTimer->Start();
+		//teleopTimer->Start();
 		while(IsOperatorControl() && IsEnabled())
 		{
 			DriveCode();
 
-			SpeedScale();
+			//SpeedScale();
 			//toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
-			updateRobotStatus();
+			//updateRobotStatus();
 			Wait(0.005);
 		}
-		teleopTimer->Stop();
+		//teleopTimer->Stop();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -166,7 +180,7 @@ public:
 		{
 			double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
 			double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
-			double Right_X = shape(controllerJoystick(driverGamepad, Axes::RIGHT_X));
+			double Right_X = 0.6 * controllerJoystick(driverGamepad, Axes::RIGHT_X);
 
 			if(controllerButton(driverGamepad, Button::A))  tankTrue = true;
 			if(controllerButton(driverGamepad, Button::B))  tankTrue = false;
@@ -176,7 +190,7 @@ public:
 			/*_________ Sets DriverJoystick in FirstPerosnDrive orientation _________*/
 			else         crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y - Right_X, Left_Y + Right_X);
 
-			driverGamepad->SetRumble(Joystick::RumbleType::kRightRumble, 0.5);
+			//driverGamepad->SetRumble(Joystick::RumbleType::kRightRumble, 0.5);
 
 
 		}
@@ -203,13 +217,13 @@ public:
 
 void updateRobotStatus(void)
 {
-	SmartDashboard::PutNumber("LeftMotor Current", crvbot.leftFrontMotor->GetOutputCurrent());
-	SmartDashboard::PutNumber("RightMotor Current", crvbot.rightFrontMotor->GetOutputCurrent());
-	SmartDashboard::PutNumber("LeftMotor Voltage", crvbot.leftFrontMotor->GetOutputVoltage());
-	SmartDashboard::PutNumber("RightMotor Voltage", crvbot.rightFrontMotor->GetOutputVoltage());
-	SmartDashboard::PutNumber("SpeedShooter", speedShoot);
+	SmartDashboard::PutNumber(" LeftMotor Current: ", crvbot.leftFrontMotor->GetOutputCurrent());
+	SmartDashboard::PutNumber(" RightMotor Current: ", crvbot.rightFrontMotor->GetOutputCurrent());
+	SmartDashboard::PutNumber(" LeftMotor Voltage: ", crvbot.leftFrontMotor->GetOutputVoltage());
+	SmartDashboard::PutNumber(" RightMotor Voltage: ", crvbot.rightFrontMotor->GetOutputVoltage());
+	SmartDashboard::PutNumber(" SpeedShooter: ", speedShoot);
 	SmartDashboard::PutBoolean(" Debug: ", visionDebug);
-	SmartDashboard::PutBoolean(" TankDrive ", tankTrue);
+	SmartDashboard::PutBoolean(" TankDrive: ", tankTrue);
 
 	speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
 	tankTrue = prefs->GetBoolean("Is tankDrive on?", true);

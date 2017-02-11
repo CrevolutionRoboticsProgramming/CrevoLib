@@ -106,8 +106,10 @@
 		 }
 	 }
 	 stopAndReset();
-	 std::cout << "Crevobot | Action Completed With : Rgt Dst: " << rightEnc->GetDistance() << "Lft Dst: "<< rightEnc->GetDistance() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
- }
+	 std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 std::cout << "|| Crevobot || Action Completed With : Rgt Dst: " << rightEnc->GetDistance() << "Lft Dst: "<< rightEnc->GetDistance() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
+	 std::cout << "" << std::endl;
+  }
 
  void DriveTrain::driveCountEncoder(double enct, double pwr, Direction dir)
  {
@@ -146,7 +148,9 @@
 	 		}
 	 	 }
 	 	stopAndReset();
-	 	std::cout << "Crevobot | Action Completed With : Rgt Enc: " << rightEnc->GetRaw() << "Lft Enc: "<< leftEnc->GetRaw() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
+	 	std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 	std::cout << "|| Crevobot || Action Completed With : Rgt Enc: " << rightEnc->GetRaw() << "Lft Enc: "<< leftEnc->GetRaw() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
+	 	std::cout << "" << std::endl;
  }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -172,8 +176,9 @@
 	 }
 	 FinishedPreviousTrial = true;
 	 stopRobot();
-	 std::cout << "Crevobot | Action Completed With : Time Driven: " << driveTime->Get() << " Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
-
+	 std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 std::cout << "|| Crevobot || Action Completed With : Time Driven: " << driveTime->Get() << " Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
+	 std::cout << "" << std::endl;
 	 driveTime->Stop();
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -189,8 +194,9 @@
 		 moveRobot(pwr);
 	 }
 	 stopRobot();
-	 std::cout << "Crevobot | Action Completed With: angle " << counts << "Speed: " << pwr << std::endl;
-
+	 std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 std::cout << "|| Crevobot || Action Completed With: angle " << counts << "Speed: " << pwr << std::endl;
+	 std::cout << "" << std::endl;
  }
  /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -221,6 +227,7 @@
 	 }
 	 else
 	 {
+
 		 steer = getSteer(error, PADJ_TURN);
 		 rgtPwr = pwr * steer;
 		 errorClip(rgtPwr, -1, 1);

@@ -37,10 +37,10 @@ private:
 
 #ifdef PRAC_BOT
 		enum MotorCAN{
-			 	 	RIGHT_FRONT_PORT = 6,
-					RIGHT_REAR_PORT = 5,
-					LEFT_FRONT_PORT = 8,
-					LEFT_REAR_PORT = 9,
+			 	 	RIGHT_FRONT_PORT = 1,
+					RIGHT_REAR_PORT = 3,
+					LEFT_FRONT_PORT = 2,
+					LEFT_REAR_PORT = 4,
 					SHOOTER_MOTOR_A = 8,
 					SHOOTER_MOTOR_B = 6,
 					AGITATOR_MOTOR = 5,
@@ -137,6 +137,8 @@ public:
 
 		 const double magicCPR = 4096;
 
+		 const double wheelCircumference = 6;
+
 
 		 /*
 		  * Distance traveled = Wheel rotations * circumference
@@ -149,7 +151,7 @@ public:
 		  * Encoder ticks = (360 / circumference) * Distance to travel
 		  */
 
-		 //double calcdistanceperPulse = ((wheelCircumfrence ) / encoderCPR );
+		 double calcdistanceperPulse = ((wheelCircumference ) / encoderCPR );
 
 		 void robotInit(void);
 		 CrevoRobot();

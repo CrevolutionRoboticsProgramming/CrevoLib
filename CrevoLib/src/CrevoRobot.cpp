@@ -72,13 +72,14 @@ void CrevoRobot::robotInit(void){
 	if(intakeRoller    != NULL) intakeRoller->SetInverted(false);
 	if(hangerMotor     != NULL) hangerMotor->SetInverted(false);
 
-	/* CTRE Magnetic Encoder
+	/*/
+	 * CTRE Magnetic Encoder
 	 * Absolute Mode							Relative Mode
 	 * Update rate: 4ms							Update rate: 100us
 	 * Max RPM: 7,500RPM						Max RPM: 15,000RPM
 	 * Accuracy: 12 bits/rotation (4096)		Accuracy: 12 bits/rotation
 	 * API: Pulse Width API						USes Quadrature API
-	 */
+	/*/
 /*
 	if(leftFrontMotor  != NULL)  leftFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
 	if(rightFrontMotor != NULL) rightFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
@@ -119,7 +120,7 @@ void CrevoRobot::robotInit(void){
 	//leftEnc->SetSamplesToAverage(5);
 	//rightEnc->SetSamplesToAverage(5);
 
-	//--Setting the distance for the encoders connected to the roborios IO port. --
+	//--Setting the distance for the encoders connected to the roboRIO's IO port. --
 	//leftEnc->SetDistancePerPulse(calcdistanceperPulse);
 	//rightEnc->SetDistancePerPulse(calcdistanceperPulse);
 
