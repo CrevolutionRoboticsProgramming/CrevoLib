@@ -47,13 +47,12 @@ public:
 
 		driverGamepad   = new Joystick(0);
 		operatorGamepad = new Joystick(1);
-		crvbot.robotInit();
-		/*
-		 * Calibrates Gyro, needs two seconds in order to calibrate correctly.
-		 */
-		//crvbot.gyro->Calibrate();
-		//Wait(2);
+		runTime         = new Timer();
 
+		crvbot.robotInit();
+		/*/
+		 * Calibrates Gyro, needs two seconds in order to calibrate correctly.
+		/*/
 		/*/
 		 *	Command to start up the stream from the USB camera.
 		/*/
@@ -78,24 +77,29 @@ public:
 	 */
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousInit() override {
-		/*
+		/*/
 		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
-		 */
+		/*/
 		AutonChooser = Autons::VisionProcessingData;
-		/*
+		/*/
 		 * Initializes the robots settings into the DriveTrain class to use its functions.
-		 */
+		/*/
 		//initDrive(crvbot.robotDrive);
+
+		speedShoot  = prefs->GetDouble("Shooter Speed Scale", 0.4);
+		tankTrue    = prefs->GetBoolean("Is tankDrive on?", true);
+		visionDebug = prefs->GetBoolean("Debug", false);
+
 		std::cout << "____________________________________________________________________________________________________" << std::endl;
 		std::cout << "|| Crevobot || In Autonomous Periodic Mode" << std::endl;
 		std::cout << "" << std::endl;
-		//autonTimer->Start();
+
+		runTime->Reset();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousPeriodic() {
-
+		runTime->Start();
 		updateRobotStatus();
-
 		while(IsAutonomous() && IsEnabled())
 		{
 			switch(AutonChooser)
@@ -117,6 +121,7 @@ public:
 			case VisionProcessingData:
 			{
 				while(true) { vs.distanceFromBoiler(); }
+				break;
 			}
 			case EchyMemes:
 			{
@@ -124,8 +129,8 @@ public:
 			}
 			case InternalScreams:
 			{
-				while(1) {
-					crvbot.robotDrive->SetLeftRightMotorOutputs(0.5, -0.5); }
+				while(1) { crvbot.robotDrive->SetLeftRightMotorOutputs(0.5, -0.5); }
+				break;
 
 			}
 			default:
@@ -135,21 +140,24 @@ public:
 				crvbot.intakeRoller->StopMotor();
 				crvbot.hangerMotor->StopMotor();
 			}
-
 			}
 		}
-
-		autonTimer->Stop();
+		runTime->Stop();
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void TeleopInit() {
 
 		//updateRobotStatus();
+		speedShoot  = prefs->GetDouble("Shooter Speed Scale", 0.4);
+		tankTrue    = prefs->GetBoolean("Is tankDrive on?", true);
+		visionDebug = prefs->GetBoolean("Debug", false);
 
 		std::cout << "____________________________________________________________________________________________________" << std::endl;
 		std::cout << "|| Crevobot || In TeleopPeriodic Mode" << std::endl;
 		std::cout << "" << std::endl;
+
+		runTime->Reset();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	bool shooterPressed;
@@ -158,7 +166,7 @@ public:
 	bool lastToggled = false;
 
 	void TeleopPeriodic() {
-		//teleopTimer->Start();
+		runTime->Start();
 		while(IsOperatorControl() && IsEnabled())
 		{
 			DriveCode();
@@ -168,7 +176,7 @@ public:
 			//updateRobotStatus();
 			Wait(0.005);
 		}
-		//teleopTimer->Stop();
+		runTime->Stop();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -178,9 +186,9 @@ public:
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void DriveCode()
 		{
-			double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
-			double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
-			double Right_X = 0.6 * controllerJoystick(driverGamepad, Axes::RIGHT_X);
+			double Left_Y  = controllerJoystick(driverGamepad, 	   	 Axes::LEFT_Y);
+			double Right_Y = controllerJoystick(driverGamepad, 		 Axes::RIGHT_Y);
+			double Right_X = shape(controllerJoystick(driverGamepad, Axes::RIGHT_X));
 
 			if(controllerButton(driverGamepad, Button::A))  tankTrue = true;
 			if(controllerButton(driverGamepad, Button::B))  tankTrue = false;
@@ -217,6 +225,7 @@ public:
 
 void updateRobotStatus(void)
 {
+	SmartDashboard::PutNumber(" Total Runtime: ", runTime->Get());
 	SmartDashboard::PutNumber(" LeftMotor Current: ", crvbot.leftFrontMotor->GetOutputCurrent());
 	SmartDashboard::PutNumber(" RightMotor Current: ", crvbot.rightFrontMotor->GetOutputCurrent());
 	SmartDashboard::PutNumber(" LeftMotor Voltage: ", crvbot.leftFrontMotor->GetOutputVoltage());
@@ -224,10 +233,6 @@ void updateRobotStatus(void)
 	SmartDashboard::PutNumber(" SpeedShooter: ", speedShoot);
 	SmartDashboard::PutBoolean(" Debug: ", visionDebug);
 	SmartDashboard::PutBoolean(" TankDrive: ", tankTrue);
-
-	speedShoot = prefs->GetDouble("Shooter Speed Scale", 0.4);
-	tankTrue = prefs->GetBoolean("Is tankDrive on?", true);
-	visionDebug = prefs->GetBoolean("Debug", false);
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -239,9 +244,7 @@ private:
 	Joystick *driverGamepad;
 	Joystick *operatorGamepad;
 	Preferences *prefs;
-	Timer *teleopTimer;
-	Timer *autonTimer;
-
+	Timer *runTime;
 	Vision vs;
 };
 

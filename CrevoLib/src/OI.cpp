@@ -31,7 +31,7 @@ float OI::shape(float inValue)
 	{
 		if (inputSlow)
 		{
-			float output = sign * (abs(inValue) * 4.0/7.0 - 0.4/7.0);
+			float output = sign * (abs(inValue) * 0.65);
 			return output;
 		}
 		else
