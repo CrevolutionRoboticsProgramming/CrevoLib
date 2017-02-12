@@ -18,7 +18,7 @@ CrevoRobot::~CrevoRobot(){
 void CrevoRobot::robotInit(void){
 
 	/*________________________________________________________________________________________________________________________________*/
-#ifdef NotDebug
+#ifdef NOT_DEBUG
 	//___________________ Drive MotorControllers ___________________
 
 
@@ -45,18 +45,22 @@ void CrevoRobot::robotInit(void){
 
 	/*________________________________________________________________________________________________________________________________*/
 
-#endif
+
 	//___________________ Manipulators MotorControllers ___________________
 
-	/*
+
 	fuelManipulator  = new CANTalon(MotorCAN::SHOOTER_MOTOR_A);
 	fuelManipulator2 = new CANTalon(MotorCAN::SHOOTER_MOTOR_B);
 
-
-
-
 	intakeRoller   	 = new CANTalon(MotorCAN::INTAKE_MOTOR);
 
+	SmartDashboard::PutBoolean(" Debug: ", false);
+
+#endif
+
+#ifndef NOT_DEBUG
+	SmartDashboard::PutBoolean(" Debug: ", true);
+#endif
 	/*________________________________________________________________________________________________________________________________*/
 
 	//___________________ Configure MotorControlers ___________________
@@ -133,5 +137,12 @@ void CrevoRobot::robotInit(void){
 	if(fuelManipulator != NULL) fuelManipulator->StopMotor();
 	if(intakeRoller    != NULL)    intakeRoller->StopMotor();
 	if(hangerMotor     != NULL)     hangerMotor->StopMotor();
+#ifdef PRAC_BOT
+	SmartDashboard::PutString("Robot Configuration: ", "Practice Bot");
+#endif
 
+#ifndef PRAC_BOT
+	SmartDashboard::PutString("Robot Configuration: ", "Competition Bot");
+#endif
 }
+

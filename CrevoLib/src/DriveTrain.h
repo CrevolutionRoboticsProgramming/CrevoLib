@@ -69,12 +69,14 @@
 	          struct Speed { double Full = 1; double ThreeQuarter = 0.75; double Half = 0.5; double ForwardQuarter = 0.25; double Off = 0;} Speed;
 	          void init(RobotDrive *_robotDrvInit, AnalogGyro *_gyroInit, EncoderType enc);
 	          void initMotors(CANTalon *_rightFront, CANTalon *_rightRear, CANTalon *_leftFront, CANTalon *_leftRear);
+	          void initMotor(CANTalon *_selectedTalon);
 	          void initEncoder(Encoder *_leftEncInit, Encoder *_rightEncInit);
 	          void initDrive(RobotDrive *_robotDrvInit);
 	          void initAccel(AnalogAccelerometer *_accelInit);
 	          void moveRobot(double lPwr, double rPwr);
 	          void moveRobot(double Pwr);
 	          void moveMotor(CANTalon *_selectedTalon, double speed);
+	          bool moveMotor(double pwr, double timeValue, Direction dir);
 	          void stopRobot(void);
 	          void driveDistanceEncoder(double dst, double pwr, Direction dir);
 	          void driveCountEncoder(double enct, double pwr, Direction dir);

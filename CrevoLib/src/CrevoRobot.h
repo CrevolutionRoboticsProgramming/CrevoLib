@@ -7,13 +7,16 @@
 
 #ifndef SRC_CREVOROBOT_H_
 #define SRC_CREVOROBOT_H_
+
 #include <iostream>
 #include <stdio.h>
+#include <string>
 #include <CANTalon.h>
 #include <Talon.h>
 #include <AnalogAccelerometer.h>
 #include <AnalogGyro.h>
 #include <AnalogPotentiometer.h>
+#include <SmartDashboard/SmartDashboard.h>
 #include <DigitalInput.h>
 #include <DoubleSolenoid.h>
 #include <Encoder.h>
@@ -21,7 +24,7 @@
 #include <RobotDrive.h>
 
 #define PRAC_BOT
-#define NotDebug
+#define NOT_DEBUG
 class CrevoRobot{
 
 private:
@@ -48,7 +51,6 @@ private:
 					AGITATOR_MOTOR = 5,
 					INTAKE_MOTOR = 7,
 		 };
-
 #endif /*PRAC_BOT*/
 
 #ifndef PRAC_BOT
@@ -63,7 +65,6 @@ private:
 				SHOOTER_MOTOR_B = 19,
 				AGITATOR_MOTOR = 21,
 				INTAKE_MOTOR = 22,
-
 				 };
 
 #endif
@@ -145,7 +146,13 @@ public:
 
 		 const double wheelCircumference = 6;
 
-
+		 /*/
+		  * These values hold variables for the PID controller
+		  * Are adjusted in the preference section of the Smart Dashboard
+		 /*/
+		 int kP;
+		 int kI;
+		 int kD;
 		 /*
 		  * Distance traveled = Wheel rotations * circumference
 		  * or

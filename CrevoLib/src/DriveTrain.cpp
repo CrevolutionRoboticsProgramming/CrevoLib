@@ -40,6 +40,11 @@
 	 leftFrontMotor = _leftFront;
 	 leftRearMotor = _leftRear;
   }
+ void DriveTrain::initMotor(CANTalon *_selectedTalon)
+ {
+	 freeTalon = _selectedTalon;
+	 driveTime = new Timer();
+ }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
  void DriveTrain::initDrive(RobotDrive *_robotDrvInit)
@@ -70,6 +75,22 @@
 	 freeTalon = _selectedTalon;
 	 freeTalon->Set(speed);
   }
+ bool DriveTrain::moveMotor(double pwr, double timeValue, Direction dir)
+   {
+	 	driveTime->Start();
+	 	 if(dir == Direction::Reverse)
+	 	 {
+	 		 pwr *= -1;
+	 	 }
+
+	 	 while(driveTime->Get() < timeValue)
+	 	 {
+	 		 freeTalon->Set(pwr);
+	 	 }
+	 	freeTalon->Set(0);
+	 	 driveTime->Stop();
+	 	 return false;
+   }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::stopRobot(void)
   {
@@ -108,6 +129,7 @@
 	 }
 	 stopAndReset();
 	 std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 std::cout << "" << std::endl;
 	 std::cout << "|| Crevobot || Action Completed With : Rgt Dst: " << rightEnc->GetDistance() << "Lft Dst: "<< rightEnc->GetDistance() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
 	 std::cout << "" << std::endl;
   }
@@ -150,6 +172,7 @@
 	 	 }
 	 	stopAndReset();
 	 	std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 	std::cout << "" << std::endl;
 	 	std::cout << "|| Crevobot || Action Completed With : Rgt Enc: " << rightEnc->GetRaw() << "Lft Enc: "<< leftEnc->GetRaw() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
 	 	std::cout << "" << std::endl;
  }
@@ -157,30 +180,21 @@
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::driveByTime(double timeValue, double pwr, Direction dir)
  {
-	 timeValue = driveTime->Get() + timeValue;
 	 driveTime->Start();
-
 	 if(dir == Direction::Reverse)
 	 {
 		 pwr *= -1;
 	 }
-
-	 if(FinishedPreviousTrial)
-	 {
-		 FinishedPreviousTrial = false;
-	 }
-
 	 while(driveTime->Get() < timeValue)
 	 {
 		 moveRobot(pwr);
-		 autonCounter++;
 	 }
-	 FinishedPreviousTrial = true;
 	 stopRobot();
+	 driveTime->Stop();
 	 std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 std::cout << "" << std::endl;
 	 std::cout << "|| Crevobot || Action Completed With : Time Driven: " << driveTime->Get() << " Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
 	 std::cout << "" << std::endl;
-	 driveTime->Stop();
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::encoderTurn(double angle, double pwr)
@@ -196,6 +210,7 @@
 	 }
 	 stopRobot();
 	 std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 std::cout << "" << std::endl;
 	 std::cout << "|| Crevobot || Action Completed With: angle " << counts << "Speed: " << pwr << std::endl;
 	 std::cout << "" << std::endl;
  }

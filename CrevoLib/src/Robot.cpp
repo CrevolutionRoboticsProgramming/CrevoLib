@@ -49,6 +49,7 @@ public:
 		operatorGamepad = new Joystick(1);
 		runTime         = new Timer();
 
+
 		crvbot.robotInit();
 		/*/
 		 * Calibrates Gyro, needs two seconds in order to calibrate correctly.
@@ -59,7 +60,10 @@ public:
 		vs.startStream();
 		prefs = Preferences::GetInstance();
 
+		//updateRobotStatus();
+
 		std::cout << "____________________________________________________________________________________________________" << std::endl;
+		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || Robot completed initialize" << std::endl;
 		std::cout << "" << std::endl;
 	}
@@ -80,17 +84,19 @@ public:
 		/*/
 		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
 		/*/
-		AutonChooser = Autons::VisionProcessingData;
+		AutonChooser = Autons::InternalScreams;
 		/*/
 		 * Initializes the robots settings into the DriveTrain class to use its functions.
 		/*/
-		//initDrive(crvbot.robotDrive);
+		initDrive(crvbot.robotDrive);
 
-		speedShoot  = prefs->GetDouble("Shooter Speed Scale", 0.4);
-		tankTrue    = prefs->GetBoolean("Is tankDrive on?", true);
-		visionDebug = prefs->GetBoolean("Debug", false);
+		updateRobotStatus();
+		updateRobotPreference();
+
+		initMotor(crvbot.intakeRoller);
 
 		std::cout << "____________________________________________________________________________________________________" << std::endl;
+		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || In Autonomous Periodic Mode" << std::endl;
 		std::cout << "" << std::endl;
 
@@ -99,9 +105,10 @@ public:
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void AutonomousPeriodic() {
 		runTime->Start();
-		updateRobotStatus();
+
 		while(IsAutonomous() && IsEnabled())
 		{
+			updateRobotStatus();
 			switch(AutonChooser)
 			{
 			case AutonMove:
@@ -129,9 +136,15 @@ public:
 			}
 			case InternalScreams:
 			{
-				while(1) { crvbot.robotDrive->SetLeftRightMotorOutputs(0.5, -0.5); }
+				while(IsEnabled())
+				{
+					moveRobot(0.5, -0.5);
+				}
 				break;
-
+			}
+			case 9:
+			{
+				break;
 			}
 			default:
 			{
@@ -143,17 +156,15 @@ public:
 			}
 		}
 		runTime->Stop();
-
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void TeleopInit() {
 
-		//updateRobotStatus();
-		speedShoot  = prefs->GetDouble("Shooter Speed Scale", 0.4);
-		tankTrue    = prefs->GetBoolean("Is tankDrive on?", true);
-		visionDebug = prefs->GetBoolean("Debug", false);
+		updateRobotStatus();
+		updateRobotPreference();
 
 		std::cout << "____________________________________________________________________________________________________" << std::endl;
+		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || In TeleopPeriodic Mode" << std::endl;
 		std::cout << "" << std::endl;
 
@@ -225,14 +236,25 @@ public:
 
 void updateRobotStatus(void)
 {
-	SmartDashboard::PutNumber(" Total Runtime: ", runTime->Get());
-	SmartDashboard::PutNumber(" LeftMotor Current: ", crvbot.leftFrontMotor->GetOutputCurrent());
-	SmartDashboard::PutNumber(" RightMotor Current: ", crvbot.rightFrontMotor->GetOutputCurrent());
-	SmartDashboard::PutNumber(" LeftMotor Voltage: ", crvbot.leftFrontMotor->GetOutputVoltage());
-	SmartDashboard::PutNumber(" RightMotor Voltage: ", crvbot.rightFrontMotor->GetOutputVoltage());
-	SmartDashboard::PutNumber(" SpeedShooter: ", speedShoot);
-	SmartDashboard::PutBoolean(" Debug: ", visionDebug);
-	SmartDashboard::PutBoolean(" TankDrive: ", tankTrue);
+	SmartDashboard::PutNumber(" Total Runtime: ",        runTime->Get());
+	SmartDashboard::PutNumber(" LeftMotor Current: ",    crvbot.leftFrontMotor->GetOutputCurrent());
+	SmartDashboard::PutNumber(" RightMotor Current: ",   crvbot.rightFrontMotor->GetOutputCurrent());
+	SmartDashboard::PutNumber(" LeftMotor Voltage: ",    crvbot.leftFrontMotor->GetOutputVoltage());
+	SmartDashboard::PutNumber(" RightMotor Voltage: ",   crvbot.rightFrontMotor->GetOutputVoltage());
+	SmartDashboard::PutNumber(" FuelShooter Voltage: ",  crvbot.fuelManipulator->GetOutputVoltage());
+	SmartDashboard::PutNumber(" FuelShooter Current: ",  crvbot.fuelManipulator->GetOutputCurrent());
+	SmartDashboard::PutNumber(" SpeedShooter: ", 		 speedShoot);
+	SmartDashboard::PutBoolean(" TankDrive: ", 			 tankTrue);
+}
+
+void updateRobotPreference(void)
+{
+	speedShoot   = prefs->GetDouble("Shooter Speed Scale", 0.4);
+	tankTrue     = prefs->GetBoolean("Is tankDrive on?", true);
+	AutonChooser = prefs->GetInt("Choose Auton", 9);
+	crvbot.kP	 = prefs->GetDouble("P", 0.0);
+	crvbot.kI	 = prefs->GetDouble("I", 0.0);
+	crvbot.kD	 = prefs->GetDouble("D", 0.0);
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
