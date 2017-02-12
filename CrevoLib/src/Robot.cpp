@@ -169,11 +169,11 @@ public:
 		runTime->Start();
 		while(IsOperatorControl() && IsEnabled())
 		{
-			DriveCode();
+		//	DriveCode();
 
 			//SpeedScale();
 			//toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
-			//updateRobotStatus();
+			updateRobotStatus();
 			Wait(0.005);
 		}
 		runTime->Stop();
@@ -188,15 +188,15 @@ public:
 		{
 			double Left_Y  = controllerJoystick(driverGamepad, 	   	 Axes::LEFT_Y);
 			double Right_Y = controllerJoystick(driverGamepad, 		 Axes::RIGHT_Y);
-			double Right_X = shape(controllerJoystick(driverGamepad, Axes::RIGHT_X));
+			double Right_X = (0.65*controllerJoystick(driverGamepad, Axes::RIGHT_X));
 
 			if(controllerButton(driverGamepad, Button::A))  tankTrue = true;
 			if(controllerButton(driverGamepad, Button::B))  tankTrue = false;
 
 			/*_________ Sets DriverJoystick in Tank Drive orientation _________*/
-			if(tankTrue) crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y, Right_Y);
+			if(tankTrue) crvbot.robotDrive->SetLeftRightMotorOutputs(LEFT_MULTIPLER*Left_Y, RIGHT_MULTIPLER*Right_Y);
 			/*_________ Sets DriverJoystick in FirstPerosnDrive orientation _________*/
-			else         crvbot.robotDrive->SetLeftRightMotorOutputs(Left_Y - Right_X, Left_Y + Right_X);
+			else         crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(Left_Y - Right_X)), (RIGHT_MULTIPLER*(Left_Y + Right_X)));
 
 			//driverGamepad->SetRumble(Joystick::RumbleType::kRightRumble, 0.5);
 

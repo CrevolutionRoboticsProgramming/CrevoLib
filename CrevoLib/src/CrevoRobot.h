@@ -21,7 +21,6 @@
 #include <RobotDrive.h>
 
 #define PRAC_BOT
-//#define COMP_BOT
 #define NotDebug
 class CrevoRobot{
 
@@ -36,6 +35,9 @@ private:
 /*________________________________________________________________________________________________________________________________*/
 
 #ifdef PRAC_BOT
+
+#define RIGHT_MULTIPLER 0.84
+#define  LEFT_MULTIPLER  0.9
 		enum MotorCAN{
 			 	 	RIGHT_FRONT_PORT = 1,
 					RIGHT_REAR_PORT = 3,
@@ -49,15 +51,19 @@ private:
 
 #endif /*PRAC_BOT*/
 
-#ifdef COMP_BOT
+#ifndef PRAC_BOT
+#define RIGHT_MULTIPLER  1
+#define  LEFT_MULTIPLER  1
 		enum MotorCAN{
-				RIGHT_FRONT_PORT = 6,
-				RIGHT_REAR_PORT = 5,
-				LEFT_FRONT_PORT = 8,
-				LEFT_REAR_PORT = 9,
-				SHOOTER_MOTOR_A = 8,
-				SHOOTER_MOTOR_B = 6,
-				INTAKE_MOTOR = 7,
+				RIGHT_FRONT_PORT = 23,
+				RIGHT_REAR_PORT = 24,
+				LEFT_FRONT_PORT = 16,
+				LEFT_REAR_PORT = 17,
+				SHOOTER_MOTOR_A = 18,
+				SHOOTER_MOTOR_B = 19,
+				AGITATOR_MOTOR = 21,
+				INTAKE_MOTOR = 22,
+
 				 };
 
 #endif
