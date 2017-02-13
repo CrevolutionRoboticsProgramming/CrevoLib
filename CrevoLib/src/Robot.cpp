@@ -62,10 +62,10 @@ public:
 
 		//updateRobotStatus();
 
-		std::cout << "____________________________________________________________________________________________________" << std::endl;
+		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || Robot completed initialize" << std::endl;
-		std::cout << "" << std::endl;
+		std::cout << "_____________________________________________" << std::endl;
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*
@@ -95,10 +95,10 @@ public:
 
 		initMotor(crvbot.intakeRoller);
 
-		std::cout << "____________________________________________________________________________________________________" << std::endl;
+		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || In Autonomous Periodic Mode" << std::endl;
-		std::cout << "" << std::endl;
+		std::cout << "_____________________________________________" << std::endl;
 
 		runTime->Reset();
 	}
@@ -113,15 +113,15 @@ public:
 			{
 			case AutonMove:
 			{
-				driveByTime(0.3, Speed.Half, Forward);
+				driveByTime(2, Speed.Half, Forward);
 				Wait(2);
 				break;
 			}
 			case ForwardAndBackwards:
 			{
-				driveByTime(0.3, Speed.Half, Forward);
+				driveByTime(2, Speed.Half, Forward);
 				Wait(2);
-				driveByTime(0.3, Speed.Half , Reverse);
+				driveByTime(2, Speed.Half , Reverse);
 				Wait(2);
 				break;
 			}
@@ -163,10 +163,10 @@ public:
 		updateRobotStatus();
 		updateRobotPreference();
 
-		std::cout << "____________________________________________________________________________________________________" << std::endl;
+		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || In TeleopPeriodic Mode" << std::endl;
-		std::cout << "" << std::endl;
+		std::cout << "_____________________________________________" << std::endl;
 
 		runTime->Reset();
 	}
@@ -236,15 +236,19 @@ public:
 
 void updateRobotStatus(void)
 {
-	SmartDashboard::PutNumber(" Total Runtime: ",        runTime->Get());
-	SmartDashboard::PutNumber(" LeftMotor Current: ",    crvbot.leftFrontMotor->GetOutputCurrent());
-	SmartDashboard::PutNumber(" RightMotor Current: ",   crvbot.rightFrontMotor->GetOutputCurrent());
-	SmartDashboard::PutNumber(" LeftMotor Voltage: ",    crvbot.leftFrontMotor->GetOutputVoltage());
-	SmartDashboard::PutNumber(" RightMotor Voltage: ",   crvbot.rightFrontMotor->GetOutputVoltage());
-	SmartDashboard::PutNumber(" FuelShooter Voltage: ",  crvbot.fuelManipulator->GetOutputVoltage());
-	SmartDashboard::PutNumber(" FuelShooter Current: ",  crvbot.fuelManipulator->GetOutputCurrent());
-	SmartDashboard::PutNumber(" SpeedShooter: ", 		 speedShoot);
-	SmartDashboard::PutBoolean(" TankDrive: ", 			 tankTrue);
+	SmartDashboard::PutNumber(" Total Runtime: ",        		  runTime->Get());
+	SmartDashboard::PutNumber(" SpeedShooter: ", 		 		  speedShoot);
+    SmartDashboard::PutBoolean(" TankDrive: ", 			 	  	  tankTrue);
+	SmartDashboard::PutNumber(" LeftMotor Current: ",   		  crvbot.leftFrontMotor->GetOutputCurrent());
+	SmartDashboard::PutNumber(" RightMotor Current: ",  		  crvbot.rightFrontMotor->GetOutputCurrent());
+	SmartDashboard::PutNumber(" LeftMotor Voltage: ",   		  crvbot.leftFrontMotor->GetOutputVoltage());
+	SmartDashboard::PutNumber(" RightMotor Voltage: ",  		  crvbot.rightFrontMotor->GetOutputVoltage());
+	SmartDashboard::PutNumber(" FuelShooter Voltage: ", 		  crvbot.fuelManipulator->GetOutputVoltage());
+	SmartDashboard::PutNumber(" FuelShooter Current: ",  	 	  crvbot.fuelManipulator->GetOutputCurrent());
+	SmartDashboard::PutNumber(" Left Side Encoder Count: ", 	  crvbot.leftEnc->GetRaw());
+	SmartDashboard::PutNumber(" Right Side Encoder Count: ",      crvbot.rightEnc->GetRaw());
+	SmartDashboard::PutNumber(" FuelShooter Encoder Position: ",  crvbot.fuelManipulator->GetEncPosition());
+	SmartDashboard::PutNumber(" FuleShooter RPM: ",      		  crvbot.fuelManipulator->GetEncVel());
 }
 
 void updateRobotPreference(void)

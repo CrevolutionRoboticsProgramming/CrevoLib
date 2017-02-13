@@ -49,7 +49,8 @@ private:
 					SHOOTER_MOTOR_A = 8,
 					SHOOTER_MOTOR_B = 6,
 					AGITATOR_MOTOR = 5,
-					INTAKE_MOTOR = 7,
+					INTAKE_MOTOR = 25,
+					HANGER_MOTOR = 9,
 		 };
 #endif /*PRAC_BOT*/
 

@@ -54,8 +54,21 @@ void CrevoRobot::robotInit(void){
 
 	intakeRoller   	 = new CANTalon(MotorCAN::INTAKE_MOTOR);
 
+	agitatorMotor	 = new CANTalon(MotorCAN::AGITATOR_MOTOR);
+
+	hangerMotor		 = new CANTalon(MotorCAN::HANGER_MOTOR);
+
 	SmartDashboard::PutBoolean(" Debug: ", false);
 
+	SmartDashboard::PutNumber("Left Front CANTalon ID: ",    (int)leftFrontMotor->GetDeviceID());
+	SmartDashboard::PutNumber("Left Rear CANTalon ID: ",     (int)leftRearMotor->GetDeviceID());
+	SmartDashboard::PutNumber("Right Front CANTalon ID: ",   (int)rightFrontMotor->GetDeviceID());
+	SmartDashboard::PutNumber("Right Rear CANTalon ID: ",    (int)rightRearMotor->GetDeviceID());
+	SmartDashboard::PutNumber("Fuel Shooter CANTalon1 ID: ", (int)fuelManipulator->GetDeviceID());
+	SmartDashboard::PutNumber("Fuel Shooter CANTalon2 ID: ", (int)fuelManipulator2->GetDeviceID());
+	SmartDashboard::PutNumber("In-take CANTalon ID: ",       (int)intakeRoller->GetDeviceID());
+	SmartDashboard::PutNumber("Agitator CANTalon ID: ",      (int)agitatorMotor->GetDeviceID());
+	SmartDashboard::PutNumber("Hanger CANTalon ID: ", 		 (int)hangerMotor->GetDeviceID());
 #endif
 
 #ifndef NOT_DEBUG
@@ -100,7 +113,7 @@ void CrevoRobot::robotInit(void){
 	if(fuelManipulator != NULL) fuelManipulator->ConfigNominalOutputVoltage(0.0f, -0.0f);
 	if(fuelManipulator != NULL) fuelManipulator->ConfigPeakOutputVoltage(12.0f, 0.0f);
 
-	if(fuelManipulator != NULL) fuelManipulator->SetPID(0,0,0);
+	if(fuelManipulator != NULL) fuelManipulator->SetPID(kP,kI,kD);
 
 
 
