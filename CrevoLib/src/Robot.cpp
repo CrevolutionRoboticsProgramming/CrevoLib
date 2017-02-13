@@ -16,6 +16,7 @@
 #include <CrevoRobot.h>
 #include <DriveTrain.h>
 #include <Vision.h>
+#include <FeedBack.h>
 
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
@@ -45,9 +46,10 @@ public:
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void RobotInit() override {
 
-		driverGamepad   = new Joystick(0);
-		operatorGamepad = new Joystick(1);
-		runTime         = new Timer();
+		driverGamepad      = new Joystick(0);
+		operatorGamepad    = new Joystick(1);
+		runTime            = new Timer();
+		fdbk.elapsedRumble = new Timer();
 
 
 		crvbot.robotInit();
@@ -181,9 +183,14 @@ public:
 		while(IsOperatorControl() && IsEnabled())
 		{
 		//	DriveCode();
+		//	toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
 
-			//SpeedScale();
-			//toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
+			if(controllerButton(driverGamepad, Button::A)){
+				driverGamepad->SetRumble(Joystick::RumbleType::kRightRumble, 1);
+			}
+			else{
+				driverGamepad->SetRumble(Joystick::RumbleType::kRightRumble, 0);
+			}
 			updateRobotStatus();
 			Wait(0.005);
 		}
@@ -220,13 +227,13 @@ public:
 		{
 			speedShoot = speedShoot - 0.05;
 			stillPressed = true;
-			Wait(0.5);
+			Wait(0.05);
 		}
 		else if(controllerButton(driverGamepad, Button::B) && !stillPressed)
 		{
 			speedShoot = speedShoot + 0.05;
 			stillPressed = true;
-			Wait(0.5);
+			Wait(0.05);
 		}
 		else
 		{
@@ -267,11 +274,13 @@ private:
 	LiveWindow* lw = LiveWindow::GetInstance();
 
 	CrevoRobot crvbot;
+	Vision vs;
+	FeedBack fdbk;
 	Joystick *driverGamepad;
 	Joystick *operatorGamepad;
 	Preferences *prefs;
 	Timer *runTime;
-	Vision vs;
+
 };
 
 START_ROBOT_CLASS(Robot)

@@ -16,3 +16,15 @@ FeedBack::~FeedBack() {
 	// TODO Auto-generated destructor stub
 }
 
+bool FeedBack::gearIndicator(void)
+{
+	if(crvbot.gearSensor->Get())
+	{
+		elapsedRumble->Start();
+	}
+	return true;
+}
+bool FeedBack::endGameIndicator(void)
+{
+	return true;
+}

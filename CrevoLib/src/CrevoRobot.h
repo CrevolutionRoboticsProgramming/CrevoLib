@@ -88,7 +88,7 @@ private:
 /*________________________________________________________________________________________________________________________________*/
 
 		 enum DigitalPort{
-			 	 	LIMIT_SWITCH_1 = 0,
+			 	 	GEAR_SENSOR = 0,
 					LIMIT_SWITCH_2 = 1,
 					FUEL_MANIPULATOR_ENCODER_1 = 0,
 					FUEL_MANIPULATOR_ENCODER_2 = 1,
@@ -122,7 +122,7 @@ public:
 
 		 Compressor   *compressor;
 
-		 DigitalInput *limitSwitch1;
+		 DigitalInput *gearSensor;
 		 DigitalInput *limitSwitch2;
 
 		 Encoder 	  *fuelManipulatorEncoder;

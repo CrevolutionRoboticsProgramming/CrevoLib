@@ -128,6 +128,8 @@ void CrevoRobot::robotInit(void){
 	gyro       = new AnalogGyro(AnalogPort::GYRO);
 	accel      = new AnalogAccelerometer(AnalogPort::ACCELEROMETER);
 
+	gearSensor = new DigitalInput(DigitalPort::GEAR_SENSOR);
+
 	if(fuelManipulator != NULL) fuelManipulator->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
 	if(fuelManipulator != NULL) fuelManipulator->SetSensorDirection(false);
 
