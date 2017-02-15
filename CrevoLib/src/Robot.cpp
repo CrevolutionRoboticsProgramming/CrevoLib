@@ -86,6 +86,7 @@ public:
 		/*/
 		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
 		/*/
+
 		AutonChooser = Autons::InternalScreams;
 		/*/
 		 * Initializes the robots settings into the DriveTrain class to use its functions.
@@ -138,14 +139,11 @@ public:
 			}
 			case InternalScreams:
 			{
-				while(IsEnabled())
-				{
-					moveRobot(0.5, -0.5);
-				}
-				break;
+				moveMotor(0.5, 2, Forward);
 			}
 			case 9:
 			{
+				moveMotor(0.5, 2, Reverse);
 				break;
 			}
 			default:
@@ -184,13 +182,6 @@ public:
 		{
 		//	DriveCode();
 		//	toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
-
-			if(controllerButton(driverGamepad, Button::A)){
-				driverGamepad->SetRumble(Joystick::RumbleType::kRightRumble, 1);
-			}
-			else{
-				driverGamepad->SetRumble(Joystick::RumbleType::kRightRumble, 0);
-			}
 			updateRobotStatus();
 			Wait(0.005);
 		}
