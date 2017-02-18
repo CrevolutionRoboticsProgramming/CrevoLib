@@ -46,11 +46,11 @@ private:
 					RIGHT_REAR_PORT = 3,
 					LEFT_FRONT_PORT = 2,
 					LEFT_REAR_PORT = 4,
-					SHOOTER_MOTOR_A = 8,
-					SHOOTER_MOTOR_B = 6,
-					AGITATOR_MOTOR = 5,
-					INTAKE_MOTOR = 25,
-					HANGER_MOTOR = 9,
+					SHOOTER_MOTOR_A = 9,
+					SHOOTER_MOTOR_B = 8,
+					AGITATOR_MOTOR = 25,
+					INTAKE_MOTOR = 5,
+					HANGER_MOTOR = 6,
 		 };
 #endif /*PRAC_BOT*/
 

@@ -80,12 +80,14 @@ void CrevoRobot::robotInit(void){
 
 	//--Set Invert--
 
+	if(fuelManipulator != NULL) fuelManipulator->SetInverted(false);
+
 	if(fuelManipulator != NULL) fuelManipulator2->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
 	if(fuelManipulator != NULL) fuelManipulator2->Set(fuelManipulator->GetDeviceID());
 
 	if(leftFrontMotor  != NULL)  leftFrontMotor->SetInverted(true);
 	if(rightFrontMotor != NULL) rightFrontMotor->SetInverted(true);
-	if(fuelManipulator != NULL) fuelManipulator->SetInverted(false);
+
 	if(intakeRoller    != NULL) intakeRoller->SetInverted(false);
 	if(hangerMotor     != NULL) hangerMotor->SetInverted(false);
 
@@ -131,7 +133,7 @@ void CrevoRobot::robotInit(void){
 	gearSensor = new DigitalInput(DigitalPort::GEAR_SENSOR);
 
 	if(fuelManipulator != NULL) fuelManipulator->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
-	if(fuelManipulator != NULL) fuelManipulator->SetSensorDirection(false);
+	if(fuelManipulator != NULL) fuelManipulator->SetSensorDirection(true);
 
 	leftEnc    = new Encoder(DigitalPort::L_EN_1, DigitalPort::L_EN_2, true, Encoder::EncodingType::k2X);
 	rightEnc   = new Encoder(DigitalPort::R_EN_1, DigitalPort::R_EN_2, false, Encoder::EncodingType::k2X);

@@ -180,9 +180,14 @@ public:
 		runTime->Start();
 		while(IsOperatorControl() && IsEnabled())
 		{
-		//	DriveCode();
-		//	toggleAction((driverGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, speedShoot);
+			DriveCode();
+
+			toggleAction((operatorGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, 0.5);
+
+			whilePressedAction(controllerButton(driverGamepad, Button::RightBummber), controllerButton(driverGamepad, Button::LeftBummber), crvbot.intakeRoller, 0.8);
+
 			updateRobotStatus();
+
 			Wait(0.005);
 		}
 		runTime->Stop();
