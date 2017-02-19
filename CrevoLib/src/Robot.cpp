@@ -13,6 +13,7 @@
 #include <CameraServer.h>
 
 #include <crevoglb.h>
+#include <DriveTrain.h>
 
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
@@ -110,15 +111,15 @@ public:
 			{
 			case AutonMove:
 			{
-				driveByTime(2, Speed.Half, Forward);
+				driveByTime(2, 0.5, Forward);
 				Wait(2);
 				break;
 			}
 			case ForwardAndBackwards:
 			{
-				driveByTime(2, Speed.Half, Forward);
+				driveByTime(2, 0.2, Forward);
 				Wait(2);
-				driveByTime(2, Speed.Half , Reverse);
+				driveByTime(2, 0.8 , Reverse);
 				Wait(2);
 				break;
 			}

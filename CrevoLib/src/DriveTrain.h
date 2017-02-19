@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include <crevoglb.h>
+#include "crevoglb.h"
 #include <CANTalon.h>
 #include <Encoder.h>
 #include <Timer.h>
@@ -59,6 +59,7 @@
 	          bool gyroTurn(double angle, double pwr);
 	          double getSteer(double error, double Pcoefficent);
 	          double getGyroError(int targetHdg);
+	          double errorClip(double number , double min, double max);
 
  	 public:
 	          enum EncoderType {MagnetEncoder, QuadEncoder};
