@@ -12,11 +12,7 @@
 #include <networktables/NetworkTable.h>
 #include <CameraServer.h>
 
-#include <OI.h>
-#include <CrevoRobot.h>
-#include <DriveTrain.h>
-#include <Vision.h>
-#include <FeedBack.h>
+#include <crevoglb.h>
 
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
@@ -95,8 +91,6 @@ public:
 
 		updateRobotStatus();
 		updateRobotPreference();
-
-		initMotor(crvbot.intakeRoller);
 
 		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
@@ -184,7 +178,7 @@ public:
 
 			toggleAction((operatorGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, 0.78);
 
-			whilePressedAction(controllerButton(driverGamepad, Button::RightBummber), controllerButton(driverGamepad, Button::LeftBummber), crvbot.intakeRoller, 0.8);
+			whilePressedAction(controllerButton(driverGamepad, Button::RightBumber), controllerButton(driverGamepad, Button::LeftBumber), crvbot.intakeRoller, 0.8);
 
 			updateRobotStatus();
 
