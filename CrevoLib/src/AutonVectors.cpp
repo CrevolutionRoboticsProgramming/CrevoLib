@@ -16,3 +16,8 @@ AutonVectors::~AutonVectors() {
 	// TODO Auto-generated destructor stub
 }
 
+void AutonVectors::AutonSwitch(AutonStratagey strat)
+{
+
+}
+

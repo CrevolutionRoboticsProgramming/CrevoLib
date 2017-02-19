@@ -39,7 +39,7 @@ private:
 
 #ifdef PRAC_BOT
 
-#define RIGHT_MULTIPLER 0.84
+#define RIGHT_MULTIPLER 0.89
 #define  LEFT_MULTIPLER  0.9
 		enum MotorCAN{
 			 	 	RIGHT_FRONT_PORT = 1,
@@ -58,14 +58,15 @@ private:
 #define RIGHT_MULTIPLER  1
 #define  LEFT_MULTIPLER  1
 		enum MotorCAN{
-				RIGHT_FRONT_PORT = 23,
-				RIGHT_REAR_PORT = 24,
+				RIGHT_FRONT_PORT = 17,
+				RIGHT_REAR_PORT = 19,
 				LEFT_FRONT_PORT = 16,
-				LEFT_REAR_PORT = 17,
-				SHOOTER_MOTOR_A = 18,
-				SHOOTER_MOTOR_B = 19,
-				AGITATOR_MOTOR = 21,
-				INTAKE_MOTOR = 22,
+				LEFT_REAR_PORT = 18,
+				SHOOTER_MOTOR_A = 20,
+				SHOOTER_MOTOR_B = 21,
+				AGITATOR_MOTOR = 22,
+				HANGER_MOTOR = 23,
+				INTAKE_MOTOR = 24,
 				 };
 
 #endif

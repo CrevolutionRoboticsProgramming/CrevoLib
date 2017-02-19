@@ -182,7 +182,7 @@ public:
 		{
 			DriveCode();
 
-			toggleAction((operatorGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, 0.5);
+			toggleAction((operatorGamepad->GetRawAxis(2) > 0.1), crvbot.fuelManipulator, 0.78);
 
 			whilePressedAction(controllerButton(driverGamepad, Button::RightBummber), controllerButton(driverGamepad, Button::LeftBummber), crvbot.intakeRoller, 0.8);
 
