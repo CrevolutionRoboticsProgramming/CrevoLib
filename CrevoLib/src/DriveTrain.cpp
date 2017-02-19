@@ -101,7 +101,7 @@
  void DriveTrain::driveDistanceEncoder(double dst, double pwr, Direction dir)
   {
 	 double counts = distanceToCounts(dst);
-	 if (dir == DriveTrain::Reverse)
+	 if (dir == Reverse)
      {
 		 counts *= -1;
 		 pwr *= -1;
@@ -151,7 +151,7 @@
 	 	 {
 	 		int lft_target = leftEnc->GetRaw() + enct;
 	 		int rgt_target = rightEnc->GetRaw() + enct;
-	 		if (dir == DriveTrain::Reverse)
+	 		if (dir == Reverse)
 	 		{
 	 			lft_target *= -1;
 	 			rgt_target *= -1;
@@ -277,15 +277,6 @@
  double DriveTrain::getSteer(double error, double Pcoefficent)
  {
 	 return errorClip(error * Pcoefficent , -1, 1);
- }
-
- double DriveTrain::errorClip(double number , double min, double max)
- {
-	 if(number < min)
-		 return min;
-	 if(number > max)
-		 return max;
-	 return number;
  }
 
  void DriveTrain::stopAndReset()

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <crevoglb.h>
 #include <CANTalon.h>
 #include <Encoder.h>
 #include <Timer.h>
@@ -18,8 +19,6 @@
  class DriveTrain
     {
  	 private:
-
-
 	 	 	  CANTalon *rightFrontMotor;
 			  CANTalon *rightRearMotor;
 			  CANTalon *leftFrontMotor;
@@ -60,13 +59,9 @@
 	          bool gyroTurn(double angle, double pwr);
 	          double getSteer(double error, double Pcoefficent);
 	          double getGyroError(int targetHdg);
-	          double errorClip(double number , double min, double max);
-
 
  	 public:
-	          enum Direction {Forward, Reverse};
 	          enum EncoderType {MagnetEncoder, QuadEncoder};
-	          struct Speed { double Full = 1; double ThreeQuarter = 0.75; double Half = 0.5; double ForwardQuarter = 0.25; double Off = 0;} Speed;
 	          void init(RobotDrive *_robotDrvInit, AnalogGyro *_gyroInit, EncoderType enc);
 	          void initMotors(CANTalon *_rightFront, CANTalon *_rightRear, CANTalon *_leftFront, CANTalon *_leftRear);
 	          void initMotor(CANTalon *_selectedTalon);
