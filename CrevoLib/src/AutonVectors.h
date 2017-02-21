@@ -16,11 +16,12 @@
 class AutonVectors {
 public:
 
-	enum AutonStratagey { SHOOT_FROM_HOPPER, SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT, SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE, SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE, SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER };
+	enum AutonStratagey { IDLE, SHOOT_FROM_HOPPER, SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT, SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE, SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE, SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER };
 
-	enum AutonAction { SHOOT, MOVE, SCORE_GEAR, DUMP_HOPPER };
+	enum AutonAction { SHOOT, SCORE_GEAR, DUMP_HOPPER, IDLE, FIND_BOILER};
 
-	void AutonSwitch(AutonStratagey strat);
+	void AutonChooser(AutonStratagey strat);
+	bool AutonStateProcess(void);
 
 	AutonVectors();
 	virtual ~AutonVectors();
@@ -31,6 +32,7 @@ private:
 
 	void IntakeState(MotorState state);
 	void DoShoot(void);
+	void MakeMove(void);
 
 };
 
