@@ -16,7 +16,7 @@ AutonVectors::~AutonVectors() {
 	// TODO Auto-generated destructor stub
 }
 
-void AutonVectors::AutonSwitch(AutonStratagey strat)
+void AutonVectors::AutonChooser(AutonStratagey strat)
 {
 	switch(strat)
 	{
@@ -62,8 +62,8 @@ void AutonVectors::AutonSwitch(AutonStratagey strat)
 
 bool AutonVectors::AutonStateProcess(void)
 {
-	MakeMove();
-	switch(int action)
+	DoMove();
+	switch(1)
 	{
 	case SHOOT:
 		DoShoot();
@@ -74,14 +74,16 @@ bool AutonVectors::AutonStateProcess(void)
 		break;
 	case FIND_BOILER:
 		break;
-	case IDLE:
+	case NOTHING:
+		break;
 	}
+	return true;
 }
 
 void AutonVectors::IntakeState(MotorState state)
 {
-	if(state == ON)  crvbot.intakeRoller(0.8);
-	if(state == OFF) crvbot.intakeRoller(0);
+	if(state == ON)  crvbot.intakeRoller->Set(0.8);
+	if(state == OFF) crvbot.intakeRoller->Set(0);
 }
 
 void AutonVectors::DoShoot(void)
@@ -89,7 +91,7 @@ void AutonVectors::DoShoot(void)
 
 }
 
-void AutonVectors::MakeMove(void)
+void AutonVectors::DoMove(void)
 {
 
 }

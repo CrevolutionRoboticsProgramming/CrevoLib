@@ -1,4 +1,5 @@
 /*
+
  * OI.cpp
  *
  *  Created on: Dec 21, 2016
@@ -60,7 +61,7 @@ float OI::controllerJoystick(Joystick *_joystick, Axes axes)
 	return (_joystick->GetRawAxis(axes));
 }
 
-void OI::toggleAction(bool Pressed, CANTalon *_CANTalonmotor, double speed)
+bool OI::toggleAction(bool Pressed, CANTalon *_CANTalonmotor, double speed)
 {
 	if(Pressed && !lastToggled)
 	{
@@ -69,7 +70,7 @@ void OI::toggleAction(bool Pressed, CANTalon *_CANTalonmotor, double speed)
 		if(toggled) _CANTalonmotor->Set(speed);
 		else    	_CANTalonmotor->Set(0.0);
 	}
-	lastToggled = Pressed;
+	return lastToggled = Pressed;
 }
 
 void OI::whilePressedAction(bool forwardPressed, bool reversedPressed, CANTalon *_CANTalonmotor, double speed)

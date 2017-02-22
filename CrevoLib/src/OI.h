@@ -53,7 +53,7 @@ public:
 	bool controllerButton(Joystick *joystick, Button button);
 	float controllerJoystick(Joystick *joystick, Axes axes);
 	float shape(float inValue);
-	void toggleAction(bool Pressed, CANTalon *_motor, double speed);
+	bool toggleAction(bool Pressed, CANTalon *_motor, double speed);
 	void whilePressedAction(bool forwardPressed, bool reversedPressed, CANTalon *_motor, double speed);
 	OI();
 	virtual ~OI();

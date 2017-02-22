@@ -39,7 +39,7 @@ private:
 
 #ifdef PRAC_BOT
 
-#define RIGHT_MULTIPLER 0.89
+#define RIGHT_MULTIPLER 1
 #define  LEFT_MULTIPLER  0.9
 		enum MotorCAN{
 			 	 	RIGHT_FRONT_PORT = 1,

@@ -133,7 +133,7 @@ void CrevoRobot::robotInit(void){
 	gearSensor = new DigitalInput(DigitalPort::GEAR_SENSOR);
 
 	if(fuelManipulator != NULL) fuelManipulator->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
-	if(fuelManipulator != NULL) fuelManipulator->SetSensorDirection(true);
+	if(fuelManipulator != NULL) fuelManipulator->SetSensorDirection(false);
 
 	leftEnc    = new Encoder(DigitalPort::L_EN_1, DigitalPort::L_EN_2, true, Encoder::EncodingType::k2X);
 	rightEnc   = new Encoder(DigitalPort::R_EN_1, DigitalPort::R_EN_2, false, Encoder::EncodingType::k2X);
