@@ -23,7 +23,7 @@
 #include <Compressor.h>
 #include <RobotDrive.h>
 
-#define PRAC_BOT
+#define ROBOT_1
 #define NOT_DEBUG
 class CrevoRobot{
 
@@ -37,7 +37,7 @@ private:
 		 };
 /*________________________________________________________________________________________________________________________________*/
 
-#ifdef PRAC_BOT
+#ifdef ROBOT_1
 
 #define RIGHT_MULTIPLER 1
 #define  LEFT_MULTIPLER  0.9
@@ -54,7 +54,7 @@ private:
 		 };
 #endif /*PRAC_BOT*/
 
-#ifndef PRAC_BOT
+#ifndef ROBOT_1
 #define RIGHT_MULTIPLER  1
 #define  LEFT_MULTIPLER  1
 		enum MotorCAN{
