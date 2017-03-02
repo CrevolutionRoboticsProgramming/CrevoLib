@@ -15,6 +15,7 @@ class OI {
 
 private:
 	Joystick *selectController;
+
 	bool inputActive;
 	bool inputSlow;
 	bool stillPressed;
