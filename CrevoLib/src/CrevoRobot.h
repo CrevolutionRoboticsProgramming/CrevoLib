@@ -40,7 +40,7 @@ private:
 #ifdef ROBOT_1
 
 #define RIGHT_MULTIPLER 1
-#define  LEFT_MULTIPLER  0.9
+#define  LEFT_MULTIPLER 0.9
 		enum MotorCAN{
 			 	 	RIGHT_FRONT_PORT = 1,
 					RIGHT_REAR_PORT = 3,
