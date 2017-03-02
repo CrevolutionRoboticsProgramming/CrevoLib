@@ -20,6 +20,8 @@ public:
 
 	enum AutonAction { SHOOT, SCORE_GEAR, DUMP_HOPPER, NOTHING, FIND_BOILER};
 
+	enum GamePiece { FUEL, GEAR };
+
 	void AutonChooser(AutonStratagey strat);
 	bool AutonStateProcess(void);
 
@@ -29,11 +31,13 @@ public:
 private:
 	CrevoRobot crvbot;
 	DriveTrain drvt;
+	Vision     vs;
 
 	void IntakeState(MotorState state);
 	void DoMove(void);
 	void DoGear(void);
 	void DoShoot(void);
+	void DoAline(void);
 };
 
 #endif /* SRC_AUTONVECTORS_H_ */
