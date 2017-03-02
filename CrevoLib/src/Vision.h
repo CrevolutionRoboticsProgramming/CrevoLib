@@ -15,6 +15,7 @@
 #include <CameraServer.h>
 #include <IterativeRobot.h>
 #include <GripPipeline.h>
+#include <SmartDashboard/SmartDashboard.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
@@ -33,6 +34,7 @@ private:
 	double calcDistancePixel(double reflectiveTapeArea);
 public:
 	double distanceFromBoiler(void);
+	double alinementToBoiler(void);
 	bool boilerDected(void);
 	void startStream(void);
 	void visionTrackingProcessing(void);
