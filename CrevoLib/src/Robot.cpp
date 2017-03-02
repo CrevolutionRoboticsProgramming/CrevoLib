@@ -212,8 +212,8 @@ private:
 	Preferences *prefs;
 	Timer *runTime;
 
-	void DriveCode(void)
-	{
+	void DriveCode(void) {
+
 	     double Left_Y  = controllerJoystick(driverGamepad, 	   	 Axes::LEFT_Y);
 	     double Right_Y = controllerJoystick(driverGamepad, 		 Axes::RIGHT_Y);
 		 double Right_X = (0.65*controllerJoystick(driverGamepad, Axes::RIGHT_X));
@@ -225,19 +225,18 @@ private:
 		 if(tankTrue) crvbot.robotDrive->SetLeftRightMotorOutputs(LEFT_MULTIPLER*Left_Y, RIGHT_MULTIPLER*Right_Y);
 		 /*_________ Sets DriverJoystick in FirstPerosnDrive orientation _________*/
 	     else         crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(Left_Y - Right_X)), (RIGHT_MULTIPLER*(Left_Y + Right_X)));
-
 	}
 
-	void ShootProcesses(void)
-	{
-	if(toggleAction((operatorGamepad->GetRawAxis(3) > 0), crvbot.fuelManipulator, 0.78))
-	{
-		whilePressedAction(controllerButton(operatorGamepad, Button::LeftBumber), controllerButton(operatorGamepad, Button::RightBumber), crvbot.agitatorMotor, 0.6);
-	}
+	void ShootProcesses(void) {
+
+		if(toggleAction((operatorGamepad->GetRawAxis(3) > 0), crvbot.fuelManipulator, 0.78))
+		{
+			whilePressedAction(controllerButton(operatorGamepad, Button::LeftBumber), controllerButton(operatorGamepad, Button::RightBumber), crvbot.agitatorMotor, 0.6);
+		}
 	}
 
-	void updateRobotStatus(void)
-	{
+	void updateRobotStatus(void) {
+
 		SmartDashboard::PutNumber(" Total Runtime: ",        		  runTime->Get());
 		SmartDashboard::PutNumber(" SpeedShooter: ", 		 		  speedShoot);
 		SmartDashboard::PutBoolean(" TankDrive: ", 			 	  	  tankTrue);
@@ -257,8 +256,8 @@ private:
 		SmartDashboard::PutNumber("Gyro Angle", 					  crvbot.gyro->GetAngle());
 	}
 
-	void updateRobotPreference(void)
-	{
+	void updateRobotPreference(void) {
+
 		speedShoot   = prefs->GetDouble("Shooter Speed Scale", 0.4);
 		tankTrue     = prefs->GetBoolean("Is tankDrive on?", true);
 		AutonChooser = prefs->GetInt("Choose Auton", 9);

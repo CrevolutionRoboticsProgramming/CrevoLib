@@ -6,6 +6,7 @@
  */
 
 #include <CrevoRobot.h>
+#include <SmartDashboard/SmartDashboard.h>
 
 CrevoRobot::CrevoRobot(){
 
@@ -23,33 +24,19 @@ void CrevoRobot::robotInit(void){
 
 
 	//--Left Side--
-    leftFrontMotor  = new CANTalon(MotorCAN::LEFT_FRONT_PORT);
-	leftRearMotor   = new CANTalon(MotorCAN::LEFT_REAR_PORT);
-	/*
-	 * Setting the Rear Motor as a Slave to the front motor, only needs to turn on one side)
-	 */
-	leftRearMotor->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
-	leftRearMotor->Set(leftFrontMotor->GetDeviceID());
+    leftFrontMotor   = new CANTalon(MotorCAN::LEFT_FRONT_PORT);
+
+	leftRearMotor    = new CANTalon(MotorCAN::LEFT_REAR_PORT);
 
 	//--Right Side--
-	rightFrontMotor = new CANTalon(MotorCAN::RIGHT_FRONT_PORT);
-	rightRearMotor  = new CANTalon(MotorCAN::RIGHT_REAR_PORT);
-	/*
-	 * Setting the Rear Motor as a Slave to the front motor, only needs to turn on one side)
-	 */
-	rightRearMotor->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
-	rightRearMotor->Set(rightFrontMotor->GetDeviceID());
+	rightFrontMotor  = new CANTalon(MotorCAN::RIGHT_FRONT_PORT);
 
-
-	//________________________________________________________________
-
-	/*________________________________________________________________________________________________________________________________*/
-
+	rightRearMotor   = new CANTalon(MotorCAN::RIGHT_REAR_PORT);
 
 	//___________________ Manipulators MotorControllers ___________________
 
-
 	fuelManipulator  = new CANTalon(MotorCAN::SHOOTER_MOTOR_A);
+
 	fuelManipulator2 = new CANTalon(MotorCAN::SHOOTER_MOTOR_B);
 
 	intakeRoller   	 = new CANTalon(MotorCAN::INTAKE_MOTOR);
@@ -57,6 +44,8 @@ void CrevoRobot::robotInit(void){
 	agitatorMotor	 = new CANTalon(MotorCAN::AGITATOR_MOTOR);
 
 	hangerMotor		 = new CANTalon(MotorCAN::HANGER_MOTOR);
+
+	/*________________________________________________________________________________________________________________________________*/
 
 	SmartDashboard::PutBoolean(" Debug: ", false);
 
@@ -78,6 +67,18 @@ void CrevoRobot::robotInit(void){
 
 	//___________________ Configure MotorControlers ___________________
 
+	/*
+	* Setting the Rear Motor as a Slave to the front motor, only needs to turn on one side)
+	*/
+	leftRearMotor->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
+	leftRearMotor->Set(leftFrontMotor->GetDeviceID());
+
+	/*
+	 * Setting the Rear Motor as a Slave to the front motor, only needs to turn on one side)
+	 */
+	rightRearMotor->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
+	rightRearMotor->Set(rightFrontMotor->GetDeviceID());
+
 	//--Set Invert--
 
 	if(fuelManipulator != NULL) fuelManipulator->SetInverted(false);
@@ -91,6 +92,7 @@ void CrevoRobot::robotInit(void){
 	if(intakeRoller    != NULL) intakeRoller->SetInverted(false);
 	if(hangerMotor     != NULL) hangerMotor->SetInverted(false);
 
+
 	/*/
 	 * CTRE Magnetic Encoder
 	 * Absolute Mode							Relative Mode
@@ -99,29 +101,27 @@ void CrevoRobot::robotInit(void){
 	 * Accuracy: 12 bits/rotation (4096)		Accuracy: 12 bits/rotation
 	 * API: Pulse Width API						USes Quadrature API
 	/*/
-/*
-	if(leftFrontMotor  != NULL)  leftFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
-	if(rightFrontMotor != NULL) rightFrontMotor->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Absolute);
-*/
-	//--
-	//leftFrontMotor->SetP(0.3);
-	//leftFrontMotor->SetI(0.5);
-	//_____________________________ PID Configuration _____________________________
 
+	//_____________________________ PID Configuration _____________________________
 
 
 	// These values are for PID control. Will be Adjusted later.
 
-	if(fuelManipulator != NULL) fuelManipulator->ConfigNominalOutputVoltage(0.0f, -0.0f);
-	if(fuelManipulator != NULL) fuelManipulator->ConfigPeakOutputVoltage(12.0f, 0.0f);
+	if(fuelManipulator != NULL) fuelManipulator->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
+	if(fuelManipulator != NULL) fuelManipulator->SetSensorDirection(false);
 
-	if(fuelManipulator != NULL) fuelManipulator->SetPID(kP,kI,kD);
+	if(fuelManipulator != NULL) fuelManipulator->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(fuelManipulator != NULL) fuelManipulator->ConfigPeakOutputVoltage(12.0, 0.0);
 
-
+	if(fuelManipulator != NULL) fuelManipulator->SelectProfileSlot(0);
+	if(fuelManipulator != NULL) fuelManipulator->SetP(kP);
+	if(fuelManipulator != NULL) fuelManipulator->SetI(kI);
+	if(fuelManipulator != NULL) fuelManipulator->SetD(kD);
 
 	/*________________________________________________________________________________________________________________________________*/
 
 	//______________________________ RobotDrive ______________________________________
+
 	robotDrive = new RobotDrive(leftFrontMotor, rightFrontMotor);
 
 	/*________________________________________________________________________________________________________________________________*/
@@ -131,9 +131,6 @@ void CrevoRobot::robotInit(void){
 	accel      = new AnalogAccelerometer(AnalogPort::ACCELEROMETER);
 
 	gearSensor = new DigitalInput(DigitalPort::GEAR_SENSOR);
-
-	if(fuelManipulator != NULL) fuelManipulator->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
-	if(fuelManipulator != NULL) fuelManipulator->SetSensorDirection(false);
 
 	leftEnc    = new Encoder(DigitalPort::L_EN_1, DigitalPort::L_EN_2, true, Encoder::EncodingType::k2X);
 	rightEnc   = new Encoder(DigitalPort::R_EN_1, DigitalPort::R_EN_2, false, Encoder::EncodingType::k2X);
@@ -154,12 +151,13 @@ void CrevoRobot::robotInit(void){
 	if(fuelManipulator != NULL) fuelManipulator->StopMotor();
 	if(intakeRoller    != NULL)    intakeRoller->StopMotor();
 	if(hangerMotor     != NULL)     hangerMotor->StopMotor();
-#ifdef PRAC_BOT
-	SmartDashboard::PutString("Robot Configuration: ", "Practice Bot");
+
+#ifdef ROBOT_1
+	SmartDashboard::PutString("Robot Configuration: ", "ROBOT 2");
 #endif
 
-#ifndef PRAC_BOT
-	SmartDashboard::PutString("Robot Configuration: ", "Competition Bot");
+#ifndef ROBOT_1
+	SmartDashboard::PutString("Robot Configuration: ", "ROBOT 2");
 #endif
 }
 

@@ -73,6 +73,7 @@ bool AutonVectors::AutonStateProcess(void)
 	case DUMP_HOPPER:
 		break;
 	case FIND_BOILER:
+		DoAline();
 		break;
 	case NOTHING:
 		break;
@@ -94,4 +95,14 @@ void AutonVectors::DoShoot(void)
 void AutonVectors::DoMove(void)
 {
 
+}
+
+void AutonVectors::DoGear(void)
+{
+
+}
+
+void AutonVectors::DoAline(void)
+{
+	vs.alinementToBoiler();
 }
