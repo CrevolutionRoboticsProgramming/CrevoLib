@@ -8,12 +8,36 @@
 #ifndef SRC_VISION_H_
 #define SRC_VISION_H_
 
-class Vision {
-private:
-	static void VisionTread();
-public:
-	void startStream(void);
+#include <GripPipeline.h>
 
+#include <WPILib.h>
+#include <CrevoRobot.h>
+#include <CameraServer.h>
+#include <IterativeRobot.h>
+#include <GripPipeline.h>
+#include <SmartDashboard/SmartDashboard.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/core/types.hpp>
+
+
+class Vision {
+
+private:
+	GripPipeline gp;
+	CrevoRobot crvbot;
+
+	const int PIXEL_HEIGHT = 720;
+	const int PIXEL_WIDTH  = 640;
+
+	static void VisionTread(void);
+	double calcDistancePixel(double reflectiveTapeArea);
+public:
+	double distanceFromBoiler(void);
+	double alinementToBoiler(void);
+	bool boilerDected(void);
+	void startStream(void);
+	void visionTrackingProcessing(void);
 	Vision();
 	virtual ~Vision();
 };

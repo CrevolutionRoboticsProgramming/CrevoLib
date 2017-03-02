@@ -1,5 +1,4 @@
 #include <DriveTrain.h>
-#include <Math.h>
 
  DriveTrain::DriveTrain()
  {
@@ -25,7 +24,7 @@
      {
     	 IsMagEnc = false;
      }
-
+     std::cout << "Robot Initialized" << std::endl;
   }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::initEncoder(Encoder *_leftEncInit, Encoder *_rightEncInit)
@@ -41,11 +40,17 @@
 	 leftFrontMotor = _leftFront;
 	 leftRearMotor = _leftRear;
   }
+ void DriveTrain::initMotor(CANTalon *_selectedTalon)
+ {
+	 freeTalon = _selectedTalon;
+	 driveTime = new Timer();
+ }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
  void DriveTrain::initDrive(RobotDrive *_robotDrvInit)
   {
 	 robotDrive = _robotDrvInit;
+	 driveTime 		= new Timer();
   }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -70,6 +75,22 @@
 	 freeTalon = _selectedTalon;
 	 freeTalon->Set(speed);
   }
+ bool DriveTrain::moveMotor(double pwr, double timeValue, Direction dir)
+   {
+	 	driveTime->Start();
+	 	 if(dir == Direction::Reverse)
+	 	 {
+	 		 pwr *= -1;
+	 	 }
+
+	 	 while(driveTime->Get() < timeValue)
+	 	 {
+	 		 freeTalon->Set(pwr);
+	 	 }
+	 	freeTalon->Set(0);
+	 	 driveTime->Stop();
+	 	 return false;
+   }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::stopRobot(void)
   {
@@ -80,7 +101,7 @@
  void DriveTrain::driveDistanceEncoder(double dst, double pwr, Direction dir)
   {
 	 double counts = distanceToCounts(dst);
-	 if (dir == DriveTrain::Reverse)
+	 if (dir == Reverse)
      {
 		 counts *= -1;
 		 pwr *= -1;
@@ -107,12 +128,14 @@
 		 }
 	 }
 	 stopAndReset();
- }
+	 std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 std::cout << "" << std::endl;
+	 std::cout << "|| Crevobot || Action Completed With : Rgt Dst: " << rightEnc->GetDistance() << "Lft Dst: "<< rightEnc->GetDistance() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
+	 std::cout << "" << std::endl;
+  }
 
  void DriveTrain::driveCountEncoder(double enct, double pwr, Direction dir)
  {
-
-
 
 	 	 if(IsMagEnc)
 	 	 {
@@ -128,7 +151,7 @@
 	 	 {
 	 		int lft_target = leftEnc->GetRaw() + enct;
 	 		int rgt_target = rightEnc->GetRaw() + enct;
-	 		if (dir == DriveTrain::Reverse)
+	 		if (dir == Reverse)
 	 		{
 	 			lft_target *= -1;
 	 			rgt_target *= -1;
@@ -147,32 +170,31 @@
 	 			 }
 	 		}
 	 	 }
-	 	 stopAndReset();
+	 	stopAndReset();
+	 	std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 	std::cout << "" << std::endl;
+	 	std::cout << "|| Crevobot || Action Completed With : Rgt Enc: " << rightEnc->GetRaw() << "Lft Enc: "<< leftEnc->GetRaw() <<" Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
+	 	std::cout << "" << std::endl;
  }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::driveByTime(double timeValue, double pwr, Direction dir)
  {
-	 timeValue *= 500;
-
+	 driveTime->Start();
 	 if(dir == Direction::Reverse)
 	 {
 		 pwr *= -1;
 	 }
-
-	 if(FinishedPreviousTrial)
-	 {
-		 autonCounter = 0;
-		 FinishedPreviousTrial = false;
-	 }
-
-	 while(autonCounter < timeValue)
+	 while(driveTime->Get() < timeValue)
 	 {
 		 moveRobot(pwr);
-		 autonCounter++;
 	 }
-	 FinishedPreviousTrial = true;
 	 stopRobot();
+	 driveTime->Stop();
+	 std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 std::cout << "" << std::endl;
+	 std::cout << "|| Crevobot || Action Completed With : Time Driven: " << driveTime->Get() << " Speed: "  << abs(pwr) << "Direction: "<< dir << std::endl;
+	 std::cout << "" << std::endl;
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::encoderTurn(double angle, double pwr)
@@ -187,6 +209,10 @@
 		 moveRobot(pwr);
 	 }
 	 stopRobot();
+	 std::cout << "____________________________________________________________________________________________________" << std::endl;
+	 std::cout << "" << std::endl;
+	 std::cout << "|| Crevobot || Action Completed With: angle " << counts << "Speed: " << pwr << std::endl;
+	 std::cout << "" << std::endl;
  }
  /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -217,6 +243,7 @@
 	 }
 	 else
 	 {
+
 		 steer = getSteer(error, PADJ_TURN);
 		 rgtPwr = pwr * steer;
 		 errorClip(rgtPwr, -1, 1);
@@ -252,15 +279,6 @@
 	 return errorClip(error * Pcoefficent , -1, 1);
  }
 
- double DriveTrain::errorClip(double number , double min, double max)
- {
-	 if(number < min)
-		 return min;
-	 if(number > max)
-		 return max;
-	 return number;
- }
-
  void DriveTrain::stopAndReset()
  {
 	 stopRobot();
@@ -276,4 +294,10 @@
 	 return error;
  }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+double DriveTrain::errorClip(double number, double min, double max)
+{
+	if(number < min) return min;
+	if(number > max) return max;
+	return number;
+}
 

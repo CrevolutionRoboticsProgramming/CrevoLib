@@ -10,12 +10,12 @@
 
 #include <Joystick.h>
 #include <CANTalon.h>
-//namespace OI {
 
 class OI {
 
 private:
 	Joystick *selectController;
+
 	bool inputActive;
 	bool inputSlow;
 	bool stillPressed;
@@ -28,8 +28,8 @@ public:
 					A = 1,
 					Y = 4,
 					B = 2,
-					LeftBummber = 5,
-					RightBummber = 6,
+					LeftBumber = 5,
+					RightBumber = 6,
 					LeftTrigger = 2,
 					RightTrigger = 3,
 					LeftStick = 0,
@@ -54,7 +54,8 @@ public:
 	bool controllerButton(Joystick *joystick, Button button);
 	float controllerJoystick(Joystick *joystick, Axes axes);
 	float shape(float inValue);
-	void toggleAction(bool Pressed, CANTalon *_motor, double speed);
+	bool toggleAction(bool Pressed, CANTalon *_motor, double speed);
+	void whilePressedAction(bool forwardPressed, bool reversedPressed, CANTalon *_motor, double speed);
 	OI();
 	virtual ~OI();
 };

@@ -7,13 +7,6 @@
 
 #include <Vision.h>
 
-#include <WPILib.h>
-#include <CameraServer.h>
-#include <IterativeRobot.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/core/types.hpp>
-
 Vision::Vision() {
 	// TODO Auto-generated constructor stub
 
@@ -25,25 +18,30 @@ Vision::~Vision() {
 
 void Vision::startStream(void)
 {
-	std::thread visionThread(VisionTread);
-	visionThread.detach();
+
+	//cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(0);
+	//camera2.SetResolution(750, 640);
+
+	std::thread shooterStream(VisionTread);
+	shooterStream.detach();
 }
 
-void Vision::VisionTread()
+void Vision::VisionTread(void)
 {
-	cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture();
+	cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture(0);
 				// Set the resolution
 	camera.SetResolution(640, 480);
-
 				// Get a CvSink. This will capture Mats from the Camera
+
 	cs::CvSink cvSink = CameraServer::GetInstance()->GetVideo();
 				// Setup a CvSource. This will send images back to the Dashboard
-	cs::CvSource outputStream = CameraServer::GetInstance()->PutVideo("Stream", 720, 640);
+	cs::CvSource outputStream = CameraServer::GetInstance()->PutVideo("Crevo Cam", 320, 280);
 
 				// Mats are very memory expensive. Lets reuse this Mat.
 	cv::Mat mat;
 
-	while (true) {
+	while (true){
+
 					// Tell the CvSink to grab a frame from the camera and put it
 					// in the source mat.  If there is an error notify the output.
 			if (cvSink.GrabFrame(mat) == 0) {
@@ -52,10 +50,47 @@ void Vision::VisionTread()
 						// skip the rest of the current iteration
 				continue;
 			}
-					// Put a rectangle on the image
-			rectangle(mat, cv::Point(100, 100), cv::Point(400, 400),
-							cv::Scalar(255, 255, 255), 5);
 					// Give the output stream a new image to display
 			outputStream.PutFrame(mat);
+
 		}
+
+}
+
+double Vision::distanceFromBoiler(void)
+{
+	double Distance;
+	std::cout << "Areas: ";
+	std::vector<double> arr = crvbot.table->GetNumberArray("area", llvm::ArrayRef<double>());
+
+	for(unsigned int i = 0; i < arr.size(); i++) {
+			std::cout << " | " << arr[i] <<" | ";
+			Distance = calcDistancePixel(arr[1]);
+			std::cout << " | Distance: " << Distance;
+	}
+	std::cout << std::endl;
+	SmartDashboard::PutNumber("Distance From Boiler", Distance);
+	return Distance;
+}
+
+double Vision::alinementToBoiler(void)
+{
+	double difference;
+	std::cout << "Difference from Center: ";
+	std::vector<double> arr  = crvbot.table->GetNumberArray("center X", llvm::ArrayRef<double>());
+
+	for(unsigned int i = 0; i < arr.size(); i++)
+	{
+		std::cout << " | " << arr[i] << " | ";
+	}
+	std::cout << std::endl;
+	SmartDashboard::PutNumber("Robot Center X value:", difference);
+	return difference;
+}
+
+double Vision::calcDistancePixel(double reflectiveTapeArea)
+{
+	double calculatedDistance;
+	reflectiveTapeArea /= 40;
+	return calculatedDistance = 25.098*pow(reflectiveTapeArea, -0.428);
 }
