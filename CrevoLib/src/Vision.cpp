@@ -22,6 +22,8 @@ void Vision::startStream(void)
 	//cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(0);
 	//camera2.SetResolution(750, 640);
 
+	table = NetworkTable::GetTable("GRIP/Crevo");
+
 	std::thread shooterStream(VisionTread);
 	shooterStream.detach();
 }
@@ -61,7 +63,7 @@ double Vision::distanceFromBoiler(void)
 {
 	double Distance;
 	std::cout << "Areas: ";
-	std::vector<double> arr = crvbot.table->GetNumberArray("area", llvm::ArrayRef<double>());
+	std::vector<double> arr = table->GetNumberArray("area", llvm::ArrayRef<double>());
 
 	for(unsigned int i = 0; i < arr.size(); i++) {
 			std::cout << " | " << arr[i] <<" | ";
@@ -76,16 +78,26 @@ double Vision::distanceFromBoiler(void)
 double Vision::alinementToBoiler(void)
 {
 	double difference;
-	std::cout << "Difference from Center: ";
-	std::vector<double> arr  = crvbot.table->GetNumberArray("center X", llvm::ArrayRef<double>());
+	std::vector<double> centerX  = table->GetNumberArray("centerX", llvm::ArrayRef<double>());
+	std::vector<double> area  = table->GetNumberArray("centerX", llvm::ArrayRef<double>());
 
-	for(unsigned int i = 0; i < arr.size(); i++)
+	if(centerX.size() > 0 && area[0] > 100)
 	{
-		std::cout << " | " << arr[i] << " | ";
+		std::cout << "Difference from Center: ";
+		for(unsigned int i = 0; i < centerX.size(); i++)
+		{
+			std::cout << " | " << centerX[i] << " | ";
+		}
+		std::cout << std::endl;
+		difference = centerX[0];
+		return difference;
 	}
-	std::cout << std::endl;
+	else{
+		std::cout << "Nothing Detected : " << std::endl;
+		return 0;
+	}
+
 	SmartDashboard::PutNumber("Robot Center X value:", difference);
-	return difference;
 }
 
 double Vision::calcDistancePixel(double reflectiveTapeArea)
