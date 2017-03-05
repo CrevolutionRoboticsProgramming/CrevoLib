@@ -78,7 +78,7 @@
  bool DriveTrain::moveMotor(double pwr, double timeValue, Direction dir)
    {
 	 	driveTime->Start();
-	 	 if(dir == Direction::Reverse)
+	 	 if(dir == Direction::Forward)
 	 	 {
 	 		 pwr *= -1;
 	 	 }
