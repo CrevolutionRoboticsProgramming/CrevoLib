@@ -81,7 +81,7 @@ void CrevoRobot::robotInit(void){
 
 	//--Set Invert--
 
-	if(fuelManipulator != NULL) fuelManipulator->SetInverted(false);
+	if(fuelManipulator != NULL) fuelManipulator->SetInverted(true);
 
 	if(fuelManipulator != NULL) fuelManipulator2->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
 	if(fuelManipulator != NULL) fuelManipulator2->Set(fuelManipulator->GetDeviceID());
@@ -143,8 +143,6 @@ void CrevoRobot::robotInit(void){
 	//rightEnc->SetDistancePerPulse(calcdistanceperPulse);
 
 	/*________________________________________________________________________________________________________________________________*/
-
-	table = NetworkTable::GetTable("GRIP/Crevo");
 
 	/*_____ Set All motor Percentages to Zero _____*/
 	if(robotDrive      != NULL)      robotDrive->StopMotor();
