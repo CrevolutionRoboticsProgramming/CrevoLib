@@ -15,6 +15,7 @@
 #include <CameraServer.h>
 #include <IterativeRobot.h>
 #include <GripPipeline.h>
+#include <networktables/NetworkTable.h>
 #include <SmartDashboard/SmartDashboard.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
@@ -26,6 +27,8 @@ class Vision {
 private:
 	GripPipeline gp;
 	CrevoRobot crvbot;
+
+	std::shared_ptr<NetworkTable> table;
 
 	const int PIXEL_HEIGHT = 720;
 	const int PIXEL_WIDTH  = 640;
