@@ -20,7 +20,7 @@
 #include <SmartDashboard/SendableChooser.h>
 #include <SmartDashboard/SmartDashboard.h>
 
-class Robot: public IterativeRobot, public OI, public DriveTrain, public AutonVectors
+class Robot: public IterativeRobot, public OI, public AutonVectors
 {
 public:
 
@@ -84,7 +84,15 @@ public:
 
 		crvbot.gyro->Reset();
 
-		initDrive(crvbot.robotDrive);
+		/*/
+		 *  Init Shooter as controlled by velocity
+		/*/
+
+		crvbot.fuelManipulator->SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode);
+
+		//drvt.initDrive(crvbot.robotDrive);
+		drvt.init(crvbot.robotDrive, crvbot.gyro, drvt.EncoderType::QuadEncoder);
+
 
 		updateRobotStatus();
 		updateRobotPreference();
@@ -111,57 +119,12 @@ public:
 			updateRobotStatus();
 
 
-//			switch(AutonChooser)
-//			{
-//			case AutonMove:
-//			{
-				//driveByTime(2, 0.5, Reverse);
-				//Wait(2);
-				//break;
-			//}
-//			case ForwardAndBackwards:
-//			{
-//				driveByTime(2, 0.2, Forward);
-//				Wait(2);
-//				driveByTime(2, 0.8 , Reverse);
-//				Wait(2);
-//				break;
-//			}
-//			case VisionProcessingData:
-//			{
-//				while(true) { vs.distanceFromBoiler(); }
-//				break;
-//			}
-//			case EchyMemes:
-//			{
-				//driveByTime(2, 0.5, Reverse);
-//				while(vs.alinementToBoiler() <=  200  && !hasReached)
-//				{
-//					moveRobot(0.15, -0.15);
-//				}
-//				hasReached = true;
-//				moveRobot(0,0);
+				while(vs.alinementToBoiler() <=  200  && !hasReached)
+				{
+					drvt.moveRobot(0.15, -0.15);
+				}				hasReached = true;
+				drvt.moveRobot(0,0);
 
-//
-//				break;
-//			}
-//			case InternalScreams:
-//			{
-//				moveMotor(0.5, 2, Forward);
-//			}
-//			case 9:
-//			{
-//				moveMotor(0.5, 2, Reverse);
-//				break;
-//			}
-//			default:
-//			{
-//				crvbot.robotDrive->StopMotor();
-//				crvbot.fuelManipulator->StopMotor();
-//				crvbot.intakeRoller->StopMotor();
-//				crvbot.hangerMotor->StopMotor();
-//			}
-			//}
 		}
 
 		runTime->Stop();
@@ -287,7 +250,6 @@ private:
 	}
 
 	void updateRobotPreference(void) {
-
 
 		reverseDirection  = prefs->GetBoolean("Is tankDrive on?", true);
 		BoilerPostition   = prefs->GetInt("BoilerPostition ", 300);
