@@ -16,7 +16,7 @@ AutonVectors::~AutonVectors() {
 	// TODO Auto-generated destructor stub
 }
 
-void AutonVectors::AutonChooser(AutonStratagey strat)
+void AutonVectors::AutonSelect(AutonStratagey strat)
 {
 	switch(strat)
 	{
@@ -26,37 +26,7 @@ void AutonVectors::AutonChooser(AutonStratagey strat)
 	case SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE:
 	case SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER:
 	case IDLE:
-			break;
-	}
-	switch(strat)
-	{
-	case SHOOT_FROM_HOPPER:
-	case SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT:
-	case SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE:
-	case SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE:
-	case SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER:
-	case IDLE:
-			break;
-	}
-	switch(strat)
-	{
-	case SHOOT_FROM_HOPPER:
-	case SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT:
-	case SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE:
-	case SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE:
-	case SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER:
-	case IDLE:
-			break;
-	}
-	switch(strat)
-	{
-	case SHOOT_FROM_HOPPER:
-	case SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT:
-	case SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE:
-	case SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE:
-	case SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER:
-	case IDLE:
-			break;
+		break;
 	}
 }
 
@@ -68,14 +38,11 @@ bool AutonVectors::AutonStateProcess(void)
 	case SHOOT:
 		DoShoot();
 		break;
-	case SCORE_GEAR:
-		break;
-	case DUMP_HOPPER:
-		break;
 	case FIND_BOILER:
 		DoAline();
 		break;
 	case NOTHING:
+		StopMotors();
 		break;
 	}
 	return true;
@@ -89,15 +56,10 @@ void AutonVectors::IntakeState(MotorState state)
 
 void AutonVectors::DoShoot(void)
 {
-
+	crvbot.fuelManipulator->Set(0.5);
 }
 
 void AutonVectors::DoMove(void)
-{
-
-}
-
-void AutonVectors::DoGear(void)
 {
 
 }
@@ -106,3 +68,13 @@ void AutonVectors::DoAline(void)
 {
 	vs.alinementToBoiler();
 }
+
+void AutonVectors::StopMotors(void)
+{
+	drvt.stopRobot();
+	crvbot.agitatorMotor->StopMotor();
+	crvbot.fuelManipulator->StopMotor();
+	crvbot.hangerMotor->StopMotor();
+	crvbot.intakeRoller->StopMotor();
+}
+
