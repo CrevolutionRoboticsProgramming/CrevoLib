@@ -151,7 +151,7 @@ void CrevoRobot::robotInit(void){
 	if(hangerMotor     != NULL)     hangerMotor->StopMotor();
 
 #ifdef ROBOT_1
-	SmartDashboard::PutString("Robot Configuration: ", "ROBOT 2");
+	SmartDashboard::PutString("Robot Configuration: ", "ROBOT 1");
 #endif
 
 #ifndef ROBOT_1
