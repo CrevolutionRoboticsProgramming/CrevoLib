@@ -21,6 +21,22 @@ void AutonVectors::AutonSelect(AutonStratagey strat)
 	switch(strat)
 	{
 	case SHOOT_FROM_HOPPER:
+	case SCORE_GEAR_CENTER:
+	{
+		drvt.driveCountEncoder(A1_M1_LeftCount, A1_M1_Speed, Forward);
+		break;
+	}
+	case SCORE_GEAR_LEFT:
+	{
+		drvt.driveCountEncoder(A2_M1_LeftCount, A2_M1_Speed, Forward);
+		drvt.turnToHeading(A2_M2_GyroAngle, A2_M2_Speed);
+		drvt.driveCountEncoder(A2_M3_LeftCount, A2_M3_Speed, Forward);
+		break;
+	}
+	case SCORE_GEAR_RIGHT:
+	{
+		break;
+	}
 	case SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT:
 	case SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE:
 	case SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE:
@@ -56,7 +72,7 @@ void AutonVectors::IntakeState(MotorState state)
 
 void AutonVectors::DoShoot(void)
 {
-	crvbot.fuelManipulator->Set(0.5);
+
 }
 
 void AutonVectors::DoMove(void)

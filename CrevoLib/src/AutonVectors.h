@@ -9,6 +9,7 @@
 #define SRC_AUTONVECTORS_H_
 
 #include <crevoglb.h>
+#include <iostream>
 #include <CrevoRobot.h>
 #include <DriveTrain.h>
 #include <Math.h>
@@ -24,16 +25,20 @@ public:
 	/*_____ Center Peg Gear Action Values _____*/
 	const int A1_M1_LeftCount = 2728;
 	const int A1_M1_RightCount = 929;
+	const int A1_M1_Speed     = 0.5;
 	/*_________________________________________*/
 
 	/*_____ Left Peg Gear Action Values _____*/
 	const int A2_M1_LeftCount = 2254;
 	const int A2_M1_RightCount = 830;
+	const int A2_M1_Speed     = 0.5;
 
 	const int A2_M2_GyroAngle = -58;
+	const int A2_M2_Speed     = 0.4;
 
-	const int A3_M3_LeftCount = 5215;
-	const int A3_M3_RightCout = 1322;
+	const int A2_M3_LeftCount = 5215;
+	const int A2_M3_RightCout = 1322;
+	const int A2_M3_Speed     = 0.5;
 	/*_______________________________________*/
 
 	/*_____ Right Peg Gear Action Values _____*/
