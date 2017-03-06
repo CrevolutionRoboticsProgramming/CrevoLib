@@ -18,12 +18,15 @@ Vision::~Vision() {
 
 void Vision::startStream(void)
 {
-
-	//cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(0);
-	//camera2.SetResolution(750, 640);
-
+	/*_____ Select table object to revive the NetworkTable from GRIPn_____*/
 	table = NetworkTable::GetTable("GRIP/Crevo");
 
+
+	/*_____ Starts Instance for Gear stream _____*/
+	cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(1);
+	camera2.SetResolution(640, 480);
+
+	/*_____ Starts Instance for Shooter stream on a Different Tread _____*/
 	std::thread shooterStream(VisionTread);
 	shooterStream.detach();
 }
@@ -63,11 +66,14 @@ double Vision::distanceFromBoiler(void)
 {
 	double Distance;
 	std::cout << "Areas: ";
-	std::vector<double> arr = table->GetNumberArray("area", llvm::ArrayRef<double>());
 
-	for(unsigned int i = 0; i < arr.size(); i++) {
-			std::cout << " | " << arr[i] <<" | ";
-			Distance = calcDistancePixel(arr[1]);
+	/*____ Pulls area array from the NetworkTable ____*/
+	std::vector<double> areas = table->GetNumberArray("area", llvm::ArrayRef<double>());
+
+	/*_____ Run through for each value in array _____*/
+	for(unsigned int i = 0; i < areas.size(); i++) {
+			std::cout << " | " << areas[i] <<" | ";
+			Distance = calcDistancePixel(areas[1]);   /*_____ Calculate distance from boiler using area_____*/
 			std::cout << " | Distance: " << Distance;
 	}
 	std::cout << std::endl;
@@ -78,9 +84,12 @@ double Vision::distanceFromBoiler(void)
 double Vision::alinementToBoiler(void)
 {
 	double difference;
-	std::vector<double> centerX  = table->GetNumberArray("centerX", llvm::ArrayRef<double>());
-	std::vector<double> area  = table->GetNumberArray("centerX", llvm::ArrayRef<double>());
 
+	/*_____ Pulls both the centerX and area _____*/
+	std::vector<double> centerX  = table->GetNumberArray("centerX", llvm::ArrayRef<double>());
+	std::vector<double> area  = table->GetNumberArray("area", llvm::ArrayRef<double>());
+
+	/*_____ Checks to see if there is a countor detected and filers mixups _____*/
 	if(centerX.size() > 0 && area[0] > 100)
 	{
 		std::cout << "Difference from Center: ";
