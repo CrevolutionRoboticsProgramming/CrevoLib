@@ -20,7 +20,7 @@
 #include <SmartDashboard/SendableChooser.h>
 #include <SmartDashboard/SmartDashboard.h>
 
-class Robot: public IterativeRobot, public OI, public DriveTrain
+class Robot: public IterativeRobot, public OI, public DriveTrain, public AutonVectors
 {
 public:
 
@@ -44,7 +44,9 @@ public:
 		/*/
 		 *	Command to start up the stream from the USB camera.
 		/*/
+
 		vs.startStream();
+
 		/*/
 		 *  This is setting up the network table to communicate preferences from smart dashboard to the RoboRIO
 		/*/
@@ -55,19 +57,7 @@ public:
 		std::cout << "|| Crevobot || Robot completed initialize" << std::endl;
 		std::cout << "_____________________________________________" << std::endl;
 	}
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * GetString line to get the auto name from the text box below the Gyro.
-	 *
-	 * You can add additional auto modes by adding additional comparisons to the
-	 * if-else structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
-	 */
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 	/*/
 	 * 1. Shoot from hopper
 	 * 2. Score gear right shoot from lift
@@ -92,13 +82,12 @@ public:
 		crvbot.leftEnc->Reset();
 		crvbot.rightEnc->Reset();
 
+		crvbot.gyro->Reset();
+
 		initDrive(crvbot.robotDrive);
 
 		updateRobotStatus();
-
 		updateRobotPreference();
-
-		crvbot.gyro->Reset();
 
 		runTime->Reset();
 
@@ -115,9 +104,13 @@ public:
 
 		runTime->Start();
 
+		AutonSelect(AutonStratagey::SHOOT_FROM_HOPPER);
+
 		while(IsAutonomous() && IsEnabled())
 		{
 			updateRobotStatus();
+
+
 //			switch(AutonChooser)
 //			{
 //			case AutonMove:
@@ -198,10 +191,14 @@ public:
 
 		while(IsOperatorControl() && IsEnabled())
 		{
+
+			/*_____ DRIVETRIAN CODE_____*/
 			DriveCode();
 
+			/*_____ SHOOTER CODE_____*/
 			ShootProcesses();
 
+			/*_____INTAKE CODE_____*/
 			whilePressedAction(controllerButton(driverGamepad, Button::RightBumber), controllerButton(driverGamepad, Button::LeftBumber), crvbot.intakeRoller, 0.8);
 
 			updateRobotStatus();
@@ -222,10 +219,10 @@ public:
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 private:
+
 	LiveWindow* lw = LiveWindow::GetInstance();
 
 	CrevoRobot crvbot;
-	AutonVectors av;
 	Vision vs;
 	FeedBack fdbk;
 	Joystick *driverGamepad;
@@ -258,13 +255,16 @@ private:
 	void ShootProcesses(void) {
 
 		toggleAction((operatorGamepad->GetRawAxis(3) > 0), crvbot.fuelManipulator, 1);
-		whilePressedAction(controllerButton(operatorGamepad, Button::LeftBumber), controllerButton(operatorGamepad, Button::RightBumber), crvbot.agitatorMotor, 0.4);
+
+		if(crvbot.fuelManipulator->GetEncVel() >= 12000)
+			whilePressedAction(controllerButton(operatorGamepad, Button::LeftBumber), controllerButton(operatorGamepad, Button::RightBumber), crvbot.agitatorMotor, 0.4);
+		else
+			crvbot.fuelManipulator->Set(0);
 	}
 
 	void updateRobotStatus(void) {
 
 		SmartDashboard::PutNumber(" Total Runtime: ",        		  runTime->Get());
-		SmartDashboard::PutBoolean(" ReverseDirection : ", 			  reverseDirection);
 		SmartDashboard::PutNumber(" LeftMotor Current: ",   		  crvbot.leftFrontMotor->GetOutputCurrent());
 		SmartDashboard::PutNumber(" RightMotor Current: ",  		  crvbot.rightFrontMotor->GetOutputCurrent());
 		SmartDashboard::PutNumber(" LeftMotor Voltage: ",   		  crvbot.leftFrontMotor->GetOutputVoltage());
@@ -282,6 +282,8 @@ private:
 		SmartDashboard::PutNumber(" FuleShooter RPM: ",      		  crvbot.fuelManipulator->GetEncVel());
 		//SmartDashboard::PutNumber(" RobotCenter X Value: ",           vs.alinementToBoiler());
 		SmartDashboard::PutNumber(" Gyro Angle : ", 				  crvbot.gyro->GetAngle());
+
+		SmartDashboard::PutBoolean(" ReverseDirection : ", 			  reverseDirection);
 	}
 
 	void updateRobotPreference(void) {
