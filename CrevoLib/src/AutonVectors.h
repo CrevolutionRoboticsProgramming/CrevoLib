@@ -71,7 +71,7 @@ public:
 
 private:
 	CrevoRobot crvbot;
-	DriveTrain drvt;
+	//DriveTrain drvt;
 	Vision     vs;
 
 	void IntakeState(MotorState state);
