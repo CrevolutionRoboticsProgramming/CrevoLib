@@ -23,14 +23,14 @@ void AutonVectors::AutonSelect(AutonStratagey strat)
 	case SHOOT_FROM_HOPPER:
 	case SCORE_GEAR_CENTER:
 	{
-		drvt.driveCountEncoder(A1_M1_LeftCount, A1_M1_Speed, Forward);
+		//drvt.driveCountEncoder(A1_M1_LeftCount, A1_M1_Speed, Forward);
 		break;
 	}
 	case SCORE_GEAR_LEFT:
 	{
-		drvt.driveCountEncoder(A2_M1_LeftCount, A2_M1_Speed, Forward);
-		drvt.turnToHeading(A2_M2_GyroAngle, A2_M2_Speed);
-		drvt.driveCountEncoder(A2_M3_LeftCount, A2_M3_Speed, Forward);
+		//drvt.driveCountEncoder(A2_M1_LeftCount, A2_M1_Speed, Forward);
+		//drvt.turnToHeading(A2_M2_GyroAngle, A2_M2_Speed);
+		//drvt.driveCountEncoder(A2_M3_LeftCount, A2_M3_Speed, Forward);
 		break;
 	}
 	case SCORE_GEAR_RIGHT:
@@ -87,7 +87,7 @@ void AutonVectors::DoAline(void)
 
 void AutonVectors::StopMotors(void)
 {
-	drvt.stopRobot();
+	//drvt.stopRobot();
 	crvbot.agitatorMotor->StopMotor();
 	crvbot.fuelManipulator->StopMotor();
 	crvbot.hangerMotor->StopMotor();
