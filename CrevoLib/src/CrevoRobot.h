@@ -152,9 +152,6 @@ public:
 		  * These values hold variables for the PID controller
 		  * Are adjusted in the preference section of the Smart Dashboard
 		 /*/
-		 int kP;
-		 int kI;
-		 int kD;
 		 /*
 		  * Distance traveled = Wheel rotations * circumference
 		  * or
