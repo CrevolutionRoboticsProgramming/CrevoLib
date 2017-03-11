@@ -82,7 +82,7 @@ void AutonVectors::DoMove(void)
 
 void AutonVectors::DoAline(void)
 {
-	vs.alinementToBoiler();
+	//vs.alinementToBoiler();
 }
 
 void AutonVectors::StopMotors(void)
