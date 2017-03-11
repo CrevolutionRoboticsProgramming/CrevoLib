@@ -81,7 +81,7 @@ double Vision::distanceFromBoiler(void)
 	return Distance;
 }
 
-double Vision::alinementToBoiler(void)
+double Vision::alignmentToBoiler(void)
 {
 	double difference;
 

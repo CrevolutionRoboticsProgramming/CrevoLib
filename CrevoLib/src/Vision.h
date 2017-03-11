@@ -37,7 +37,7 @@ private:
 	double calcDistancePixel(double reflectiveTapeArea);
 public:
 	double distanceFromBoiler(void);
-	double alinementToBoiler(void);
+	double alignmentToBoiler(void);
 	bool boilerDected(void);
 	void startStream(void);
 	void visionTrackingProcessing(void);
