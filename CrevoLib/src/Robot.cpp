@@ -169,7 +169,6 @@ public:
 
 		while(IsOperatorControl() && IsEnabled())
 		{
-
 			/*_____ DRIVETRIAN CODE_____*/
 			DriveCode();
 
@@ -179,9 +178,11 @@ public:
 			/*_____INTAKE CODE_____*/
 			whilePressedAction(controllerButton(driverGamepad, Button::RightBumber), controllerButton(driverGamepad, Button::LeftBumber), crvbot.intakeRoller, 0.8);
 
-			updateRobotStatus();
+			/*_____ALIGNMENT CODE_____*/
+			AlineCheck();
 
-			//Wait(0.005);
+			/*_____UPDATING ROBOT STATUS_____*/
+			updateRobotStatus();
 		}
 
 		runTime->Stop();
@@ -211,7 +212,7 @@ private:
 	SendableChooser<int> *Allaince_Chooser;
 
 
-	bool reverseDirection = false;
+	bool ReverseDirection = false;
 
 	void DriveCode(void) {
 
@@ -219,11 +220,11 @@ private:
 	     double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
 		 double Right_X = (0.65*controllerJoystick(driverGamepad, Axes::RIGHT_X));
 
-		 if(controllerButton(driverGamepad, Button::A))  reverseDirection = true;
-		 if(controllerButton(driverGamepad, Button::B))  reverseDirection = false;
+		 if(controllerButton(driverGamepad, Button::A))  ReverseDirection = true;
+		 if(controllerButton(driverGamepad, Button::B))  ReverseDirection = false;
 
 		 /*_________ Sets DriverJoystick in Tank Drive orientation _________*/
-		 if(!reverseDirection)
+		 if(!ReverseDirection)
 			 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(Left_Y - Right_X)), (RIGHT_MULTIPLER*(Left_Y + Right_X)));
 		 /*_________ Sets DriverJoystick in FirstPerosnDrive orientation _________*/
 	     else
@@ -235,16 +236,17 @@ private:
 	double setRPM;
 	double agitatorspeed;
 	double Error;
+
 	void ShootProcesses(void) {
 
-		SmartDashboard::PutNumber(" Error: ", Error);
-
 		//(kP*Error + setPoint)
+
 		toggleAction((operatorGamepad->GetRawAxis(3) > 0), crvbot.fuelManipulator, setRPM);
 
-		//if(crvbot.fuelManipulator->GetEncVel() >= 12000)
+	//if(crvbot.fuelManipulator->GetEncVel() >= 12000)
 		whilePressedAction(controllerButton(operatorGamepad, Button::LeftBumber), controllerButton(operatorGamepad, Button::RightBumber), crvbot.agitatorMotor, agitatorspeed);
-
+	//else
+	//	crvbot.agitatorMotor->Set(0);
 	}
 
 	void updateRobotStatus(void) {
@@ -262,17 +264,19 @@ private:
 		SmartDashboard::PutNumber(" Left Side Encoder Count: ", 	  crvbot.leftEnc->GetRaw());
 		SmartDashboard::PutNumber(" Right Side Encoder Count: ",      crvbot.rightEnc->GetRaw());
 		SmartDashboard::PutNumber(" FuelShooter Encoder Position: ",  crvbot.fuelManipulator->GetEncPosition());
-		SmartDashboard::PutNumber(" FuleShooter RPM: ",      		  crvbot.fuelManipulator->GetEncVel());
+		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  crvbot.fuelManipulator->GetEncVel());
+		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  crvbot.fuelManipulator->GetEncVel());
+		SmartDashboard::PutNumber(" FuelShooter Error:",              crvbot.fuelManipulator->GetClosedLoopError());
 		SmartDashboard::PutNumber(" Gyro Angle : ", 				  crvbot.gyro->GetAngle());
-		SmartDashboard::PutBoolean(" ReverseDirection : ", 			  reverseDirection);
+		SmartDashboard::PutBoolean(" ReverseDirection : ", 			  ReverseDirection);
+		SmartDashboard::PutBoolean(" Align to boiler ",               BoilerInRange);
 	}
 
 	void updateRobotPreference(void) {
 
-
-		reverseDirection  = prefs->GetBoolean("Is tankDrive on?", true);
-		BoilerPostition   = prefs->GetInt("BoilerPostition ", 300);
 		AutonChooser      = prefs->GetInt("Choose Auton", 9);
+		leftMost 		  = prefs->GetInt("leftMost",     250);
+		rightMost 		  = prefs->GetInt("rightMost",    350);
 		setRPM		      = prefs->GetDouble("shooterspeed", .75);
 		agitatorspeed     = prefs->GetDouble("agitatorspeed", 0.25);
 		kP	    		  = prefs->GetDouble("P", 1.0);
@@ -282,6 +286,20 @@ private:
 
 	}
 
+	int boilerPosition;
+	int leftMost;
+	int rightMost;
+
+	bool BoilerInRange = false;
+
+	void AlineCheck(void)
+	{
+		boilerPosition = vs.alignmentToBoiler();
+		if(rightMost < boilerPosition && boilerPosition < leftMost)
+			BoilerInRange = true;
+		else
+			BoilerInRange = false;
+	}
 };
 
 START_ROBOT_CLASS(Robot)
