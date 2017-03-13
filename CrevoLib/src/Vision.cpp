@@ -23,8 +23,8 @@ void Vision::startStream(void)
 
 
 	/*_____ Starts Instance for Gear stream _____*/
-	cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(1);
-	camera2.SetResolution(640, 480);
+	//cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(1);
+	//camera2.SetResolution(640, 480);
 
 	/*_____ Starts Instance for Shooter stream on a Different Tread _____*/
 	std::thread shooterStream(VisionTread);
@@ -66,19 +66,18 @@ double Vision::distanceFromBoiler(void)
 {
 	double Distance;
 	std::cout << "Areas: ";
-
 	/*____ Pulls area array from the NetworkTable ____*/
 	std::vector<double> areas = table->GetNumberArray("area", llvm::ArrayRef<double>());
 
 	/*_____ Run through for each value in array _____*/
-	for(unsigned int i = 0; i < areas.size(); i++) {
-			std::cout << " | " << areas[i] <<" | ";
-			Distance = calcDistancePixel(areas[1]);   /*_____ Calculate distance from boiler using area_____*/
-			std::cout << " | Distance: " << Distance;
+	if(areas.size() > 0 && areas[0] > 100){
+		Distance = (double)calcDistancePixel(areas[1]);
+		return Distance;
 	}
-	std::cout << std::endl;
+	else {
+		return 0;
+	}
 	SmartDashboard::PutNumber("Distance From Boiler", Distance);
-	return Distance;
 }
 
 double Vision::alignmentToBoiler(void)
@@ -91,20 +90,9 @@ double Vision::alignmentToBoiler(void)
 
 	/*_____ Checks to see if there is a countor detected and filers mixups _____*/
 	if(centerX.size() > 0 && area[0] > 100)
-	{
-		std::cout << "Difference from Center: ";
-		for(unsigned int i = 0; i < centerX.size(); i++)
-		{
-			std::cout << " | " << centerX[i] << " | ";
-		}
-		std::cout << std::endl;
-		difference = centerX[0];
-		return difference;
-	}
-	else{
-		std::cout << "Nothing Detected : " << std::endl;
+		return centerX[0];
+	else
 		return 0;
-	}
 
 	SmartDashboard::PutNumber("Robot Center X value:", difference);
 }
