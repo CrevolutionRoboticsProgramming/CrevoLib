@@ -16,10 +16,7 @@
 #include <IterativeRobot.h>
 #include <GripPipeline.h>
 #include <networktables/NetworkTable.h>
-#include <SmartDashboard/SmartDashboard.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/core/types.hpp>
+
 
 
 class Vision {

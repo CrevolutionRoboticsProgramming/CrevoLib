@@ -6,6 +6,10 @@
  */
 
 #include <Vision.h>
+#include <SmartDashboard/SmartDashboard.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/core/types.hpp>
 
 Vision::Vision() {
 	// TODO Auto-generated constructor stub
@@ -59,6 +63,7 @@ void Vision::VisionTread(void)
 			outputStream.PutFrame(mat);
 
 		}
+
 
 }
 

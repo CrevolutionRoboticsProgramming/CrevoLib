@@ -115,8 +115,8 @@ public:
 		 CANTalon 	  *leftFrontMotor	 = NULL;
 		 CANTalon 	  *leftRearMotor	 = NULL;
 		 CANTalon 	  *intakeRoller 	 = NULL;
-		 CANTalon 	  *fuelManipulator   = NULL;
-		 CANTalon 	  *fuelManipulator2  = NULL;
+		 CANTalon 	  *fuelShooter   = NULL;
+		 CANTalon 	  *fuelShooter2  = NULL;
 		 CANTalon	  *agitatorMotor     = NULL;
 		 CANTalon	  *hangerMotor 	     = NULL;
 
@@ -127,7 +127,7 @@ public:
 		 DigitalInput *gearSensor;
 		 DigitalInput *limitSwitch2;
 
-		 Encoder 	  *fuelManipulatorEncoder;
+		 Encoder 	  *fuelShooterEncoder;
 		 Encoder 	  *rightEnc;
 		 Encoder 	  *leftEnc;
 
