@@ -52,10 +52,6 @@ public:
 		/*/
 		prefs = Preferences::GetInstance();
 
-		Allaince_Chooser = new SendableChooser<int>();
-
-
-
 		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || Robot completed initialize" << std::endl;
@@ -72,14 +68,8 @@ public:
 	 /*/
 	int AutonChooser;
 
-	enum Autons{AutonMove, ForwardAndBackwards, EchyMemes, InternalScreams, VisionProcessingData};
-
 	void AutonomousInit() override {
 
-		/*/
-		 *	Temporary: select what Auton you like to by its name. Will later be selected through the SmartDashboard.
-		/*/
-		AutonChooser = Autons::AutonMove;
 //		/*/
 //		 * Initializes the robots settings into the DriveTrain class to use its functions.
 //		/*/
@@ -112,6 +102,7 @@ public:
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	bool hasReached;
 	int BoilerPostition;
+
 	void AutonomousPeriodic() {
 
 		runTime->Start();
@@ -209,7 +200,6 @@ private:
 	Preferences *prefs;
 	Timer *runTime;
 	Command *Alliance_COLOR;
-	SendableChooser<int> *Allaince_Chooser;
 
 
 	bool ReverseDirection = false;
@@ -241,7 +231,7 @@ private:
 
 		//(kP*Error + setPoint)
 
-		toggleAction((operatorGamepad->GetRawAxis(3) > 0), crvbot.fuelManipulator, setRPM);
+		toggleAction((operatorGamepad->GetRawAxis(3) > 0.5), crvbot.fuelManipulator, setRPM);
 
 	//if(crvbot.fuelManipulator->GetEncVel() >= 12000)
 		whilePressedAction(controllerButton(operatorGamepad, Button::LeftBumber), controllerButton(operatorGamepad, Button::RightBumber), crvbot.agitatorMotor, agitatorspeed);
@@ -268,6 +258,7 @@ private:
 		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  crvbot.fuelManipulator->GetEncVel());
 		SmartDashboard::PutNumber(" FuelShooter Error:",              crvbot.fuelManipulator->GetClosedLoopError());
 		SmartDashboard::PutNumber(" Gyro Angle : ", 				  crvbot.gyro->GetAngle());
+		SmartDashboard::PutNumber(" Alignment : ",					  boilerPosition);
 		SmartDashboard::PutBoolean(" ReverseDirection : ", 			  ReverseDirection);
 		SmartDashboard::PutBoolean(" Align to boiler ",               BoilerInRange);
 	}
@@ -275,8 +266,8 @@ private:
 	void updateRobotPreference(void) {
 
 		AutonChooser      = prefs->GetInt("Choose Auton", 9);
-		leftMost 		  = prefs->GetInt("leftMost",     250);
-		rightMost 		  = prefs->GetInt("rightMost",    350);
+		leftMost 		  = prefs->GetInt("leftMost",     0);
+		rightMost 		  = prefs->GetInt("rightMost",    500);
 		setRPM		      = prefs->GetDouble("shooterspeed", .75);
 		agitatorspeed     = prefs->GetDouble("agitatorspeed", 0.25);
 		kP	    		  = prefs->GetDouble("P", 1.0);
@@ -294,11 +285,14 @@ private:
 
 	void AlineCheck(void)
 	{
-		boilerPosition = vs.alignmentToBoiler();
-		if(rightMost < boilerPosition && boilerPosition < leftMost)
-			BoilerInRange = true;
-		else
-			BoilerInRange = false;
+		if((operatorGamepad->GetRawAxis(3) > 0) && (operatorGamepad->GetRawAxis(3) <= 0.5))
+		{
+			boilerPosition = vs.alignmentToBoiler();
+			if(boilerPosition <= 0)
+				BoilerInRange = false;
+			else
+				BoilerInRange = true;
+		}
 	}
 };
 
