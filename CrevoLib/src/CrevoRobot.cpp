@@ -83,8 +83,6 @@ void CrevoRobot::robotInit(void){
 
 	if(fuelManipulator != NULL) fuelManipulator->SetInverted(false);
 
-	if(fuelManipulator != NULL) fuelManipulator2->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
-	if(fuelManipulator != NULL) fuelManipulator2->Set(fuelManipulator->GetDeviceID());
 
 	if(leftFrontMotor  != NULL)  leftFrontMotor->SetInverted(true);
 	if(rightFrontMotor != NULL) rightFrontMotor->SetInverted(true);
@@ -107,16 +105,20 @@ void CrevoRobot::robotInit(void){
 
 	// These values are for PID control. Will be Adjusted later.
 
+	if(fuelManipulator != NULL) fuelManipulator2->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
+	if(fuelManipulator != NULL) fuelManipulator2->Set(fuelManipulator->GetDeviceID());
+
+	if(fuelManipulator != NULL) fuelManipulator->SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode);
+
 	if(fuelManipulator != NULL) fuelManipulator->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
 	if(fuelManipulator != NULL) fuelManipulator->SetSensorDirection(false);
 
-	if(fuelManipulator != NULL) fuelManipulator->ConfigNominalOutputVoltage(0.0, -0.0);
-	if(fuelManipulator != NULL) fuelManipulator->ConfigPeakOutputVoltage(12.0, 0.0);
 
-	if(fuelManipulator != NULL) fuelManipulator->SelectProfileSlot(0);
-	if(fuelManipulator != NULL) fuelManipulator->SetP(kP);
-	if(fuelManipulator != NULL) fuelManipulator->SetI(kI);
-	if(fuelManipulator != NULL) fuelManipulator->SetD(kD);
+	if(fuelManipulator != NULL) fuelManipulator->SetVoltageRampRate(0.2);
+
+	if(fuelManipulator != NULL) fuelManipulator->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(fuelManipulator != NULL) fuelManipulator->ConfigPeakOutputVoltage(12, -120);
+
 
 	/*________________________________________________________________________________________________________________________________*/
 
@@ -144,8 +146,6 @@ void CrevoRobot::robotInit(void){
 
 	/*________________________________________________________________________________________________________________________________*/
 
-	table = NetworkTable::GetTable("GRIP/Crevo");
-
 	/*_____ Set All motor Percentages to Zero _____*/
 	if(robotDrive      != NULL)      robotDrive->StopMotor();
 	if(fuelManipulator != NULL) fuelManipulator->StopMotor();
@@ -153,7 +153,7 @@ void CrevoRobot::robotInit(void){
 	if(hangerMotor     != NULL)     hangerMotor->StopMotor();
 
 #ifdef ROBOT_1
-	SmartDashboard::PutString("Robot Configuration: ", "ROBOT 2");
+	SmartDashboard::PutString("Robot Configuration: ", "ROBOT 1");
 #endif
 
 #ifndef ROBOT_1

@@ -18,10 +18,15 @@ Vision::~Vision() {
 
 void Vision::startStream(void)
 {
+	/*_____ Select table object to revive the NetworkTable from GRIPn_____*/
+	table = NetworkTable::GetTable("GRIP/Crevo");
 
-	//cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(0);
-	//camera2.SetResolution(750, 640);
 
+	/*_____ Starts Instance for Gear stream _____*/
+	//cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(1);
+	//camera2.SetResolution(640, 480);
+
+	/*_____ Starts Instance for Shooter stream on a Different Tread _____*/
 	std::thread shooterStream(VisionTread);
 	shooterStream.detach();
 }
@@ -61,31 +66,35 @@ double Vision::distanceFromBoiler(void)
 {
 	double Distance;
 	std::cout << "Areas: ";
-	std::vector<double> arr = crvbot.table->GetNumberArray("area", llvm::ArrayRef<double>());
+	/*____ Pulls area array from the NetworkTable ____*/
+	std::vector<double> areas = table->GetNumberArray("area", llvm::ArrayRef<double>());
 
-	for(unsigned int i = 0; i < arr.size(); i++) {
-			std::cout << " | " << arr[i] <<" | ";
-			Distance = calcDistancePixel(arr[1]);
-			std::cout << " | Distance: " << Distance;
+	/*_____ Run through for each value in array _____*/
+	if(areas.size() > 0 && areas[0] > 100){
+		Distance = (double)calcDistancePixel(areas[1]);
+		return Distance;
 	}
-	std::cout << std::endl;
+	else {
+		return 0;
+	}
 	SmartDashboard::PutNumber("Distance From Boiler", Distance);
-	return Distance;
 }
 
-double Vision::alinementToBoiler(void)
+double Vision::alignmentToBoiler(void)
 {
 	double difference;
-	std::cout << "Difference from Center: ";
-	std::vector<double> arr  = crvbot.table->GetNumberArray("center X", llvm::ArrayRef<double>());
 
-	for(unsigned int i = 0; i < arr.size(); i++)
-	{
-		std::cout << " | " << arr[i] << " | ";
-	}
-	std::cout << std::endl;
+	/*_____ Pulls both the centerX and area _____*/
+	std::vector<double> centerX  = table->GetNumberArray("centerX", llvm::ArrayRef<double>());
+	std::vector<double> area  = table->GetNumberArray("area", llvm::ArrayRef<double>());
+
+	/*_____ Checks to see if there is a countor detected and filers mixups _____*/
+	if(centerX.size() > 0 && area[0] > 100)
+		return centerX[0];
+	else
+		return 0;
+
 	SmartDashboard::PutNumber("Robot Center X value:", difference);
-	return difference;
 }
 
 double Vision::calcDistancePixel(double reflectiveTapeArea)

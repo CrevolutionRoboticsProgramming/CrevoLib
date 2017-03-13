@@ -15,6 +15,7 @@
 #include <CameraServer.h>
 #include <IterativeRobot.h>
 #include <GripPipeline.h>
+#include <networktables/NetworkTable.h>
 #include <SmartDashboard/SmartDashboard.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
@@ -27,6 +28,8 @@ private:
 	GripPipeline gp;
 	CrevoRobot crvbot;
 
+	std::shared_ptr<NetworkTable> table;
+
 	const int PIXEL_HEIGHT = 720;
 	const int PIXEL_WIDTH  = 640;
 
@@ -34,7 +37,7 @@ private:
 	double calcDistancePixel(double reflectiveTapeArea);
 public:
 	double distanceFromBoiler(void);
-	double alinementToBoiler(void);
+	double alignmentToBoiler(void);
 	bool boilerDected(void);
 	void startStream(void);
 	void visionTrackingProcessing(void);

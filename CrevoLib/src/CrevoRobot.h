@@ -23,7 +23,7 @@
 #include <Compressor.h>
 #include <RobotDrive.h>
 
-#define ROBOT_1
+//#define ROBOT_1
 #define NOT_DEBUG
 class CrevoRobot{
 
@@ -82,7 +82,7 @@ private:
 /*________________________________________________________________________________________________________________________________*/
 
 		 enum AnalogPort{
-			 	 	GYRO = 1,
+			 	 	GYRO = 0,
 					POTEIOMETER = 1,
 					ACCELEROMETER = 2,
 		 };
@@ -93,10 +93,11 @@ private:
 					LIMIT_SWITCH_2 = 1,
 					FUEL_MANIPULATOR_ENCODER_1 = 0,
 					FUEL_MANIPULATOR_ENCODER_2 = 1,
-					R_EN_1 = 3,
-					R_EN_2 = 4,
-					L_EN_1 = 5,
-					L_EN_2 = 6,
+					R_EN_1 = 4,
+					R_EN_2 = 5
+					,
+					L_EN_1 = 2,
+					L_EN_2 = 3,
 		 };
 /*________________________________________________________________________________________________________________________________*/
 
@@ -134,7 +135,6 @@ public:
 		 AnalogPotentiometer *pot;
 		 AnalogAccelerometer *accel;
 
-		 std::shared_ptr<NetworkTable> table;
 
 
 		 //Length of current year's robot
@@ -152,9 +152,6 @@ public:
 		  * These values hold variables for the PID controller
 		  * Are adjusted in the preference section of the Smart Dashboard
 		 /*/
-		 int kP;
-		 int kI;
-		 int kD;
 		 /*
 		  * Distance traveled = Wheel rotations * circumference
 		  * or
