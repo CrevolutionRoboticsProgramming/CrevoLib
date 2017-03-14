@@ -66,7 +66,6 @@ public:
 	 * 5. Score gear left, knock down hoppers
 	 * 6. Hopper knock down
 	 /*/
-	int AutonChooser;
 
 	void AutonomousInit() override {
 
@@ -95,11 +94,11 @@ public:
 		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || In Autonomous Periodic Mode" << std::endl;
 		std::cout << "_____________________________________________" << std::endl;
-		hasReached = false;
+		HasReached = false;
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-	bool hasReached;
-	int BoilerPostition;
+	bool HasReached;
+	int boilerPostition;
 
 	void AutonomousPeriodic() {
 
@@ -140,16 +139,8 @@ public:
 		crvbot.leftEnc->Reset();
 		crvbot.rightEnc->Reset();
 
-
-		crvbot.fuelShooter1->SetP(kP);
-		crvbot.fuelShooter1->SetI(kI);
-		crvbot.fuelShooter1->SetD(kD);
-		crvbot.fuelShooter1->SetF(kF);
-
-		crvbot.fuelShooter2->SetP(kP);
-		crvbot.fuelShooter2->SetI(kI);
-		crvbot.fuelShooter2->SetD(kD);
-		crvbot.fuelShooter2->SetF(kF);
+		crvbot.fuelShooter1->SetPID(kP, kI, kD, kF);
+		crvbot.fuelShooter2->SetPID(kP, kI, kD, kF);
 
 		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
@@ -293,7 +284,6 @@ private:
 
 	void updateRobotPreference(void) {
 
-		AutonChooser      = prefs->GetInt("Choose Auton", 9);
 		leftMost 		  = prefs->GetInt("leftMost",     0);
 		rightMost 		  = prefs->GetInt("rightMost",    500);
 		setRPM		      = prefs->GetDouble("shooterspeed", .75);
