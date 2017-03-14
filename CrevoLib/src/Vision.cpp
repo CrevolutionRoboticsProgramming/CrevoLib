@@ -23,6 +23,7 @@ Vision::~Vision() {
 void Vision::startStream(void)
 {
 	/*_____ Select table object to revive the NetworkTable from GRIPn_____*/
+	table->Initialize();
 	table = NetworkTable::GetTable("GRIP/Crevo");
 
 
