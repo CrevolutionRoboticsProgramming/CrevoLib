@@ -123,10 +123,10 @@ public:
 		runTime->Stop();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-	int kP;
-	int kI;
-	int kD;
-	int kF;
+	double kP;
+	double kI;
+	double kD;
+	double kF;
 
 	void TeleopInit() {
 
@@ -141,15 +141,15 @@ public:
 		crvbot.rightEnc->Reset();
 
 
-		//crvbot.fuelShooter1->SetP(kP);
-		//crvbot.fuelShooter1->SetI(kI);
-		//crvbot.fuelShooter1->SetD(kD);
-		//crvbot.fuelShooter1->SetF(kF);
+		crvbot.fuelShooter1->SetP(kP);
+		crvbot.fuelShooter1->SetI(kI);
+		crvbot.fuelShooter1->SetD(kD);
+		crvbot.fuelShooter1->SetF(kF);
 
-		//crvbot.fuelShooter2->SetP(kP);
-		//crvbot.fuelShooter2->SetI(kI);
-		//crvbot.fuelShooter2->SetD(kD);
-		//crvbot.fuelShooter2->SetF(kF);
+		crvbot.fuelShooter2->SetP(kP);
+		crvbot.fuelShooter2->SetI(kI);
+		crvbot.fuelShooter2->SetD(kD);
+		crvbot.fuelShooter2->SetF(kF);
 
 		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
