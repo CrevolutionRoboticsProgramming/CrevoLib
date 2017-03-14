@@ -231,47 +231,37 @@ private:
 	double Error;
 	double reverseTime = 0.5;
 
-	bool agitatorEnabled;
+	bool AgitatorEnabled = false;
+	bool ReachedRPM;
 
 	void ShootingProcesses(void) {
 
-		currentRPM = crvbot.fuelShooter1->GetEncVel();
+		if(operatorGamepad->GetRawAxis(2) > 0)  shooterMotorsSet(-setRPM);
+		if(operatorGamepad->GetRawAxis(3) > 0)  shooterMotorsSet(setRPM);
+		else									shooterMotorsSet(0);
 
-		if(operatorGamepad->GetRawAxis(2) > 0)
-		{
-			crvbot.fuelShooter1->Set(-setRPM);
-			crvbot.fuelShooter2->Set(-setRPM);
-		}
-		else if(operatorGamepad->GetRawAxis(3) > 0)
-		{
-			crvbot.fuelShooter1->Set(setRPM);
-			crvbot.fuelShooter2->Set(setRPM);
-		}
-		else
-		{
-			crvbot.fuelShooter1->Set(0);
-			crvbot.fuelShooter2->Set(0);
-		}
 
-		std::cout << currentRPM << std::endl;
+		AgitatorEnabled =  (crvbot.fuelShooter1->GetEncVel() <= -20000);
 
-		agitatorEnabled =  (currentRPM <= -20000);
-
-		if(agitatorEnabled){
+		if(AgitatorEnabled){
 
 			crvbot.agitatorMotor->Set(agitatorspeed);
+			ReachedRPM = true;
 		}
 		else
 		{
 			whilePressedAction(controllerButton(operatorGamepad, Button::LeftBumber),
 										   controllerButton(operatorGamepad, Button::RightBumber),
 										   crvbot.agitatorMotor, agitatorspeed);
+			ReachedRPM = false;
 		}
-		//else{
-			//crvbot.agitatorMotor->StopMotor();
-		//}
 
+	}
 
+	void shooterMotorsSet(double inValue){
+
+		crvbot.fuelShooter1->Set(inValue);
+		crvbot.fuelShooter2->Set(inValue);
 	}
 
 	void updateRobotStatus(void) {
@@ -298,6 +288,7 @@ private:
 		SmartDashboard::PutNumber(" Alignment : ",					  boilerPosition);
 		SmartDashboard::PutBoolean(" ReverseDirection : ", 			  ReverseDirection);
 		SmartDashboard::PutBoolean(" Align to boiler ",               BoilerInRange);
+		SmartDashboard::PutBoolean(" Reached Set RPM ",               ReachedRPM);
 	}
 
 	void updateRobotPreference(void) {
