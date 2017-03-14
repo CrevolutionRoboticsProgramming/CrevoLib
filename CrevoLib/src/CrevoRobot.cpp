@@ -35,7 +35,7 @@ void CrevoRobot::robotInit(void){
 
 	//___________________ Manipulators MotorControllers ___________________
 
-	fuelShooter      = new CANTalon(MotorCAN::SHOOTER_MOTOR_A);
+	fuelShooter1      = new CANTalon(MotorCAN::SHOOTER_MOTOR_A);
 
 	fuelShooter2     = new CANTalon(MotorCAN::SHOOTER_MOTOR_B);
 
@@ -53,7 +53,7 @@ void CrevoRobot::robotInit(void){
 	SmartDashboard::PutNumber("Left Rear CANTalon ID: ",     (int)leftRearMotor->GetDeviceID());
 	SmartDashboard::PutNumber("Right Front CANTalon ID: ",   (int)rightFrontMotor->GetDeviceID());
 	SmartDashboard::PutNumber("Right Rear CANTalon ID: ",    (int)rightRearMotor->GetDeviceID());
-	SmartDashboard::PutNumber("Fuel Shooter CANTalon1 ID: ", (int)fuelShooter->GetDeviceID());
+	SmartDashboard::PutNumber("Fuel Shooter CANTalon1 ID: ", (int)fuelShooter1->GetDeviceID());
 	SmartDashboard::PutNumber("Fuel Shooter CANTalon2 ID: ", (int)fuelShooter2->GetDeviceID());
 	SmartDashboard::PutNumber("In-take CANTalon ID: ",       (int)intakeRoller->GetDeviceID());
 	SmartDashboard::PutNumber("Agitator CANTalon ID: ",      (int)agitatorMotor->GetDeviceID());
@@ -81,17 +81,17 @@ void CrevoRobot::robotInit(void){
 
 
 	if(leftFrontMotor  != NULL)  leftFrontMotor->SetInverted(true);
-	if(leftFrontMotor  != NULL) fuelShooter->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(leftFrontMotor  != NULL) leftFrontMotor->ConfigNominalOutputVoltage(0.0, -0.0);
 
 	if(rightFrontMotor != NULL) rightFrontMotor->SetInverted(true);
-	if(rightFrontMotor != NULL) fuelShooter->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(rightFrontMotor != NULL) rightFrontMotor->ConfigNominalOutputVoltage(0.0, -0.0);
 
 	if(intakeRoller    != NULL) intakeRoller->SetInverted(false);
 	if(intakeRoller	   != NULL) intakeRoller->SetVoltageRampRate(0.5);
-	if(intakeRoller    != NULL) fuelShooter->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(intakeRoller    != NULL) intakeRoller->ConfigNominalOutputVoltage(0.0, -0.0);
 
 	if(hangerMotor     != NULL) hangerMotor->SetInverted(false);
-	if(hangerMotor     != NULL) fuelShooter->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(hangerMotor     != NULL) hangerMotor->ConfigNominalOutputVoltage(0.0, -0.0);
 
 	/*/
 	 * CTRE Magnetic Encoder
@@ -106,20 +106,27 @@ void CrevoRobot::robotInit(void){
 
 
 	// These values are for PID control. Will be Adjusted later.
-	if(fuelShooter != NULL) fuelShooter2->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
-	if(fuelShooter != NULL) fuelShooter2->Set(fuelShooter->GetDeviceID());
+	//if(fuelShooter != NULL) fuelShooter2->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
+	//if(fuelShooter != NULL) fuelShooter2->Set(fuelShooter->GetDeviceID());
 
 
 	//if(fuelShooter != NULL) fuelShooter->SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode);
 
-	if(fuelShooter != NULL) fuelShooter->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
-	if(fuelShooter != NULL) fuelShooter->SetSensorDirection(false);
+	if(fuelShooter1 != NULL) fuelShooter1->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
+	if(fuelShooter1 != NULL) fuelShooter1->SetSensorDirection(false);
 
-	//if(fuelShooter != NULL) fuelShooter->SetVoltageRampRate(0.2);
+	if(fuelShooter1 != NULL) fuelShooter1->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(fuelShooter1 != NULL) fuelShooter1->ConfigPeakOutputVoltage(12, -12);
 
-	//if(fuelShooter != NULL) fuelShooter->ConfigNominalOutputVoltage(0.0, -0.0);
-	//if(fuelShooter != NULL) fuelShooter->ConfigPeakOutputVoltage(12, -12);
+	if(fuelShooter1 != NULL) fuelShooter1->SetVoltageRampRate(0.2);
 
+	if(fuelShooter2 != NULL) fuelShooter2->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(fuelShooter2 != NULL) fuelShooter2->ConfigPeakOutputVoltage(12, -12);
+
+	if(fuelShooter2 != NULL) fuelShooter2->SetVoltageRampRate(0.2);
+
+	if(fuelShooter1 != NULL) fuelShooter1->SetInverted(true);
+	if(fuelShooter2 != NULL) fuelShooter2->SetInverted(true);
 
 	/*________________________________________________________________________________________________________________________________*/
 
@@ -149,7 +156,8 @@ void CrevoRobot::robotInit(void){
 
 	/*_____ Set All motor Percentages to Zero _____*/
 	if(robotDrive      != NULL)      robotDrive->StopMotor();
-	//if(fuelShooter 	   != NULL) 	fuelShooter->Set(0);
+	if(fuelShooter1 	   != NULL) 	fuelShooter1->Set(0);
+	if(fuelShooter2 	   != NULL) 	fuelShooter2->Set(0);
 	if(intakeRoller    != NULL)    intakeRoller->Set(0);
 	if(hangerMotor     != NULL)     hangerMotor->Set(0);
 
