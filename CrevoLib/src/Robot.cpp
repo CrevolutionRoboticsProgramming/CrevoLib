@@ -82,8 +82,6 @@ public:
 		 *  Init Shooter as controlled by velocity
 		/*/
 
-		crvbot.fuelShooter->SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode);
-
 		//initDrive(crvbot.robotDrive);
 		init(crvbot.robotDrive, crvbot.gyro, EncoderType::QuadEncoder);
 
@@ -143,10 +141,15 @@ public:
 		crvbot.rightEnc->Reset();
 
 
-		//crvbot.fuelShooter->SetP(kP);
-		//crvbot.fuelShooter->SetI(kI);
-		//crvbot.fuelShooter->SetD(kD);
-		//crvbot.fuelShooter->SetF(kF);
+		//crvbot.fuelShooter1->SetP(kP);
+		//crvbot.fuelShooter1->SetI(kI);
+		//crvbot.fuelShooter1->SetD(kD);
+		//crvbot.fuelShooter1->SetF(kF);
+
+		//crvbot.fuelShooter2->SetP(kP);
+		//crvbot.fuelShooter2->SetI(kI);
+		//crvbot.fuelShooter2->SetD(kD);
+		//crvbot.fuelShooter2->SetF(kF);
 
 		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
@@ -226,29 +229,44 @@ private:
 	double setRPM;
 	double agitatorspeed;
 	double Error;
+	double reverseTime = 0.5;
 
-	bool shooterEnabled;
+	bool agitatorEnabled;
 
 	void ShootingProcesses(void) {
 
-		currentRPM = crvbot.fuelShooter->GetEncVel();
+		currentRPM = crvbot.fuelShooter1->GetEncVel();
 
-		if((operatorGamepad->GetRawAxis(3) > 0))
+		if(operatorGamepad->GetRawAxis(2) > 0)
 		{
-			crvbot.fuelShooter->Set(0.5);
+			crvbot.fuelShooter1->Set(-setRPM);
+			crvbot.fuelShooter2->Set(-setRPM);
+		}
+		else if(operatorGamepad->GetRawAxis(3) > 0)
+		{
+			crvbot.fuelShooter1->Set(setRPM);
+			crvbot.fuelShooter2->Set(setRPM);
 		}
 		else
 		{
-			crvbot.fuelShooter->Set(0);
+			crvbot.fuelShooter1->Set(0);
+			crvbot.fuelShooter2->Set(0);
 		}
 
-		//toggleAction((operatorGamepad->GetRawAxis(3) > 0), crvbot.fuelShooter, 20000);
+		std::cout << currentRPM << std::endl;
 
-		//if(currentRPM >= 12000){
+		agitatorEnabled =  (currentRPM <= -20000);
+
+		if(agitatorEnabled){
+
+			crvbot.agitatorMotor->Set(agitatorspeed);
+		}
+		else
+		{
 			whilePressedAction(controllerButton(operatorGamepad, Button::LeftBumber),
-							   controllerButton(operatorGamepad, Button::RightBumber),
-							   crvbot.agitatorMotor, agitatorspeed);
-		//}
+										   controllerButton(operatorGamepad, Button::RightBumber),
+										   crvbot.agitatorMotor, agitatorspeed);
+		}
 		//else{
 			//crvbot.agitatorMotor->StopMotor();
 		//}
@@ -263,17 +281,19 @@ private:
 		SmartDashboard::PutNumber(" RightMotor Current: ",  		  crvbot.rightFrontMotor->GetOutputCurrent());
 		SmartDashboard::PutNumber(" LeftMotor Voltage: ",   		  crvbot.leftFrontMotor->GetOutputVoltage());
 		SmartDashboard::PutNumber(" RightMotor Voltage: ",  		  crvbot.rightFrontMotor->GetOutputVoltage());
-		SmartDashboard::PutNumber(" FuelShooter Voltage: ", 		  crvbot.fuelShooter->GetOutputVoltage());
-		SmartDashboard::PutNumber(" FuelShooter Current: ",  	 	  crvbot.fuelShooter->GetOutputCurrent());
+		SmartDashboard::PutNumber(" FuelShooter Voltage: ", 		  crvbot.fuelShooter1->GetOutputVoltage());
+		SmartDashboard::PutNumber(" FuelShooter Current: ",  	 	  crvbot.fuelShooter1->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Agitator Voltage: ",              crvbot.agitatorMotor->GetOutputVoltage());
+		SmartDashboard::PutNumber(" FuelShooter Voltage: ", 		  crvbot.fuelShooter2->GetOutputVoltage());
+		SmartDashboard::PutNumber(" FuelShooter Current: ",  		  crvbot.fuelShooter2->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Agitator Current: ",              crvbot.agitatorMotor->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Agitator Current: ",              crvbot.agitatorMotor->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Left Side Encoder Count: ", 	  crvbot.leftEnc->GetRaw());
 		SmartDashboard::PutNumber(" Right Side Encoder Count: ",      crvbot.rightEnc->GetRaw());
-		SmartDashboard::PutNumber(" FuelShooter Encoder Position: ",  crvbot.fuelShooter->GetEncPosition());
-		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  crvbot.fuelShooter->GetEncVel());
-		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  crvbot.fuelShooter->GetEncVel());
-		SmartDashboard::PutNumber(" FuelShooter Error:",              crvbot.fuelShooter->GetClosedLoopError());
+		SmartDashboard::PutNumber(" FuelShooter Encoder Position: ",  crvbot.fuelShooter1->GetEncPosition());
+		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  crvbot.fuelShooter1->GetEncVel());
+		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  crvbot.fuelShooter1->GetEncVel());
+		SmartDashboard::PutNumber(" FuelShooter Error:",              crvbot.fuelShooter1->GetClosedLoopError());
 		SmartDashboard::PutNumber(" Gyro Angle : ", 				  crvbot.gyro->GetAngle());
 		SmartDashboard::PutNumber(" Alignment : ",					  boilerPosition);
 		SmartDashboard::PutBoolean(" ReverseDirection : ", 			  ReverseDirection);
