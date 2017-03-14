@@ -89,7 +89,7 @@ void AutonVectors::StopMotors(void)
 {
 	//drvt.stopRobot();
 	crvbot.agitatorMotor->StopMotor();
-	crvbot.fuelShooter->StopMotor();
+	crvbot.fuelShooter1->StopMotor();
 	crvbot.hangerMotor->StopMotor();
 	crvbot.intakeRoller->StopMotor();
 }
