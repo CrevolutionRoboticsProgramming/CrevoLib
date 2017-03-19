@@ -25,6 +25,7 @@ class Robot: public IterativeRobot, public OI, public AutonVectors, public Drive
 public:
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	int auton;
 	void RobotInit() override {
 
 		driverGamepad      = new Joystick(0);
@@ -82,7 +83,7 @@ public:
 		/*/
 
 		//initDrive(crvbot.robotDrive);
-		init(crvbot.robotDrive, crvbot.gyro, EncoderType::QuadEncoder);
+		init(crvbot.robotDrive, crvbot.gyro, EncoderType::kQuadEncoder, DriveEncoder::kRightEncoder);
 
 
 		updateRobotStatus();
@@ -98,29 +99,156 @@ public:
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	bool HasReached;
+	int autonSelect = 1;
 	int boilerPostition;
 
 	void AutonomousPeriodic() {
-
 		runTime->Start();
-
-		AutonSelect(AutonStratagey::SHOOT_FROM_HOPPER);
 
 		while(IsAutonomous() && IsEnabled())
 		{
+		switch(auton)
+		{
+		case 0:
+		{
+
+
+				//AutonSelect(AutonStratagey::SHOOT_FROM_HOPPER);
+
+	//				while(vs.alinementToBoiler() <=  200  && !hasReached)
+	//				{
+	//					drvt.moveRobot(0.15, -0.15);
+	//				}				hasReached = true;
+	//				drvt.moveRobot(0,0);
+				while(!HasReached){
+
+					while(-1800  <= crvbot.leftEnc->GetRaw() ) {
+							moveRobot(0.3, 0.2);
+							updateRobotStatus();
+						 }
+				HasReached = true;
+				}
+					break;
+			}
+
+		case 1:
+		{
+			while(1800 >= crvbot.leftEnc->GetRaw())
+			{
+				moveRobot(0.3, 0.3);
+				updateRobotStatus();
+			}
+
+			stopRobot();
+			while(crvbot.gyro->GetAngle() > -56)
+			{
+				moveRobot(0.3, -0.3);
+				updateRobotStatus();
+			}
+
+			stopRobot();
+			Wait(1);
+			crvbot.leftEnc->Reset();
+
+			while(800 >= crvbot.leftEnc->GetRaw() )
+			{
+				moveRobot(0.3, 0.3);
+				updateRobotStatus();
+			}
+			stopRobot();
+			auton = 2851;
+			break;
+		}
+		case 2:
+		{
+
+			break;
+		}
+		case 3:
+		{
+
+			while(crvbot.leftEnc->GetRaw() <= 1700)
+			{
+				moveRobot(0.3, 0.3);
+				updateRobotStatus();
+			}
+
+			stopRobot();
+			crvbot.gyro->Reset();
+			while(crvbot.gyro->GetAngle() <= 44)
+			{
+				moveRobot(-0.3, 0.3);
+				updateRobotStatus();
+			}
+
+			crvbot.leftEnc->Reset();
+			stopRobot();
+			Wait(0.5);
+			while(crvbot.leftEnc->GetRaw() <= 650)
+			{
+				moveRobot(0.3, 0.3);
+			}
+
+			stopRobot();
+			auton = 2851;
+			break;
+		}
+		case 4:
+		{
+			int placeholder;
+			while(crvbot.leftEnc->GetRaw() <= placeholder)
+			{
+				moveRobot(0.3, 0.3);
+				updateRobotStatus();
+			}
+			stopRobot();
 			updateRobotStatus();
 
+			while(crvbot.gyro->GetAngle() <= 90)
+			{
+				moveRobot(0.3, -0.3);
+				updateRobotStatus();
+			}
+			stopAndReset();
+			Wait(1);
+			updateRobotStatus();
 
-//				while(vs.alinementToBoiler() <=  200  && !hasReached)
-//				{
-//					drvt.moveRobot(0.15, -0.15);
-//				}				hasReached = true;
-//				drvt.moveRobot(0,0);
+			while(crvbot.leftEnc->GetRaw() <= placeholder)
+			{
+				moveRobot(0.3, 0.3);
+				updateRobotStatus();
+			}
+			stopRobot();
+			Wait(3);
+			updateRobotStatus();
 
+			while(crvbot.leftEnc->GetRaw() >= 0)
+			{
+				moveRobot(-0.3, -0.3);
+				updateRobotStatus();
+			}
+			stopAndReset();
+			updateRobotStatus();
+
+			while(crvbot.gyro->GetAngle() <= 45)
+			{
+				moveRobot(0.3, -0.3);
+				updateRobotStatus();
+			}
+			updateRobotStatus();
+			auton = 2851;
+			break;
+		}
+		case 2851:
+		{
+			stopRobot();
+			break;
 		}
 
+		}
+		}
 		runTime->Stop();
-	}
+}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	double kP;
 	double kI;
@@ -141,6 +269,7 @@ public:
 
 		crvbot.fuelShooter1->SetPID(kP, kI, kD, kF);
 		crvbot.fuelShooter2->SetPID(kP, kI, kD, kF);
+
 
 		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
@@ -173,6 +302,12 @@ public:
 		runTime->Stop();
 
 	}
+
+/*	void DisabledInit()
+	{
+		stopRobot();
+		resetEncouderCounts();
+	}*/
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 	void TestPeriodic() {
@@ -193,8 +328,6 @@ private:
 	Joystick *operatorGamepad;
 	Preferences *prefs;
 	Timer *runTime;
-	Command *Alliance_COLOR;
-
 
 	bool ReverseDirection = false;
 
@@ -215,24 +348,54 @@ private:
 	    	 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(-Left_Y - Right_X)), (RIGHT_MULTIPLER*(-Left_Y + Right_X)));
 	}
 
-	int	currentRPM;
+	double hangerSpeed;
+
+	void HangerCode(void) {
+		whilePressedAction(controllerButton(operatorGamepad, Button::A), controllerButton(operatorGamepad, Button::B), crvbot.hangerMotor, hangerSpeed);
+
+	}
+	double	currentRPM;
 
 	double setRPM;
 	double agitatorspeed;
 	double Error;
 	double reverseTime = 0.5;
+	double IntergralError = 0;
 
 	bool AgitatorEnabled = false;
 	bool ReachedRPM;
 
 	void ShootingProcesses(void) {
 
-		if(operatorGamepad->GetRawAxis(2) > 0)  shooterMotorsSet(-setRPM);
-		if(operatorGamepad->GetRawAxis(3) > 0)  shooterMotorsSet(setRPM);
-		else									shooterMotorsSet(0);
+		currentRPM = crvbot.fuelShooter1->GetEncVel();
+
+		//Shooter is at negative RPM
+		Error = setRPM  + currentRPM;
+		IntergralError += Error;
+
+		//			if((currentRPM > setRPM*.8) && (currentRPM < setRPM*1.2)){
+		//				shooterMotorsSet( -(kI*IntergralError -kP*Error + setRPM));
+		//			}
+		//			else{
+
+		//			}
+		if(operatorGamepad->GetRawAxis(3) > 0) {
 
 
-		AgitatorEnabled =  (crvbot.fuelShooter1->GetEncVel() <= -20000);
+				shooterMotorsSet(-setRPM);
+
+
+		}
+		else if(operatorGamepad->GetRawAxis(2) > 0) {
+			shooterMotorsSet(setRPM);
+		}
+		else {
+			shooterMotorsSet(0);
+		}
+
+
+
+		//AgitatorEnabled =  (crvbot.fuelShooter1->GetEncVel() <= -setRPM);
 
 		if(AgitatorEnabled){
 
@@ -241,8 +404,8 @@ private:
 		}
 		else
 		{
-			whilePressedAction(controllerButton(operatorGamepad, Button::LeftBumber),
-										   controllerButton(operatorGamepad, Button::RightBumber),
+			whilePressedAction(controllerButton(operatorGamepad, Button::RightBumber),
+										   controllerButton(operatorGamepad, Button::LeftBumber),
 										   crvbot.agitatorMotor, agitatorspeed);
 			ReachedRPM = false;
 		}
@@ -272,14 +435,17 @@ private:
 		SmartDashboard::PutNumber(" Left Side Encoder Count: ", 	  crvbot.leftEnc->GetRaw());
 		SmartDashboard::PutNumber(" Right Side Encoder Count: ",      crvbot.rightEnc->GetRaw());
 		SmartDashboard::PutNumber(" FuelShooter Encoder Position: ",  crvbot.fuelShooter1->GetEncPosition());
-		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  crvbot.fuelShooter1->GetEncVel());
-		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  crvbot.fuelShooter1->GetEncVel());
-		SmartDashboard::PutNumber(" FuelShooter Error:",              crvbot.fuelShooter1->GetClosedLoopError());
+		SmartDashboard::PutNumber(" FuelShooter1 Shooter Speed",      crvbot.fuelShooter1->Get());
+		SmartDashboard::PutNumber(" FuelShooter1 Mode",      		  crvbot.fuelShooter1->GetControlMode());
+		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  currentRPM);
+		SmartDashboard::PutNumber(" FuelShooter RPM Graph: ",      	  crvbot.fuelShooter1->GetEncVel());
+		SmartDashboard::PutNumber(" FuelShooter Error:",              Error);
 		SmartDashboard::PutNumber(" Gyro Angle : ", 				  crvbot.gyro->GetAngle());
 		SmartDashboard::PutNumber(" Alignment : ",					  boilerPosition);
-		SmartDashboard::PutBoolean(" ReverseDirection : ", 			  ReverseDirection);
+		SmartDashboard::PutBoolean(" ReverseDirection ", 			  ReverseDirection);
 		SmartDashboard::PutBoolean(" Align to boiler ",               BoilerInRange);
 		SmartDashboard::PutBoolean(" Reached Set RPM ",               ReachedRPM);
+		SmartDashboard::PutNumber("IntergralError",                   IntergralError);
 	}
 
 	void updateRobotPreference(void) {
@@ -287,11 +453,13 @@ private:
 		leftMost 		  = prefs->GetInt("leftMost",     0);
 		rightMost 		  = prefs->GetInt("rightMost",    500);
 		setRPM		      = prefs->GetDouble("shooterspeed", .75);
+		hangerSpeed       = prefs->GetDouble("Hanger Motor Speed", 0.75);
 		agitatorspeed     = prefs->GetDouble("agitatorspeed", 0.25);
 		kP	    		  = prefs->GetDouble("P", 1.0);
-		kI	      		  = prefs->GetDouble("I", 0.0);
+		kI	      		  = prefs->GetDouble("I", 0.00000001);
 		kD	 			  = prefs->GetDouble("D", 0.0);
 		kF				  = prefs->GetDouble("F", 0.04);
+		auton 	  		  = prefs->GetInt("Auton", 1);
 
 	}
 
@@ -306,10 +474,8 @@ private:
 		if((operatorGamepad->GetRawAxis(3) > 0) && (operatorGamepad->GetRawAxis(3) <= 0.5))
 		{
 			boilerPosition = vs.alignmentToBoiler();
-			if(boilerPosition <= 0)
-				BoilerInRange = false;
-			else
-				BoilerInRange = true;
+			if(boilerPosition <= 0) BoilerInRange = false;
+			else                    BoilerInRange = true;
 		}
 	}
 };
