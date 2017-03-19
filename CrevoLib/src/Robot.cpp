@@ -9,6 +9,7 @@
 #include <Joystick.h>
 #include <Timer.h>
 #include <PIDController.h>
+#include <CANSpeedController.h>
 #include <Preferences.h>
 #include <networktables/NetworkTable.h>
 
@@ -267,11 +268,11 @@ public:
 		crvbot.leftEnc->Reset();
 		crvbot.rightEnc->Reset();
 
-		crvbot.fuelShooter1->SelectProfileSlot(0);
-		crvbot.fuelShooter2->SelectProfileSlot(0);
-		crvbot.fuelShooter1->SetPID(kP, kI, kD, kF);
-		crvbot.fuelShooter2->SetPID(kP, kI, kD, kF);
-
+		crvbot.fuelShooter->SelectProfileSlot(0);
+		crvbot.fuelShooter->SetP(kP);
+		crvbot.fuelShooter->SetI(kI);
+		crvbot.fuelShooter->SetD(kD);
+		crvbot.fuelShooter->SetF(kF);
 
 		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
@@ -305,11 +306,6 @@ public:
 
 	}
 
-/*	void DisabledInit()
-	{
-		stopRobot();
-		resetEncouderCounts();
-	}*/
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 	void TestPeriodic() {
@@ -356,8 +352,8 @@ private:
 		whilePressedAction(controllerButton(operatorGamepad, Button::A), controllerButton(operatorGamepad, Button::B), crvbot.hangerMotor, hangerSpeed);
 
 	}
-	double	currentRPM;
 
+	double currentRPM;
 	double setRPM;
 	double agitatorspeed;
 	double Error;
@@ -369,55 +365,54 @@ private:
 
 	void ShootingProcesses(void) {
 
-		currentRPM = crvbot.fuelShooter1->GetEncVel();
-
+		currentRPM = crvbot.fuelShooter->GetEncVel();
+	/*
+ 	 *  Homemade PID control will add if Talon SRX PID fail
+ 	 *
 		//Shooter is at negative RPM
 		Error = setRPM  + currentRPM;
 		IntergralError += Error;
 
-		//			if((currentRPM > setRPM*.8) && (currentRPM < setRPM*1.2)){
-		//				shooterMotorsSet( -(kI*IntergralError -kP*Error + setRPM));
-		//			}
-		//			else{
+		if((currentRPM > setRPM*.8) && (currentRPM < setRPM*1.2)){
+			shooterMotorsSet( -(kI*IntergralError -kP*Error + setRPM));
+		}
+		else{
 
-		//			}
+		*/
+
 		if(operatorGamepad->GetRawAxis(3) > 0) {
-
-
-				shooterMotorsSet(-setRPM);
-
-
+			//Switches the Talon SRXs to Velocity control for PID
+			crvbot.fuelShooter->SetControlMode(CANSpeedController::kSpeed);
+			crvbot.fuelShooter->Set(-setRPM);
 		}
 		else if(operatorGamepad->GetRawAxis(2) > 0) {
-			shooterMotorsSet(setRPM);
+			//Switches the Talon SRXs to Voltage Percentage control
+			crvbot.fuelShooter->SetControlMode(CANSpeedController::kPercentVbus);
+			crvbot.fuelShooter->Set(0.5);
 		}
 		else {
-			shooterMotorsSet(0);
+			//Switches the Talon SRXs to Voltage Percentage control
+			crvbot.fuelShooter->SetControlMode(CANSpeedController::kPercentVbus);
+			crvbot.fuelShooter->Set(0);
 		}
 
 
 
-		//AgitatorEnabled =  (crvbot.fuelShooter1->GetEncVel() <= -setRPM);
+		AgitatorEnabled =  (crvbot.fuelShooter->GetEncVel() <= -setRPM);
 
 		if(AgitatorEnabled){
-
-			crvbot.agitatorMotor->Set(agitatorspeed);
 			ReachedRPM = true;
+			crvbot.agitatorMotor->Set(agitatorspeed);
+
 		}
 		else
 		{
+			ReachedRPM = false;
 			whilePressedAction(controllerButton(operatorGamepad, Button::RightBumber),
 										   controllerButton(operatorGamepad, Button::LeftBumber),
 										   crvbot.agitatorMotor, agitatorspeed);
-			ReachedRPM = false;
 		}
 
-	}
-
-	void shooterMotorsSet(double inValue){
-
-		crvbot.fuelShooter1->Set(inValue);
-		crvbot.fuelShooter2->Set(inValue);
 	}
 
 	void updateRobotStatus(void) {
@@ -427,8 +422,8 @@ private:
 		SmartDashboard::PutNumber(" RightMotor Current: ",  		  crvbot.rightFrontMotor->GetOutputCurrent());
 		SmartDashboard::PutNumber(" LeftMotor Voltage: ",   		  crvbot.leftFrontMotor->GetOutputVoltage());
 		SmartDashboard::PutNumber(" RightMotor Voltage: ",  		  crvbot.rightFrontMotor->GetOutputVoltage());
-		SmartDashboard::PutNumber(" FuelShooter Voltage: ", 		  crvbot.fuelShooter1->GetOutputVoltage());
-		SmartDashboard::PutNumber(" FuelShooter Current: ",  	 	  crvbot.fuelShooter1->GetOutputCurrent());
+		SmartDashboard::PutNumber(" FuelShooter Voltage: ", 		  crvbot.fuelShooter->GetOutputVoltage());
+		SmartDashboard::PutNumber(" FuelShooter Current: ",  	 	  crvbot.fuelShooter->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Agitator Voltage: ",              crvbot.agitatorMotor->GetOutputVoltage());
 		SmartDashboard::PutNumber(" FuelShooter Voltage: ", 		  crvbot.fuelShooter2->GetOutputVoltage());
 		SmartDashboard::PutNumber(" FuelShooter Current: ",  		  crvbot.fuelShooter2->GetOutputCurrent());
@@ -436,18 +431,19 @@ private:
 		SmartDashboard::PutNumber(" Agitator Current: ",              crvbot.agitatorMotor->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Left Side Encoder Count: ", 	  crvbot.leftEnc->GetRaw());
 		SmartDashboard::PutNumber(" Right Side Encoder Count: ",      crvbot.rightEnc->GetRaw());
-		SmartDashboard::PutNumber(" FuelShooter Encoder Position: ",  crvbot.fuelShooter1->GetEncPosition());
-		SmartDashboard::PutNumber(" FuelShooter1 Shooter Speed",      crvbot.fuelShooter1->Get());
-		SmartDashboard::PutNumber(" FuelShooter1 Mode",      		  crvbot.fuelShooter1->GetControlMode());
+		SmartDashboard::PutNumber(" FuelShooter Encoder Position: ",  crvbot.fuelShooter->GetEncPosition());
+		SmartDashboard::PutNumber(" fuelShooter Shooter Speed",       crvbot.fuelShooter->Get());
+		SmartDashboard::PutNumber(" fuelShooter Mode",      		  crvbot.fuelShooter->GetControlMode());
 		SmartDashboard::PutNumber(" FuelShooter RPM: ",      		  currentRPM);
-		SmartDashboard::PutNumber(" FuelShooter RPM Graph: ",      	  crvbot.fuelShooter1->GetEncVel());
+		SmartDashboard::PutNumber(" FuelShooter RPM Graph: ",      	  crvbot.fuelShooter->GetEncVel());
 		SmartDashboard::PutNumber(" FuelShooter Error:",              Error);
 		SmartDashboard::PutNumber(" Gyro Angle : ", 				  crvbot.gyro->GetAngle());
 		SmartDashboard::PutNumber(" Alignment : ",					  boilerPosition);
+		SmartDashboard::PutNumber("IntergralError",                   IntergralError);
 		SmartDashboard::PutBoolean(" ReverseDirection ", 			  ReverseDirection);
 		SmartDashboard::PutBoolean(" Align to boiler ",               BoilerInRange);
 		SmartDashboard::PutBoolean(" Reached Set RPM ",               ReachedRPM);
-		SmartDashboard::PutNumber("IntergralError",                   IntergralError);
+		SmartDashboard::PutBoolean(" Agitator Enabled ",             AgitatorEnabled);
 	}
 
 	void updateRobotPreference(void) {
