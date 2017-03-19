@@ -115,7 +115,7 @@ public:
 		 CANTalon 	  *leftFrontMotor	 = NULL;
 		 CANTalon 	  *leftRearMotor	 = NULL;
 		 CANTalon 	  *intakeRoller 	 = NULL;
-		 CANTalon 	  *fuelShooter1      = NULL;
+		 CANTalon 	  *fuelShooter       = NULL;
 		 CANTalon 	  *fuelShooter2      = NULL;
 		 CANTalon	  *agitatorMotor     = NULL;
 		 CANTalon	  *hangerMotor 	     = NULL;
