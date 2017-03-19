@@ -267,6 +267,8 @@ public:
 		crvbot.leftEnc->Reset();
 		crvbot.rightEnc->Reset();
 
+		crvbot.fuelShooter1->SelectProfileSlot(0);
+		crvbot.fuelShooter2->SelectProfileSlot(0);
 		crvbot.fuelShooter1->SetPID(kP, kI, kD, kF);
 		crvbot.fuelShooter2->SetPID(kP, kI, kD, kF);
 
