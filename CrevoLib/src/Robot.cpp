@@ -83,7 +83,7 @@ public:
 		/*/
 
 		//initDrive(crvbot.robotDrive);
-		init(crvbot.robotDrive, crvbot.gyro, EncoderType::kQuadEncoder, DriveEncoder::kRightEncoder);
+		init(crvbot.robotDrive, crvbot.gyro, EncoderType::kQuadEncoder, SelectedEncoder::kLeft);
 
 
 		updateRobotStatus();
@@ -99,6 +99,7 @@ public:
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	bool HasReached;
+
 	int autonSelect = 1;
 	int boilerPostition;
 
