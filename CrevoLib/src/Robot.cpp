@@ -25,8 +25,9 @@ class Robot: public IterativeRobot, public OI, public AutonVectors, public Drive
 public:
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-	int auton;
 	void RobotInit() override {
+
+		SmartDashboard::PutString("Crevobot State : ", "Robot initializing");
 
 		driverGamepad      = new Joystick(0);
 		operatorGamepad    = new Joystick(1);
@@ -57,6 +58,10 @@ public:
 		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || Robot completed initialize" << std::endl;
 		std::cout << "_____________________________________________" << std::endl;
+
+		SmartDashboard::PutString("Auton State : ", "NULL");
+		SmartDashboard::PutString("Auton Selected : ", "NULL");
+		SmartDashboard::PutString("Crevobot State : ", "Robot completed initialization");
 	}
 
 	/*/
@@ -67,6 +72,8 @@ public:
 	 * 5. Score gear left, knock down hoppers
 	 * 6. Hopper knock down
 	 /*/
+
+	enum AutonStates {Idle, ScoreGearCenter, ScoreGearRight, ScoreGearLeft};
 
 	void AutonomousInit() override {
 
@@ -82,7 +89,6 @@ public:
 		 *  Init Shooter as controlled by velocity
 		/*/
 
-		//initDrive(crvbot.robotDrive);
 		init(crvbot.robotDrive, crvbot.gyro, EncoderType::kQuadEncoder, SelectedEncoder::kLeft);
 
 
@@ -95,6 +101,10 @@ public:
 		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || In Autonomous Periodic Mode" << std::endl;
 		std::cout << "_____________________________________________" << std::endl;
+
+		SmartDashboard::PutString("Crevobot State : ", "In Auton Periodic");
+		SmartDashboard::PutString("Auton State : ", "Auton Initilized");
+
 		HasReached = false;
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -108,12 +118,11 @@ public:
 
 		while(IsAutonomous() && IsEnabled())
 		{
-		switch(auton)
+		switch(autonSelect)
 		{
-		case 0:
+		case ScoreGearCenter:
 		{
-
-
+			SmartDashboard::PutString("Auton Selected : ", "Score Gear Center");
 				//AutonSelect(AutonStratagey::SHOOT_FROM_HOPPER);
 
 	//				while(vs.alinementToBoiler() <=  200  && !hasReached)
@@ -121,23 +130,23 @@ public:
 	//					drvt.moveRobot(0.15, -0.15);
 	//				}				hasReached = true;
 	//				drvt.moveRobot(0,0);
-				while(!HasReached){
 
-					while(A1_M1_LeftCount  <= crvbot.leftEnc->GetRaw() ) {
-							moveRobot(A1_M1_Speed);
-							updateRobotStatus();
-						 }
-				HasReached = true;
-				}
-					break;
+			while(A1_M1_LeftCount  <= crvbot.leftEnc->GetRaw() ) {
+				moveRobot(A1_M1_Speed);
+				updateRobotStatus();
+			}
+			autonSelect = AutonStates::Idle;
+			break;
 			}
 
-		case 1:
+		case ScoreGearRight:
 		{
+			SmartDashboard::PutString("Auton Selected : ", "Score Gear Right");
 			while(A2_M1_LeftCount >= crvbot.leftEnc->GetRaw())
 			{
 				moveRobot(A2_M1_Speed);
 				updateRobotStatus();
+				SmartDashboard::PutString("Auton State : ", "Running Action 1");
 			}
 			stopRobot();
 
@@ -145,24 +154,25 @@ public:
 			{
 				moveRobot(A2_M2_Speed, -A2_M2_Speed);
 				updateRobotStatus();
+				SmartDashboard::PutString("Auton State : ", "Running Action 2");
 			}
 
 			stopRobot();
 			Wait(1);
 			crvbot.leftEnc->Reset();
-
 			while(A2_M3_LeftCount >= crvbot.leftEnc->GetRaw() )
 			{
 				moveRobot(A2_M3_Speed);
 				updateRobotStatus();
+				SmartDashboard::PutString("Auton State : ", "Running Action 3");
 			}
 			stopRobot();
-			auton = 2851;
+			autonSelect = AutonStates::Idle;
 			break;
 		}
-		case 3:
+		case ScoreGearLeft:
 		{
-
+			SmartDashboard::PutString("Auton Selected : ", "Score Gear Left");
 			while(crvbot.leftEnc->GetRaw() <= A3_M1_LeftCount)
 			{
 				moveRobot(0.3, 0.3);
@@ -185,7 +195,7 @@ public:
 			}
 
 			stopRobot();
-			auton = 2851;
+			autonSelect = AutonStates::Idle;
 			break;
 		}
 		case 4:
@@ -231,13 +241,15 @@ public:
 				updateRobotStatus();
 			}
 			updateRobotStatus();
-			auton = 2851;
+			autonSelect = AutonStates::Idle;
 			break;
 		}
-		case 2851:
+		case Idle:
 		{
+			SmartDashboard::PutString("Auton State : ", "Idling");
 			stopRobot();
 			crvbot.fuelShooterMaster->StopMotor();
+			crvbot.agitatorMotor->StopMotor();
 			break;
 		}
 
@@ -271,6 +283,8 @@ public:
 		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || In TeleopPeriodic Mode" << std::endl;
 		std::cout << "_____________________________________________" << std::endl;
+
+		SmartDashboard::PutString("Crevobot State : ", "TeleopPeriodic Mode");
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void TeleopPeriodic() {
@@ -298,12 +312,6 @@ public:
 		runTime->Stop();
 
 	}
-
-/*	void DisabledInit()
-	{
-		stopRobot();
-		resetEncouderCounts();
-	}*/
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 	void TestPeriodic() {
@@ -427,6 +435,7 @@ private:
 
 		leftMost 		  = prefs->GetInt("leftMost",     0);
 		rightMost 		  = prefs->GetInt("rightMost",    500);
+		autonSelect 	  = prefs->GetInt("Auton Select", 1);
 		setRPM		      = prefs->GetDouble("shooterspeed", .75);
 		hangerSpeed       = prefs->GetDouble("Hanger Motor Speed", 0.75);
 		agitatorspeed     = prefs->GetDouble("agitatorspeed", 0.25);
@@ -434,8 +443,6 @@ private:
 		kI	      		  = prefs->GetDouble("I", 0.00000001);
 		kD	 			  = prefs->GetDouble("D", 0.0);
 		kF				  = prefs->GetDouble("F", 0.04);
-		auton 	  		  = prefs->GetInt("Auton", 1);
-
 	}
 
 	int boilerPosition;
