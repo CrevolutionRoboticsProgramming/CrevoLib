@@ -35,9 +35,9 @@ void CrevoRobot::robotInit(void){
 
 	//___________________ Manipulators MotorControllers ___________________
 
-	fuelShooter1      = new CANTalon(MotorCAN::SHOOTER_MOTOR_A);
+	fuelShooterMaster      = new CANTalon(MotorCAN::SHOOTER_MOTOR_A);
 
-	fuelShooter2     = new CANTalon(MotorCAN::SHOOTER_MOTOR_B);
+	fuelShooterSlave     = new CANTalon(MotorCAN::SHOOTER_MOTOR_B);
 
 	intakeRoller   	 = new CANTalon(MotorCAN::INTAKE_MOTOR);
 
@@ -53,8 +53,8 @@ void CrevoRobot::robotInit(void){
 	SmartDashboard::PutNumber("Left Rear CANTalon ID: ",     (int)leftRearMotor->GetDeviceID());
 	SmartDashboard::PutNumber("Right Front CANTalon ID: ",   (int)rightFrontMotor->GetDeviceID());
 	SmartDashboard::PutNumber("Right Rear CANTalon ID: ",    (int)rightRearMotor->GetDeviceID());
-	SmartDashboard::PutNumber("Fuel Shooter CANTalon1 ID: ", (int)fuelShooter1->GetDeviceID());
-	SmartDashboard::PutNumber("Fuel Shooter CANTalon2 ID: ", (int)fuelShooter2->GetDeviceID());
+	SmartDashboard::PutNumber("Fuel Shooter CANTalon1 ID: ", (int)fuelShooterMaster->GetDeviceID());
+	SmartDashboard::PutNumber("Fuel Shooter CANTalon2 ID: ", (int)fuelShooterSlave->GetDeviceID());
 	SmartDashboard::PutNumber("In-take CANTalon ID: ",       (int)intakeRoller->GetDeviceID());
 	SmartDashboard::PutNumber("Agitator CANTalon ID: ",      (int)agitatorMotor->GetDeviceID());
 	SmartDashboard::PutNumber("Hanger CANTalon ID: ", 		 (int)hangerMotor->GetDeviceID());
@@ -106,27 +106,27 @@ void CrevoRobot::robotInit(void){
 
 
 	// These values are for PID control. Will be Adjusted later.
-	//if(fuelShooter != NULL) fuelShooter2->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
-	//if(fuelShooter != NULL) fuelShooter2->Set(fuelShooter->GetDeviceID());
+	//if(fuelShooter != NULL) fuelShooterSlave->SetTalonControlMode(CANTalon::TalonControlMode::kFollowerMode);
+	//if(fuelShooter != NULL) fuelShooterSlave->Set(fuelShooter->GetDeviceID());
 
 
 	//if(fuelShooter != NULL) fuelShooter->SetTalonControlMode(CANTalon::TalonControlMode::kSpeedMode);
 
-	if(fuelShooter1 != NULL) fuelShooter1->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
-	if(fuelShooter1 != NULL) fuelShooter1->SetSensorDirection(false);
+	if(fuelShooterMaster != NULL) fuelShooterMaster->SetFeedbackDevice(CANTalon::FeedbackDevice::CtreMagEncoder_Relative);
+	if(fuelShooterMaster != NULL) fuelShooterMaster->SetSensorDirection(false);
 
-	if(fuelShooter1 != NULL) fuelShooter1->ConfigNominalOutputVoltage(0.0, -0.0);
-	if(fuelShooter1 != NULL) fuelShooter1->ConfigPeakOutputVoltage(12, -12);
+	if(fuelShooterMaster != NULL) fuelShooterMaster->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(fuelShooterMaster != NULL) fuelShooterMaster->ConfigPeakOutputVoltage(12, -12);
 
-	if(fuelShooter1 != NULL) fuelShooter1->SetVoltageRampRate(0.2);
+	if(fuelShooterMaster != NULL) fuelShooterMaster->SetVoltageRampRate(0.2);
 
-	if(fuelShooter2 != NULL) fuelShooter2->ConfigNominalOutputVoltage(0.0, -0.0);
-	if(fuelShooter2 != NULL) fuelShooter2->ConfigPeakOutputVoltage(12, -12);
+	if(fuelShooterSlave != NULL) fuelShooterSlave->ConfigNominalOutputVoltage(0.0, -0.0);
+	if(fuelShooterSlave != NULL) fuelShooterSlave->ConfigPeakOutputVoltage(12, -12);
 
-	if(fuelShooter2 != NULL) fuelShooter2->SetVoltageRampRate(0.2);
+	if(fuelShooterSlave != NULL) fuelShooterSlave->SetVoltageRampRate(0.2);
 
-	if(fuelShooter1 != NULL) fuelShooter1->SetInverted(true);
-	if(fuelShooter2 != NULL) fuelShooter2->SetInverted(true);
+	if(fuelShooterMaster != NULL) fuelShooterMaster->SetInverted(true);
+	if(fuelShooterSlave != NULL) fuelShooterSlave->SetInverted(true);
 
 	/*________________________________________________________________________________________________________________________________*/
 
@@ -156,8 +156,8 @@ void CrevoRobot::robotInit(void){
 
 	/*_____ Set All motor Percentages to Zero _____*/
 	if(robotDrive      != NULL)      robotDrive->StopMotor();
-	if(fuelShooter1 	   != NULL) 	fuelShooter1->Set(0);
-	if(fuelShooter2 	   != NULL) 	fuelShooter2->Set(0);
+	if(fuelShooterMaster 	   != NULL) 	fuelShooterMaster->Set(0);
+	if(fuelShooterSlave 	   != NULL) 	fuelShooterSlave->Set(0);
 	if(intakeRoller    != NULL)    intakeRoller->Set(0);
 	if(hangerMotor     != NULL)     hangerMotor->Set(0);
 
