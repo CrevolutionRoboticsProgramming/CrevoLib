@@ -11,34 +11,30 @@
  }
     //use for testing
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
- void DriveTrain::init(RobotDrive *_robotDrvInit, AnalogGyro *_gyroInit, EncoderType enc)
+ void DriveTrain::init(RobotDrive *_robotDrvInit, AnalogGyro *_gyroInit, EncoderType enc, SelectedEncoder selcEnc)
   {
-	 robotDrive = _robotDrvInit;
-     gyro = _gyroInit;
+	 robotDrive      = _robotDrvInit;
+     gyro 		     = _gyroInit;
+     encoderType     = enc;
+     encoderSelected = selcEnc;
 
-     if(enc == MagnetEncoder)
-     {
-    	 IsMagEnc = true;
-     }
-     else
-     {
-    	 IsMagEnc = false;
-     }
+     driveTime 		 = new Timer();
+
      std::cout << "Robot Initialized" << std::endl;
   }
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::initEncoder(Encoder *_leftEncInit, Encoder *_rightEncInit)
  {
-	 leftEnc = _leftEncInit;
+	 leftEnc  = _leftEncInit;
 	 rightEnc = _rightEncInit;
  }
-/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*----------------------------- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
  void DriveTrain::initMotors(CANTalon *_rightFront, CANTalon *_rightRear, CANTalon *_leftFront, CANTalon *_leftRear)
   {
 	 rightFrontMotor = _rightFront;
-	 rightRearMotor = _rightRear;
-	 leftFrontMotor = _leftFront;
-	 leftRearMotor = _leftRear;
+	 rightRearMotor  = _rightRear;
+	 leftFrontMotor  = _leftFront;
+	 leftRearMotor   = _leftRear;
   }
  void DriveTrain::initMotor(CANTalon *_selectedTalon)
  {
@@ -107,7 +103,7 @@
 		 pwr *= -1;
      }
 
-	 if(IsMagEnc)
+	 if(encoderType == kMagnetEncoder)
 	 {
 		// int lft_target = leftFrontMotor->GetEncPosition(CANTalon::) + counts;
 //		 int rgt_target = rightFrontMotor->GetEncPosition() + counts;
@@ -117,7 +113,7 @@
 //			 moveRobot(pwr);
 //		 }
 	 }
-	 else
+	 if(encoderType == kQuadEncoder)
 	 {
 		 int lft_target = leftEnc->GetRaw() + counts;
 		 int rgt_target = rightEnc->GetRaw() + counts;
@@ -136,9 +132,7 @@
 
  void DriveTrain::driveCountEncoder(double enct, double pwr, Direction dir)
  {
-
-	 	 if(IsMagEnc)
-	 	 {
+	 if(encoderType == kMagnetEncoder) {
 	 		// int lft_target = leftFrontMotor->GetEncPosition(CANTalon::) + counts;
 	 //		 int rgt_target = rightFrontMotor->GetEncPosition() + counts;
 	 //
@@ -146,30 +140,30 @@
 	 //		 {
 	 //			 moveRobot(pwr);
 	 //		 }
-	 	 }
-	 	 else
-	 	 {
-	 		int lft_target = leftEnc->GetRaw() + enct;
-	 		int rgt_target = rightEnc->GetRaw() + enct;
-	 		if (dir == Reverse)
-	 		{
-	 			lft_target *= -1;
-	 			rgt_target *= -1;
-	 			pwr *= -1;
-	 			while(lft_target  <= leftEnc->GetRaw() && rgt_target <= rightEnc->GetRaw())
-	 			{
-	 				moveRobot(pwr);
-	 			}
-	 		}
+	 }
 
-	 		else
-	 		{
-	 			 while(lft_target  >= leftEnc->GetRaw() && rgt_target >= rightEnc->GetRaw())
-	 			 {
-	 				 moveRobot(pwr);
-	 			 }
-	 		}
-	 	 }
+	 if(encoderType == kQuadEncoder){
+
+		 int lft_target = leftEnc->GetRaw() + enct;
+		 int rgt_target = rightEnc->GetRaw() + enct;
+
+		 if (dir == Reverse) {
+			 lft_target *= -1;
+			 rgt_target *= -1;
+			 pwr *= -1;
+			 while(lft_target  <= leftEnc->GetRaw())
+			 {
+				 moveRobot(pwr);
+	 		 }
+	 	}
+
+	 	else {
+	 		 while(lft_target  >= leftEnc->GetRaw())
+	 		 {
+	 			 moveRobot(pwr);
+	 		 }
+	 	}
+	 }
 	 	stopAndReset();
 	 	std::cout << "____________________________________________________________________________________________________" << std::endl;
 	 	std::cout << "" << std::endl;
