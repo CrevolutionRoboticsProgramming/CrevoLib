@@ -55,8 +55,8 @@ private:
 #endif /*PRAC_BOT*/
 
 #ifndef ROBOT_1
-#define RIGHT_MULTIPLER  0.9
-#define  LEFT_MULTIPLER  1
+#define RIGHT_MULTIPLER   0.9
+#define  LEFT_MULTIPLER   1
 		enum MotorCAN{
 				RIGHT_FRONT_PORT = 17,
 				RIGHT_REAR_PORT = 19,
