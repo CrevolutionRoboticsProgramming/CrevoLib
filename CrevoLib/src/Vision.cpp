@@ -38,7 +38,7 @@ void Vision::startStream(void)
 
 void Vision::VisionTread(void)
 {
-	cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture(0);
+	cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture(1);
 				// Set the resolution
 	camera.SetResolution(640, 480);
 				// Get a CvSink. This will capture Mats from the Camera
