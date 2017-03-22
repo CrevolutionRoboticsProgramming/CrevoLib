@@ -55,7 +55,7 @@ private:
 #endif /*PRAC_BOT*/
 
 #ifndef ROBOT_1
-#define RIGHT_MULTIPLER  1
+#define RIGHT_MULTIPLER  0.9
 #define  LEFT_MULTIPLER  1
 		enum MotorCAN{
 				RIGHT_FRONT_PORT = 17,
@@ -72,7 +72,7 @@ private:
 #endif
 
 //#else
-	//	std::cout << "Need to Select Robot Configuration!!" << std:endl;
+	//	std::cout << "Need to Select Robot Configuration!!" << std:endl;';;
 		//std::cout << "Redownload porgram with corresponding robot." << std::endl;
 /*________________________________________________________________________________________________________________________________*/
 
