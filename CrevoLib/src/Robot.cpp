@@ -47,7 +47,7 @@ public:
 		 *	Command to start up the stream from the USB camera.
 		/*/
 
-		//vs.startStream();
+		vs.startStream();
 
 		/*/
 		 *  This is setting up the network table to communicate preferences from smart dashboard to the RoboRIO
@@ -84,8 +84,6 @@ public:
 		/*/
 
 		//initDrive(crvbot.robotDrive);
-		init(crvbot.robotDrive, crvbot.gyro, EncoderType::kQuadEncoder, DriveEncoder::kRightEncoder);
-
 
 		updateRobotStatus();
 		updateRobotPreference();
@@ -190,7 +188,7 @@ private:
 
 	     double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
 	     double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
-		 double Right_X = (0.65*controllerJoystick(driverGamepad, Axes::RIGHT_X));
+		 double Right_X = (0.4*controllerJoystick(driverGamepad, Axes::RIGHT_X));
 
 		 if(controllerButton(driverGamepad, Button::A))  ReverseDirection = true;
 		 if(controllerButton(driverGamepad, Button::B))  ReverseDirection = false;
@@ -223,7 +221,7 @@ private:
 
 	void ShootingProcesses(void) {
 
-		currentRPM = crvbot.fuelShooterMaster->GetEncVel();
+		currentRPM = crvbot.fuelShooterMaster->Get();
 	/*
  	 *  Homemade PID control will add if Talon SRX PID fail
  	 *
@@ -241,12 +239,12 @@ private:
 		if(operatorGamepad->GetRawAxis(3) > 0) {
 			//Switches the Talon SRXs to Velocity control for PID
 			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kSpeed);
-			crvbot.fuelShooterMaster->Set(-setRPM);
+			crvbot.fuelShooterMaster->Set(setRPM);
 		}
 		else if(operatorGamepad->GetRawAxis(2) > 0) {
 			//Switches the Talon SRXs to Voltage Percentage control
 			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kPercentVbus);
-			crvbot.fuelShooterMaster->Set(0.5);
+			crvbot.fuelShooterMaster->Set(-0.5);
 		}
 		else {
 			//Switches the Talon SRXs to Voltage Percentage control
@@ -256,7 +254,7 @@ private:
 
 
 
-		AgitatorEnabled =  (crvbot.fuelShooterMaster->GetEncVel() <= -setRPM);
+		AgitatorEnabled =  (crvbot.fuelShooterMaster->Get() <= (-setRPM + 100));
 
 		if(AgitatorEnabled){
 			ReachedRPM = true;
