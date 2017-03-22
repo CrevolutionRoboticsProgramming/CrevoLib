@@ -51,10 +51,11 @@ public:
 					LEFT_Y = 1,
 		};
 
-	bool controllerButton(Joystick *joystick, Button button);
-	float controllerJoystick(Joystick *joystick, Axes axes);
 	float shape(float inValue);
+	float controllerJoystick(Joystick *joystick, Axes axes);
+	bool controllerButton(Joystick *joystick, Button button);
 	bool toggleAction(bool Pressed, CANTalon *_motor, double speed);
+	bool toggleBoolean(bool Pressed, bool returnBool);
 	void whilePressedAction(bool forwardPressed, bool reversedPressed, CANTalon *_motor, double speed);
 	OI();
 	virtual ~OI();
