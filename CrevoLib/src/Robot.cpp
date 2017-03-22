@@ -184,11 +184,13 @@ private:
 
 	bool ReverseDirection = false;
 
+	double TRN_SENIVITY;
+
 	void DriveCode(void) {
 
 	     double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
 	     double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
-		 double Right_X = (0.4*controllerJoystick(driverGamepad, Axes::RIGHT_X));
+		 double Right_X = TRN_SENIVITY * controllerJoystick(driverGamepad, Axes::RIGHT_X);
 
 		 if(controllerButton(driverGamepad, Button::A))  ReverseDirection = true;
 		 if(controllerButton(driverGamepad, Button::B))  ReverseDirection = false;
@@ -313,6 +315,7 @@ private:
 		kI	      		  = prefs->GetDouble("I", 0.00000001);
 		kD	 			  = prefs->GetDouble("D", 0.0);
 		kF				  = prefs->GetDouble("F", 0.04);
+		TRN_SENIVITY      = prefs->GetDouble("Turn Sensitivity", 0.4);
 		auton 	  		  = prefs->GetInt("Auton", 1);
 
 	}
