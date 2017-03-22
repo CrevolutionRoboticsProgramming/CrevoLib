@@ -165,6 +165,7 @@ public:
 
 	void TestPeriodic() {
 		lw->Run();
+		updateRobotStatus();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -182,25 +183,30 @@ private:
 	Preferences *prefs;
 	Timer *runTime;
 
-	bool ReverseDirection = false;
+	bool ReverseDirection;
+	bool HighSpeed;
 
+	double speedMultiplier = 0.4;
 	double TRN_SENIVITY;
 
+	int inverseMulitpler;
+
 	void DriveCode(void) {
+		double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
+	    double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
+		double Right_X = TRN_SENIVITY * controllerJoystick(driverGamepad, Axes::RIGHT_X);
 
-	     double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
-	     double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
-		 double Right_X = TRN_SENIVITY * controllerJoystick(driverGamepad, Axes::RIGHT_X);
+		toggleBoolean(controllerButton(driverGamepad, Button::A), ReverseDirection);
+		toggleBoolean(controllerButton(driverGamepad, Button::B), HighSpeed);
 
-		 if(controllerButton(driverGamepad, Button::A))  ReverseDirection = true;
-		 if(controllerButton(driverGamepad, Button::B))  ReverseDirection = false;
+		if(!ReverseDirection) inverseMulitpler = -1;
+		else				  inverseMulitpler = 1;
 
 		 /*_________ Sets DriverJoystick in Tank Drive orientation _________*/
-		 if(!ReverseDirection)
-			 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(Left_Y - Right_X)), (RIGHT_MULTIPLER*(Left_Y + Right_X)));
-		 /*_________ Sets DriverJoystick in FirstPerosnDrive orientation _________*/
-	     else
-	    	 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(-Left_Y - Right_X)), (RIGHT_MULTIPLER*(-Left_Y + Right_X)));
+	    if(!HighSpeed)
+	    	crvbot.robotDrive->SetLeftRightMotorOutputs(inverseMulitpler * (LEFT_MULTIPLER*(Left_Y - Right_X)), inverseMulitpler * (RIGHT_MULTIPLER*(Left_Y + Right_X)));
+	    else
+	    	crvbot.robotDrive->SetLeftRightMotorOutputs(0.5 * inverseMulitpler * (LEFT_MULTIPLER*(Left_Y - Right_X)), 0.5 * inverseMulitpler * (RIGHT_MULTIPLER*(Left_Y + Right_X)));
 
 	}
 
@@ -261,7 +267,6 @@ private:
 		if(AgitatorEnabled){
 			ReachedRPM = true;
 			crvbot.agitatorMotor->Set(agitatorspeed);
-
 		}
 		else
 		{
