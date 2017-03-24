@@ -29,7 +29,7 @@ void Vision::startStream(void)
 
 	/*_____ Starts Instance for Gear stream _____*/
 	//cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(1);
-	//camera2.SetResolution(640, 480);
+	//camera2.SetResolution(320, 280);
 
 	/*_____ Starts Instance for Shooter stream on a Different Tread _____*/
 	std::thread shooterStream(VisionTread);
@@ -38,7 +38,7 @@ void Vision::startStream(void)
 
 void Vision::VisionTread(void)
 {
-	cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture(1);
+	cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture();
 				// Set the resolution
 	camera.SetResolution(640, 480);
 				// Get a CvSink. This will capture Mats from the Camera
