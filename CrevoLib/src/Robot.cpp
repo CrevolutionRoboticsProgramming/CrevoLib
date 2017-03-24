@@ -34,6 +34,7 @@ public:
 		runTime            = new Timer();
 		fdbk.elapsedRumble = new Timer();
 
+
 		crvbot.robotInit();
 
 		/*/
@@ -49,6 +50,8 @@ public:
 
 		vs.startStream();
 
+		AllianceLED();
+
 		/*/
 		 *  This is setting up the network table to communicate preferences from smart dashboard to the RoboRIO
 		/*/
@@ -56,7 +59,7 @@ public:
 
 		std::cout << "_____________________________________________" << std::endl;
 		std::cout << "" << std::endl;
-		std::cout << "|| Crevobot || Robot completed initialize" << std::endl;
+		std::cout << "|| Crevobot || Robot completed initialize"     << std::endl;
 		std::cout << "_____________________________________________" << std::endl;
 	}
 
@@ -85,8 +88,8 @@ public:
 
 		//initDrive(crvbot.robotDrive);
 
-		updateRobotStatus();
-		updateRobotPreference();
+		UpdateRobotStatus();
+		UpdateRobotPreference();
 
 		runTime->Reset();
 
@@ -113,8 +116,8 @@ public:
 
 	void TeleopInit() {
 
-		updateRobotStatus();
-		updateRobotPreference();
+		UpdateRobotStatus();
+		UpdateRobotPreference();
 
 		runTime->Reset();
 
@@ -150,11 +153,14 @@ public:
 			/*_____INTAKE CODE_____*/
 			whilePressedAction(controllerButton(driverGamepad, Button::RightBumber), controllerButton(driverGamepad, Button::LeftBumber), crvbot.intakeRoller, 0.8);
 
+			/*_____HANGER CODE_____*/
+			HangerCode();
+
 			/*_____ALIGNMENT CODE_____*/
 			//AlineCheck();
 
 			/*_____UPDATING ROBOT STATUS_____*/
-			updateRobotStatus();
+			UpdateRobotStatus();
 		}
 
 		runTime->Stop();
@@ -165,7 +171,6 @@ public:
 
 	void TestPeriodic() {
 		lw->Run();
-		updateRobotStatus();
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -183,30 +188,25 @@ private:
 	Preferences *prefs;
 	Timer *runTime;
 
-	bool ReverseDirection;
-	bool HighSpeed;
+	bool ReverseDirection = false;
 
-	double speedMultiplier = 0.4;
 	double TRN_SENIVITY;
 
-	int inverseMulitpler;
-
 	void DriveCode(void) {
-		double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
-	    double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
-		double Right_X = TRN_SENIVITY * controllerJoystick(driverGamepad, Axes::RIGHT_X);
 
-		toggleBoolean(controllerButton(driverGamepad, Button::A), ReverseDirection);
-		toggleBoolean(controllerButton(driverGamepad, Button::B), HighSpeed);
+	     double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
+	     double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
+		 double Right_X = TRN_SENIVITY * controllerJoystick(driverGamepad, Axes::RIGHT_X);
 
-		if(!ReverseDirection) inverseMulitpler = -1;
-		else				  inverseMulitpler = 1;
+		 if(controllerButton(driverGamepad, Button::A))  ReverseDirection = true;
+		 if(controllerButton(driverGamepad, Button::B))  ReverseDirection = false;
 
 		 /*_________ Sets DriverJoystick in Tank Drive orientation _________*/
-	    if(!HighSpeed)
-	    	crvbot.robotDrive->SetLeftRightMotorOutputs(inverseMulitpler * (LEFT_MULTIPLER*(Left_Y - Right_X)), inverseMulitpler * (RIGHT_MULTIPLER*(Left_Y + Right_X)));
-	    else
-	    	crvbot.robotDrive->SetLeftRightMotorOutputs(0.5 * inverseMulitpler * (LEFT_MULTIPLER*(Left_Y - Right_X)), 0.5 * inverseMulitpler * (RIGHT_MULTIPLER*(Left_Y + Right_X)));
+		 if(!ReverseDirection)
+			 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(Left_Y - Right_X)), (RIGHT_MULTIPLER*(Left_Y + Right_X)));
+		 /*_________ Sets DriverJoystick in FirstPerosnDrive orientation _________*/
+	     else
+	    	 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(-Left_Y - Right_X)), (RIGHT_MULTIPLER*(-Left_Y + Right_X)));
 
 	}
 
@@ -214,7 +214,6 @@ private:
 
 	void HangerCode(void) {
 		whilePressedAction(controllerButton(operatorGamepad, Button::A), controllerButton(operatorGamepad, Button::B), crvbot.hangerMotor, hangerSpeed);
-
 	}
 
 	double currentRPM;
@@ -228,7 +227,6 @@ private:
 	bool ReachedRPM;
 
 	void ShootingProcesses(void) {
-
 		currentRPM = crvbot.fuelShooterMaster->Get();
 	/*
  	 *  Homemade PID control will add if Talon SRX PID fail
@@ -243,30 +241,30 @@ private:
 		else{
 
 		*/
-
 		if(operatorGamepad->GetRawAxis(3) > 0) {
-			//Switches the Talon SRXs to Velocity control for PID
+		//Switches the Talon SRXs to Velocity control for PID
 			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kSpeed);
-			crvbot.fuelShooterMaster->Set(setRPM);
+			crvbot.fuelShooterMaster->Set(-setRPM);
+
 		}
 		else if(operatorGamepad->GetRawAxis(2) > 0) {
-			//Switches the Talon SRXs to Voltage Percentage control
+		//Switches the Talon SRXs to Voltage Percentage control
 			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kPercentVbus);
-			crvbot.fuelShooterMaster->Set(-0.5);
+			crvbot.fuelShooterMaster->Set(0.5);
 		}
 		else {
-			//Switches the Talon SRXs to Voltage Percentage control
+		//Switches the Talon SRXs to Voltage Percentage control
 			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kPercentVbus);
 			crvbot.fuelShooterMaster->Set(0);
-		}
+		 }
 
 
-
-		AgitatorEnabled =  (crvbot.fuelShooterMaster->Get() <= (-setRPM + 100));
+		AgitatorEnabled =  (crvbot.fuelShooterMaster->Get() <= (setRPM - 100));
 
 		if(AgitatorEnabled){
 			ReachedRPM = true;
 			crvbot.agitatorMotor->Set(agitatorspeed);
+
 		}
 		else
 		{
@@ -278,7 +276,7 @@ private:
 
 	}
 
-	void updateRobotStatus(void) {
+	void UpdateRobotStatus(void) {
 
 		SmartDashboard::PutNumber(" Total Runtime: ",        		  runTime->Get());
 		SmartDashboard::PutNumber(" LeftMotor Current: ",   		  crvbot.leftFrontMotor->GetOutputCurrent());
@@ -288,41 +286,44 @@ private:
 		SmartDashboard::PutNumber(" fuelShooter Voltage: ", 	      crvbot.fuelShooterMaster->GetOutputVoltage());
 		SmartDashboard::PutNumber(" fuelShooter Current: ",  	      crvbot.fuelShooterMaster->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Agitator Voltage: ",              crvbot.agitatorMotor->GetOutputVoltage());
-		SmartDashboard::PutNumber(" fuelShooter2 Voltage: ", 		  crvbot.fuelShooterSlave->GetOutputVoltage());
-		SmartDashboard::PutNumber(" fuelShooter2 Current: ",  		  crvbot.fuelShooterSlave->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Agitator Current: ",              crvbot.agitatorMotor->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Agitator Current: ",              crvbot.agitatorMotor->GetOutputCurrent());
 		SmartDashboard::PutNumber(" Left Side Encoder Count: ", 	  crvbot.leftEnc->GetRaw());
 		SmartDashboard::PutNumber(" Right Side Encoder Count: ",      crvbot.rightEnc->GetRaw());
-		SmartDashboard::PutNumber(" fuelShooter Encoder Position: ",  crvbot.fuelShooterMaster->GetEncPosition());
 		SmartDashboard::PutNumber(" fuelShooter Shooter Speed",       crvbot.fuelShooterMaster->Get());
 		SmartDashboard::PutNumber(" fuelShooter Mode",      		  crvbot.fuelShooterMaster->GetControlMode());
 		SmartDashboard::PutNumber(" fuelShooter RPM: ",      		  currentRPM);
-		SmartDashboard::PutNumber(" fuelShooter RPM Graph: ",      	  crvbot.fuelShooterMaster->GetEncVel());
+		SmartDashboard::PutNumber(" fuelShooter RPM Graph: ",      	  crvbot.fuelShooterMaster->Get());
 		SmartDashboard::PutNumber(" fuelShooter Error:",              Error);
 		SmartDashboard::PutNumber(" Gyro Angle : ", 				  crvbot.gyro->GetAngle());
 		SmartDashboard::PutNumber(" Alignment : ",					  boilerPosition);
-		SmartDashboard::PutNumber("IntergralError",                   IntergralError);
 		SmartDashboard::PutBoolean(" ReverseDirection ", 			  ReverseDirection);
 		SmartDashboard::PutBoolean(" Align to boiler ",               BoilerInRange);
 		SmartDashboard::PutBoolean(" Reached Set RPM ",               ReachedRPM);
-		SmartDashboard::PutBoolean(" Agitator Enabled ",             AgitatorEnabled);
+		SmartDashboard::PutBoolean(" Agitator Enabled ",              AgitatorEnabled);
 	}
 
-	void updateRobotPreference(void) {
+	void UpdateRobotPreference(void) {
 
 		leftMost 		  = prefs->GetInt("leftMost",     0);
 		rightMost 		  = prefs->GetInt("rightMost",    500);
+		allianceSide      = prefs->GetInt("Alliance Side", 0);
 		setRPM		      = prefs->GetDouble("shooterspeed", .75);
 		hangerSpeed       = prefs->GetDouble("Hanger Motor Speed", 0.75);
 		agitatorspeed     = prefs->GetDouble("agitatorspeed", 0.25);
-		kP	    		  = prefs->GetDouble("P", 1.0);
+		kP	    		  = prefs->GetDouble("P", 0.1);
 		kI	      		  = prefs->GetDouble("I", 0.00000001);
 		kD	 			  = prefs->GetDouble("D", 0.0);
 		kF				  = prefs->GetDouble("F", 0.04);
 		TRN_SENIVITY      = prefs->GetDouble("Turn Sensitivity", 0.4);
-		auton 	  		  = prefs->GetInt("Auton", 1);
+	}
 
+	int allianceSide;
+
+	void AllianceLED(void){
+
+		if(allianceSide == AllianceSide::BLUE) { crvbot.BlueLED->Set(true); }
+		if(allianceSide == AllianceSide::RED)  { crvbot.RedLED->Set(true); }
 	}
 
 	int boilerPosition;
