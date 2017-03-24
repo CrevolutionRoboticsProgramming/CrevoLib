@@ -19,8 +19,8 @@ private:
 	bool inputActive;
 	bool inputSlow;
 	bool stillPressed;
-	bool toggled = false;
-	bool lastToggled = false;
+	//bool toggled = false;
+	//bool lastToggled = false;
 
 public:
 	enum Button {
