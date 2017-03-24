@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string>
 #include <CANTalon.h>
+#include <Solenoid.h>
 #include <Talon.h>
 #include <AnalogAccelerometer.h>
 #include <AnalogGyro.h>
@@ -19,12 +20,14 @@
 #include <SmartDashboard/SmartDashboard.h>
 #include <DigitalInput.h>
 #include <DoubleSolenoid.h>
+#include <Solenoid.h>
 #include <Encoder.h>
 #include <Compressor.h>
 #include <RobotDrive.h>
 
 //#define ROBOT_1
 #define NOT_DEBUG
+#define SHOOTER_BACKUP
 class CrevoRobot{
 
 private:
@@ -46,11 +49,12 @@ private:
 					RIGHT_REAR_PORT = 3,
 					LEFT_FRONT_PORT = 2,
 					LEFT_REAR_PORT = 4,
-					SHOOTER_MOTOR_A = 9,
-					SHOOTER_MOTOR_B = 8,
+					FUEL_SHOOTER_MASTER = 9,
+					FUEL_SHOOTER_SLAVE = 8,
 					AGITATOR_MOTOR = 25,
 					INTAKE_MOTOR = 5,
 					HANGER_MOTOR = 6,
+
 		 };
 #endif /*PRAC_BOT*/
 
@@ -62,8 +66,8 @@ private:
 				RIGHT_REAR_PORT = 19,
 				LEFT_FRONT_PORT = 16,
 				LEFT_REAR_PORT = 18,
-				SHOOTER_MOTOR_A = 20,
-				SHOOTER_MOTOR_B = 21,
+				FUEL_SHOOTER_MASTER = 20,
+				FUEL_SHOOTER_SLAVE = 21,
 				AGITATOR_MOTOR = 22,
 				HANGER_MOTOR = 23,
 				INTAKE_MOTOR = 24,
@@ -101,11 +105,14 @@ private:
 		 };
 /*________________________________________________________________________________________________________________________________*/
 
-		 enum SoleniodPort{
+		 enum SolenoidPort{
 			 	 	RIGHT_DRIVE_SWITCH1 = 1,
 					RIGHT_DRIVE_SWITCH2 = 2,
 					LEFT_DRIVE_SWTICH1 = 3,
 					LEFT_DRIVE_SWITCH2 = 4,
+					RED_LED_PORT = 0,
+					BLUE_LED_PORT = 1,
+					GREEN_LED_PORT = 2,
 		 };
 /*________________________________________________________________________________________________________________________________*/
 
@@ -115,14 +122,18 @@ public:
 		 CANTalon 	  *leftFrontMotor	 = NULL;
 		 CANTalon 	  *leftRearMotor	 = NULL;
 		 CANTalon 	  *intakeRoller 	 = NULL;
-		 CANTalon 	  *fuelShooterMaster       = NULL;
-		 CANTalon 	  *fuelShooterSlave      = NULL;
+		 CANTalon 	  *fuelShooterMaster = NULL;
+		 CANTalon 	  *fuelShooterSlave  = NULL;
 		 CANTalon	  *agitatorMotor     = NULL;
 		 CANTalon	  *hangerMotor 	     = NULL;
 
 		 RobotDrive   *robotDrive;
 
 		 Compressor   *compressor;
+
+		 Solenoid 	  *RedLED;
+		 Solenoid 	  *BlueLED;
+		 Solenoid 	  *GreenLED;
 
 		 DigitalInput *gearSensor;
 		 DigitalInput *limitSwitch2;
@@ -134,8 +145,6 @@ public:
 		 AnalogGyro   *gyro;
 		 AnalogPotentiometer *pot;
 		 AnalogAccelerometer *accel;
-
-
 
 		 //Length of current year's robot
 		 const double robotLentgh = 28;
