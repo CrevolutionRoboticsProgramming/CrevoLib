@@ -1,4 +1,5 @@
 /*
+ /*
  * CrevoRobot.cpp
  *
  *  Created on: Dec 19, 2016
@@ -87,7 +88,6 @@ void CrevoRobot::robotInit(void){
 	if(rightFrontMotor != NULL) rightFrontMotor->ConfigNominalOutputVoltage(0.0, -0.0);
 
 	if(intakeRoller    != NULL) intakeRoller->SetInverted(false);
-	if(intakeRoller	   != NULL) intakeRoller->SetVoltageRampRate(0.5);
 	if(intakeRoller    != NULL) intakeRoller->ConfigNominalOutputVoltage(0.0, -0.0);
 
 	if(hangerMotor     != NULL) hangerMotor->SetInverted(false);

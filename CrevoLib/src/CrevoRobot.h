@@ -59,8 +59,8 @@ private:
 #endif /*PRAC_BOT*/
 
 #ifndef ROBOT_1
-#define RIGHT_MULTIPLER   0.9
-#define  LEFT_MULTIPLER   1
+#define RIGHT_MULTIPLER   1
+#define  LEFT_MULTIPLER   0.98
 		enum MotorCAN{
 				RIGHT_FRONT_PORT = 17,
 				RIGHT_REAR_PORT = 19,
@@ -98,8 +98,7 @@ private:
 					FUEL_MANIPULATOR_ENCODER_1 = 0,
 					FUEL_MANIPULATOR_ENCODER_2 = 1,
 					R_EN_1 = 4,
-					R_EN_2 = 5
-					,
+					R_EN_2 = 5,
 					L_EN_1 = 2,
 					L_EN_2 = 3,
 		 };
