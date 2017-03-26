@@ -47,12 +47,13 @@
 
 	  	 	  int InverseMulti;
 	  	 	  int autonCounter = 0;
+	  	 	  int encoderType;
+	  	 	  int encoderSelected;
 
 	  	 	  bool FinishedPreviousTrial = false;
 	  	 	  bool turnToheading;
 	  	 	  bool leftCountsReached;
 	  	 	  bool rightCountsReached;
-	  	 	  bool IsMagEnc;
 
 	          int distanceToCounts(double distance);
 	          int angleToCounts(double angle, double radius);
@@ -62,8 +63,9 @@
 	          double errorClip(double number , double min, double max);
 
  	 public:
-	          enum EncoderType {MagnetEncoder, QuadEncoder};
-	          void init(RobotDrive *_robotDrvInit, AnalogGyro *_gyroInit, EncoderType enc);
+	          enum SelectedEncoder {kLeft, kRight, kLeftAndRight};
+	          enum EncoderType {kMagnetEncoder, kQuadEncoder};
+	          void init(RobotDrive *_robotDrvInit, AnalogGyro *_gyroInit, EncoderType enc, SelectedEncoder selcEnc);
 	          void initMotors(CANTalon *_rightFront, CANTalon *_rightRear, CANTalon *_leftFront, CANTalon *_leftRear);
 	          void initMotor(CANTalon *_selectedTalon);
 	          void initEncoder(Encoder *_leftEncInit, Encoder *_rightEncInit);
