@@ -21,27 +21,45 @@ void AutonVectors::AutonSelect(AutonStratagey strat)
 	switch(strat)
 	{
 	case SHOOT_FROM_HOPPER:
+	{
+		break;
+	}
+	case SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE:
 	case SCORE_GEAR_CENTER:
 	{
-		//drvt.driveCountEncoder(A1_M1_LeftCount, A1_M1_Speed, Forward);
+		SmartDashboard::PutString("Auton Selected : ", "Score Gear Center");
+		drvt.driveCountEncoder(A1_M1_LeftCount, A1_M1_Speed, Forward);
+		strat = IDLE;
 		break;
 	}
+	case SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE:
+	case SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER:
 	case SCORE_GEAR_LEFT:
 	{
-		//drvt.driveCountEncoder(A2_M1_LeftCount, A2_M1_Speed, Forward);
-		//drvt.turnToHeading(A2_M2_GyroAngle, A2_M2_Speed);
-		//drvt.driveCountEncoder(A2_M3_LeftCount, A2_M3_Speed, Forward);
-		break;
-	}
-	case SCORE_GEAR_RIGHT:
-	{
+		SmartDashboard::PutString("Auton Selected : ", "Score Gear Left");
+		drvt.driveCountEncoder(A2_M1_LeftCount, A2_M1_Speed, Forward);
+		drvt.turnToHeading(A2_M2_GyroAngle, A2_M2_Speed);
+		drvt.resetEncouderCounts();
+		drvt.driveCountEncoder(A2_M3_LeftCount, A2_M3_Speed, Forward);
+		strat = IDLE;
 		break;
 	}
 	case SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT:
-	case SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE:
-	case SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE:
-	case SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER:
+	case SCORE_GEAR_RIGHT:
+	{
+		SmartDashboard::PutString("Auton Selected : ", "Score Gear Right");
+		drvt.driveCountEncoder(A3_M1_LeftCount, A3_M1_Speed, Forward);
+		drvt.turnToHeading(A3_M2_GyroAngle, A3_M2_Speed);
+		drvt.resetEncouderCounts();
+		drvt.driveCountEncoder(A3_M3_LeftCount, A3_M3_Speed, Forward);
+		strat = IDLE;
+		break;
+	}
 	case IDLE:
+		SmartDashboard::PutString("Auton State : ", "Idling");
+		drvt.stopAndReset();
+		crvbot.fuelShooterMaster->StopMotor();
+		crvbot.agitatorMotor->StopMotor();
 		break;
 	}
 }
