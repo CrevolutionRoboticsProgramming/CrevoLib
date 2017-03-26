@@ -8,8 +8,6 @@
 #include <IterativeRobot.h>
 #include <Joystick.h>
 #include <Timer.h>
-#include <PIDController.h>
-#include <CANSpeedController.h>
 #include <Preferences.h>
 #include <networktables/NetworkTable.h>
 
@@ -33,6 +31,7 @@ public:
 		operatorGamepad    = new Joystick(1);
 		runTime            = new Timer();
 		fdbk.elapsedRumble = new Timer();
+		agitatorTimer      = new Timer();
 
 
 		crvbot.robotInit();
@@ -150,8 +149,11 @@ public:
 			/*_____ SHOOTER CODE_____*/
 			ShootingProcesses();
 
+			/*_____AGITATOR CODE_____*/
+			AgitatorCode();
+
 			/*_____INTAKE CODE_____*/
-			whilePressedAction(controllerButton(driverGamepad, Button::RightBumber), controllerButton(driverGamepad, Button::LeftBumber), crvbot.intakeRoller, 0.8);
+			whilePressedAction(controllerButton(driverGamepad, Button::RightBumber), driverGamepad->GetRawAxis(2) > 0, crvbot.intakeRoller, 0.6);
 
 			/*_____HANGER CODE_____*/
 			HangerCode();
@@ -187,8 +189,10 @@ private:
 	Joystick *operatorGamepad;
 	Preferences *prefs;
 	Timer *runTime;
+	Timer *agitatorTimer;
 
 	bool ReverseDirection = false;
+	bool HighSpeed = true;
 
 	double TRN_SENIVITY;
 
@@ -198,22 +202,30 @@ private:
 	     double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
 		 double Right_X = TRN_SENIVITY * controllerJoystick(driverGamepad, Axes::RIGHT_X);
 
-		 if(controllerButton(driverGamepad, Button::A))  ReverseDirection = true;
-		 if(controllerButton(driverGamepad, Button::B))  ReverseDirection = false;
+		 if(controllerButton(driverGamepad, Button::A))  	  ReverseDirection = true;
+		 else if(controllerButton(driverGamepad, Button::B))  ReverseDirection = false;
 
-		 /*_________ Sets DriverJoystick in Tank Drive orientation _________*/
+		 if(controllerButton(driverGamepad, Button::LeftBumber)) { HighSpeed = false;}
+		 else 													 { HighSpeed = true; }
+
 		 if(!ReverseDirection)
-			 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(Left_Y - Right_X)), (RIGHT_MULTIPLER*(Left_Y + Right_X)));
-		 /*_________ Sets DriverJoystick in FirstPerosnDrive orientation _________*/
+			 if(HighSpeed)
+				 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(Left_Y - Right_X)), (RIGHT_MULTIPLER*(Left_Y + Right_X)));
+			 else
+				 crvbot.robotDrive->SetLeftRightMotorOutputs(0.5 * (LEFT_MULTIPLER*(Left_Y - Right_X)), 0.5 * (RIGHT_MULTIPLER*(Left_Y + Right_X)));
 	     else
-	    	 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(-Left_Y - Right_X)), (RIGHT_MULTIPLER*(-Left_Y + Right_X)));
+	    	 if(HighSpeed)
+	    		 crvbot.robotDrive->SetLeftRightMotorOutputs((LEFT_MULTIPLER*(-Left_Y - Right_X)), (RIGHT_MULTIPLER*(-Left_Y + Right_X)));
+	    	 else
+	    		 crvbot.robotDrive->SetLeftRightMotorOutputs(0.5 * (LEFT_MULTIPLER*(-Left_Y - Right_X)), 0.5 * (RIGHT_MULTIPLER*(-Left_Y + Right_X)));
+
 
 	}
 
 	double hangerSpeed;
 
 	void HangerCode(void) {
-		whilePressedAction(controllerButton(operatorGamepad, Button::A), controllerButton(operatorGamepad, Button::B), crvbot.hangerMotor, hangerSpeed);
+		whilePressedAction(controllerButton(operatorGamepad, Button::A), controllerButton(operatorGamepad, Button::Start), crvbot.hangerMotor, hangerSpeed);
 	}
 
 	double currentRPM;
@@ -250,6 +262,7 @@ private:
 		else if(operatorGamepad->GetRawAxis(2) > 0) {
 		//Switches the Talon SRXs to Voltage Percentage control
 			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kPercentVbus);
+
 			crvbot.fuelShooterMaster->Set(0.5);
 		}
 		else {
@@ -259,20 +272,57 @@ private:
 		 }
 
 
-		AgitatorEnabled =  (crvbot.fuelShooterMaster->Get() <= (setRPM - 100));
 
+
+	}
+
+	bool Completed = false;
+
+	void AgitatorCode(void) {
+		//AgitatorEnabled =  (crvbot.fuelShooterMaster->Get() >= (setRPM - 100));
+/*
 		if(AgitatorEnabled){
 			ReachedRPM = true;
 			crvbot.agitatorMotor->Set(agitatorspeed);
+		}
+		else {
+		*/
+			whilePressedAction(controllerButton(operatorGamepad, Button::RightBumber),
+							   controllerButton(operatorGamepad, Button::LeftBumber),
+							   crvbot.agitatorMotor, agitatorspeed);
+			/*
+		}
+	*/
+
+		/*
+		 * AGITATOR SPINS FOR 0.28 SECONDS EVERY .52 SECONDS
+		 * AGITATOR PULSE
+		if(controllerButton(operatorGamepad, Button::RightBumber)) {
+
+			agitatorTimer->Start();
+
+			if(agitatorTimer->Get() < .28) {
+				crvbot.agitatorMotor->Set(agitatorspeed);
+			}
+			else {
+				if(agitatorTimer->Get() >= .28 && agitatorTimer->Get() < .9) {
+					crvbot.agitatorMotor->StopMotor();
+				}
+				else {
+					agitatorTimer->Reset();
+				}
+			}
 
 		}
-		else
-		{
-			ReachedRPM = false;
-			whilePressedAction(controllerButton(operatorGamepad, Button::RightBumber),
-										   controllerButton(operatorGamepad, Button::LeftBumber),
-										   crvbot.agitatorMotor, agitatorspeed);
+		else if(controllerButton(operatorGamepad, Button::LeftBumber)) {
+			crvbot.agitatorMotor->Set(-agitatorspeed);
 		}
+		else {
+			crvbot.agitatorMotor->StopMotor();
+			agitatorTimer->Reset();
+			Completed =false;
+		}
+		*/
 
 	}
 
@@ -291,13 +341,14 @@ private:
 		SmartDashboard::PutNumber(" Left Side Encoder Count: ", 	  crvbot.leftEnc->GetRaw());
 		SmartDashboard::PutNumber(" Right Side Encoder Count: ",      crvbot.rightEnc->GetRaw());
 		SmartDashboard::PutNumber(" fuelShooter Shooter Speed",       crvbot.fuelShooterMaster->Get());
-		SmartDashboard::PutNumber(" fuelShooter Mode",      		  crvbot.fuelShooterMaster->GetControlMode());
+		SmartDashboard::PutNumber(" fuelShooter encoder Postion", 	  crvbot.fuelShooterMaster->GetEncPosition());
 		SmartDashboard::PutNumber(" fuelShooter RPM: ",      		  currentRPM);
 		SmartDashboard::PutNumber(" fuelShooter RPM Graph: ",      	  crvbot.fuelShooterMaster->Get());
 		SmartDashboard::PutNumber(" fuelShooter Error:",              Error);
 		SmartDashboard::PutNumber(" Gyro Angle : ", 				  crvbot.gyro->GetAngle());
 		SmartDashboard::PutNumber(" Alignment : ",					  boilerPosition);
 		SmartDashboard::PutBoolean(" ReverseDirection ", 			  ReverseDirection);
+		SmartDashboard::PutNumber(" Agitator Timer :",                agitatorTimer->Get());
 		SmartDashboard::PutBoolean(" Align to boiler ",               BoilerInRange);
 		SmartDashboard::PutBoolean(" Reached Set RPM ",               ReachedRPM);
 		SmartDashboard::PutBoolean(" Agitator Enabled ",              AgitatorEnabled);
