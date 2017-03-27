@@ -28,6 +28,8 @@ public:
 	void RobotInit() override {
 
 		SmartDashboard::PutString("Crevobot State : ", "Robot initializing");
+		SmartDashboard::PutString("Auton State : ", "NULL");
+		SmartDashboard::PutString("Auton Selected : ", "NULL");
 
 		driverGamepad      = new Joystick(0);
 		operatorGamepad    = new Joystick(1);
@@ -63,8 +65,6 @@ public:
 		std::cout << "|| Crevobot || Robot completed initialize"     << std::endl;
 		std::cout << "_____________________________________________" << std::endl;
 
-		SmartDashboard::PutString("Auton State : ", "NULL");
-		SmartDashboard::PutString("Auton Selected : ", "NULL");
 		SmartDashboard::PutString("Crevobot State : ", "Robot completed initialization");
 	}
 
@@ -134,6 +134,7 @@ public:
 					while(A1_M1_LeftCount  <= crvbot.leftEnc->GetRaw() ) {
 						moveRobot(A1_M1_Speed);
 						UpdateRobotStatus();
+						SmartDashboard::PutString("Auton State : ", "Running Action 1");
 					}
 					autonSelect = AutonStates::Idle;
 					break;
@@ -286,6 +287,8 @@ public:
 		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || In TeleopPeriodic Mode" << std::endl;
 		std::cout << "_____________________________________________" << std::endl;
+
+		SmartDashboard::PutString("Crevobot State : ", "In Teleop Periodic");
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void TeleopPeriodic() {
