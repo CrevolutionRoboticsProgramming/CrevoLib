@@ -63,6 +63,8 @@
 	          double errorClip(double number , double min, double max);
 
  	 public:
+	          std::string SmartDashbaordAction        = "Auton State : ";
+
 	          enum SelectedEncoder {kLeft, kRight, kLeftAndRight};
 	          enum EncoderType {kMagnetEncoder, kQuadEncoder};
 	          void init(RobotDrive *_robotDrvInit, AnalogGyro *_gyroInit, EncoderType enc, SelectedEncoder selcEnc);
@@ -74,11 +76,13 @@
 	          void moveRobot(double lPwr, double rPwr);
 	          void moveRobot(double Pwr);
 	          void moveMotor(CANTalon *_selectedTalon, double speed);
-	          bool moveMotor(double pwr, double timeValue, Direction dir);
+	          bool moveMotor(double timeValue, double pwr, Direction dir);
 	          void stopRobot(void);
 	          void driveDistanceEncoder(double dst, double pwr, Direction dir);
 	          void driveCountEncoder(double enct, double pwr, Direction dir);
+	          void motorCountEncoder(double enct, double pwr, Direction dir);
 	          void driveByTime(double time, double pwr, Direction dir);
+	          void driveByTime(double time, double lPwr, double rPwr, Direction dir);
 	          void encoderTurn(double angle, double pwr);
 	          void turnToHeading(int heading, double pwr);
 	          void stopAndReset(void);

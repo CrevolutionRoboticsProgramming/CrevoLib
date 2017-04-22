@@ -14,7 +14,7 @@
 class OI {
 
 private:
-	Joystick *selectController;
+	Joystick *_selectedGamepad;
 
 	bool inputActive;
 	bool inputSlow;
@@ -57,6 +57,7 @@ public:
 	bool toggleAction(bool Pressed, CANTalon *_motor, double speed);
 	bool toggleBoolean(bool Pressed, bool returnBool);
 	void whilePressedAction(bool forwardPressed, bool reversedPressed, CANTalon *_motor, double speed);
+
 	OI();
 	virtual ~OI();
 };

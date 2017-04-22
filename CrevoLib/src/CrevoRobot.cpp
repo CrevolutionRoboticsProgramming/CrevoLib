@@ -142,7 +142,7 @@ void CrevoRobot::robotInit(void){
 
 	gearSensor = new DigitalInput(DigitalPort::GEAR_SENSOR);
 
-	leftEnc    = new Encoder(DigitalPort::L_EN_1, DigitalPort::L_EN_2, true, Encoder::EncodingType::k2X);
+	leftEnc    = new Encoder(DigitalPort::L_EN_1, DigitalPort::L_EN_2, true, frc::CounterBase::EncodingType::k2X);
 	rightEnc   = new Encoder(DigitalPort::R_EN_1, DigitalPort::R_EN_2, false, Encoder::EncodingType::k2X);
 
 	//leftEnc->SetSamplesToAverage(5);

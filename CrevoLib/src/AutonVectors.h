@@ -17,6 +17,28 @@
 class AutonVectors {
 public:
 
+	std::string idle          	  		= "Idle";
+	std::string GearCenter    	  		= "Score Gear Center";
+	std::string	GearLeft          		= "Score Gear Left";
+	std::string GearRight        	    = "Score Gear Right";
+	std::string ShootFromWallRed 		= "Shoot from Wall Red";
+	std::string ShootFromWallBlue 		= "Shoot from Wall Blue";
+	std::string Baseline      	  		= "Baseline";
+	std::string GearCenterTimed   		= "Score Gear Center Timed";
+
+	std::string autonSelected;
+
+	std::string blueAlliance 				= "Blue";
+	std::string redAlliance 				= "Red";
+	std::string SmartDashbaordAllianceKey   = "Alliance Side :";
+	std::string SmartDashboardAutonKey      = "Auton Selected : ";
+
+
+	std::string SelectedAlliance;
+
+	SendableChooser<std::string> chooser;
+	SendableChooser<std::string> selectedAllianceSide;
+
 	/*/ 		Key for Auton Values:
 	 * Ax = Defines what action the value belongs too
 	 * Mx = Defines what move that the value belongs too
@@ -57,6 +79,13 @@ public:
 	/*_____ Hopper Dump Action Values _____*/
 	/*_____________________________________*/
 
+	/*_____ Shoot and cross baseline  Action Values _____*/
+	const int SHOOTER_RPM = 3800;
+
+	const int A4_M1_LeftCount = 800;
+	const double A4_M1_Speed = 0.3;
+
+	/*_____________________________________*/
 
 	/*/
 	* 1. Shoot from hopper
@@ -67,14 +96,16 @@ public:
 	* 6. Hopper knock down
 	/*/
 
-	enum AutonStratagey { IDLE, SCORE_GEAR_CENTER, SCORE_GEAR_LEFT, SCORE_GEAR_RIGHT, SHOOT_FROM_HOPPER, SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT, SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE, SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE, SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER };
+	int AutonSelected;
+
+	enum AutonStratagey { IDLE, MOBILITY, SHOOT_FROM_WALL_CROSS_BASELINE, SCORE_GEAR_CENTER, SCORE_GEAR_CENTER_TMED, SCORE_GEAR_LEFT, SCORE_GEAR_RIGHT, SHOOT_FROM_HOPPER, SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT, SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE, SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE, SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER };
 
 	enum AutonAction { SHOOT, FIND_BOILER, NOTHING};
 
 	enum GamePiece { FUEL, GEAR };
 
-	void AutonSelect(AutonStratagey strat);
-	bool AutonStateProcess(void);
+	void AutonSelect(void);
+	void AutonStateProcess(void);
 
 	AutonVectors();
 	virtual ~AutonVectors();
@@ -87,7 +118,7 @@ private:
 	void IntakeState(MotorState state);
 	void DoMove(void);
 	void StopMotors(void);
-	void DoShoot(void);
+	void DoShoot(MotorState state);
 	void DoAline(void);
 };
 

@@ -25,9 +25,12 @@
 #include <Compressor.h>
 #include <RobotDrive.h>
 
-//#define ROBOT_1
+#define ROBOT_1
+
 #define NOT_DEBUG
+
 #define SHOOTER_BACKUP
+
 class CrevoRobot{
 
 private:
@@ -43,17 +46,17 @@ private:
 #ifdef ROBOT_1
 
 #define RIGHT_MULTIPLER 1
-#define  LEFT_MULTIPLER 0.9
+#define  LEFT_MULTIPLER 1
 		enum MotorCAN{
 			 	 	RIGHT_FRONT_PORT = 1,
-					RIGHT_REAR_PORT = 3,
-					LEFT_FRONT_PORT = 2,
-					LEFT_REAR_PORT = 4,
-					FUEL_SHOOTER_MASTER = 9,
-					FUEL_SHOOTER_SLAVE = 8,
-					AGITATOR_MOTOR = 25,
-					INTAKE_MOTOR = 5,
-					HANGER_MOTOR = 6,
+					RIGHT_REAR_PORT = 14,
+					LEFT_FRONT_PORT = 28,
+					LEFT_REAR_PORT = 27,
+					FUEL_SHOOTER_MASTER = 12,
+					FUEL_SHOOTER_SLAVE = 10,
+					AGITATOR_MOTOR = 2,
+					INTAKE_MOTOR = 29,
+					HANGER_MOTOR = 11,
 
 		 };
 #endif /*PRAC_BOT*/
@@ -97,10 +100,10 @@ private:
 					LIMIT_SWITCH_2 = 1,
 					FUEL_MANIPULATOR_ENCODER_1 = 0,
 					FUEL_MANIPULATOR_ENCODER_2 = 1,
-					R_EN_1 = 4,
-					R_EN_2 = 5,
-					L_EN_1 = 2,
-					L_EN_2 = 3,
+					R_EN_1 = 2,
+					R_EN_2 = 3,
+					L_EN_1 = 0,
+					L_EN_2 = 1,
 		 };
 /*________________________________________________________________________________________________________________________________*/
 

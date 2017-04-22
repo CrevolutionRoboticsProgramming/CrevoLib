@@ -10,62 +10,69 @@
 #include <Timer.h>
 #include <Preferences.h>
 #include <networktables/NetworkTable.h>
+#include <TalonSRX.h>
 
-#include <crevoglb.h>
-#include <DriveTrain.h>
-#include <AutonVectors.h>
+#include "crevoglb.h"
+#include "DriveTrain.h"
+#include "AutonVectors.h"
 
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
 #include <SmartDashboard/SmartDashboard.h>
 
-class Robot: public IterativeRobot, public OI, public AutonVectors, public DriveTrain
+class Robot: public IterativeRobot, public OI, public DriveTrain
 {
 public:
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-	int auton;
+
 	void RobotInit() override {
 
-		SmartDashboard::PutString("Crevobot State : ", "Robot initializing");
+		SmartDashboard::PutString(CrevoRobotState, "Robot initializing");
 		SmartDashboard::PutString("Auton State : ", "NULL");
-		SmartDashboard::PutString("Auton Selected : ", "NULL");
+		SmartDashboard::PutString(av.SmartDashboardAutonKey, "NULL");
 
 		driverGamepad      = new Joystick(0);
 		operatorGamepad    = new Joystick(1);
 		runTime            = new Timer();
-		fdbk.elapsedRumble = new Timer();
 		agitatorTimer      = new Timer();
+		shooterTimer   	   = new Timer();
 
-
+		//Initilizes all Talon SRX, Sensors, and joyticks.
 		crvbot.robotInit();
 
-		/*/
-		 * Calibrates Gyro, needs two seconds in order to calibrate correctly.
-		/*/
+		//Calibrates Gyro, needs two seconds in order to calibrate correctly.
 		crvbot.gyro->Calibrate();
-
-		Wait(2);
 
 		/*/
 		 *	Command to start up the stream from the USB camera.
 		/*/
 
 		vs.startStream();
-
-		AllianceLED();
-
 		/*/
 		 *  This is setting up the network table to communicate preferences from smart dashboard to the RoboRIO
 		/*/
 		prefs = Preferences::GetInstance();
 
-		std::cout << "_____________________________________________" << std::endl;
-		std::cout << "" << std::endl;
-		std::cout << "|| Crevobot || Robot completed initialize"     << std::endl;
-		std::cout << "_____________________________________________" << std::endl;
+		av.selectedAllianceSide.AddObject(av.redAlliance, av.redAlliance);
+		av.selectedAllianceSide.AddObject(av.blueAlliance, av.blueAlliance);
+		av.selectedAllianceSide.AddDefault("Pls Choose Alliance", "None Selected");
+		frc::SmartDashboard::PutData("Alliance Side", &av.selectedAllianceSide);
 
-		SmartDashboard::PutString("Crevobot State : ", "Robot completed initialization");
+		av.chooser.AddObject(av.GearCenter, av.GearCenter);
+		av.chooser.AddObject(av.GearLeft,av. GearLeft);
+		av.chooser.AddObject(av.GearRight, av.GearRight);
+		av.chooser.AddObject( av.ShootFromWallRed, av.ShootFromWallRed);
+		av.chooser.AddObject( av.ShootFromWallBlue, av.ShootFromWallBlue);
+		av.chooser.AddObject(av.GearCenterTimed, av.GearCenterTimed);
+		av.chooser.AddObject(av.Baseline, av.Baseline);
+		av.chooser.AddDefault(av.idle, av.idle);
+		frc::SmartDashboard::PutData("Auton List", &av.chooser);
+
+		std::cout << "|| Crevobot || Robot completed initialize"     << std::endl;
+
+		SmartDashboard::PutString(CrevoRobotState, "Robot completed initialization");
+
 	}
 
 	/*/
@@ -77,188 +84,55 @@ public:
 	 * 6. Hopper knock down
 	 /*/
 
-	enum AutonStates {Idle, ScoreGearCenter, ScoreGearRight, ScoreGearLeft};
+	int allianceSide;
 
 	void AutonomousInit() override {
 
-		/*/
-		 * Initializes the robots settings into the DriveTrain class to use its functions.
-		/*/
+		av.AutonSelect(); 						//Lets pull in values from the smartdashboard chooser to choose auton
+
+		UpdateRobotStatus();					//Update robot values so we can see any changes that has happened
+		UpdateRobotChooser();
+
+
+		crvbot.fuelShooterMaster->SetP(.5);  	//Sets all PID values for auton
+		crvbot.fuelShooterMaster->SetI(.001);
+		crvbot.fuelShooterMaster->SetD(25);
+
+
+		runTime->Reset();           			//Reset timer for new time
+
+
+		crvbot.gyro->Reset();					//Reset all sensors for new run
 		crvbot.leftEnc->Reset();
 		crvbot.rightEnc->Reset();
 
-		crvbot.gyro->Reset();
+		init(crvbot.robotDrive, crvbot.gyro, EncoderType::kQuadEncoder, SelectedEncoder::kLeft);  //Now lets init our robot configuratoin to
+		initEncoder(crvbot.leftEnc, crvbot.rightEnc);								  			  //our Drivetrain class
 
-		/*/
-		 *  Init Shooter as controlled by velocity
-		/*/
-
-		init(crvbot.robotDrive, crvbot.gyro, EncoderType::kQuadEncoder, SelectedEncoder::kLeft);
-
-		UpdateRobotStatus();
-		UpdateRobotPreference();
-
-		runTime->Reset();
-
-		std::cout << "_____________________________________________" << std::endl;
-		std::cout << "" << std::endl;
 		std::cout << "|| Crevobot || In Autonomous Periodic Mode" << std::endl;
-		std::cout << "_____________________________________________" << std::endl;
 
-		SmartDashboard::PutString("Crevobot State : ", "In Auton Periodic");
-		SmartDashboard::PutString("Auton State : ", "Auton Initilized");
+		SmartDashboard::PutString(CrevoRobotState, "In Auton Periodic");          //Put in what state the robot is in
+		SmartDashboard::PutString(av.SmartDashboardAutonKey, "Auton Initilized");
+
+
 
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-	int autonSelect = 1;
 	int boilerPostition;
 
+    int autonSelect;
+
 	void AutonomousPeriodic() {
+
+		runTime->Start();
+
 		while(IsAutonomous() && IsEnabled()) {
-
-			runTime->Start();
-
-			switch(autonSelect)
-				{
-				case ScoreGearCenter:
-				{
-					SmartDashboard::PutString("Auton Selected : ", "Score Gear Center");
-						//AutonSelect(AutonStratagey::SHOOT_FROM_HOPPER);
-
-			//				while(vs.alinementToBoiler() <=  200  && !hasReached)
-			//				{
-			//					drvt.moveRobot(0.15, -0.15);
-			//				}				hasReached = true;
-			//				drvt.moveRobot(0,0);
-
-					while(A1_M1_LeftCount  <= crvbot.leftEnc->GetRaw() ) {
-						moveRobot(A1_M1_Speed);
-						UpdateRobotStatus();
-						SmartDashboard::PutString("Auton State : ", "Running Action 1");
-					}
-					autonSelect = AutonStates::Idle;
-					break;
-					}
-
-				case ScoreGearRight:
-				{
-					SmartDashboard::PutString("Auton Selected : ", "Score Gear Right");
-					while(A2_M1_LeftCount >= crvbot.leftEnc->GetRaw())
-					{
-						moveRobot(A2_M1_Speed);
-						UpdateRobotStatus();
-						SmartDashboard::PutString("Auton State : ", "Running Action 1");
-					}
-					stopRobot();
-
-					while(-A2_M2_GyroAngle < crvbot.gyro->GetAngle())
-					{
-						moveRobot(A2_M2_Speed, -A2_M2_Speed);
-						UpdateRobotStatus();
-						SmartDashboard::PutString("Auton State : ", "Running Action 2");
-					}
-
-					stopRobot();
-					Wait(1);
-					crvbot.leftEnc->Reset();
-					while(A2_M3_LeftCount >= crvbot.leftEnc->GetRaw() )
-					{
-						moveRobot(A2_M3_Speed);
-						UpdateRobotStatus();
-						SmartDashboard::PutString("Auton State : ", "Running Action 3");
-					}
-					stopRobot();
-					autonSelect = AutonStates::Idle;
-					break;
-				}
-				case ScoreGearLeft:
-				{
-					SmartDashboard::PutString("Auton Selected : ", "Score Gear Left");
-					while(crvbot.leftEnc->GetRaw() <= A3_M1_LeftCount)
-					{
-						moveRobot(0.3, 0.3);
-						UpdateRobotStatus();
-					}
-
-					stopRobot();
-					crvbot.gyro->Reset();
-					while(crvbot.gyro->GetAngle() <= A3_M2_GyroAngle)
-					{
-						moveRobot(-0.3, 0.3);
-						UpdateRobotStatus();
-					}
-					stopRobot();
-					crvbot.leftEnc->Reset();
-					Wait(0.5);
-					while(crvbot.leftEnc->GetRaw() <= A3_M3_LeftCount)
-					{
-						moveRobot(0.3, 0.3);
-					}
-
-					stopRobot();
-					autonSelect = AutonStates::Idle;
-					break;
-				}
-				case 4:
-				{
-					int placeholder;
-					while(crvbot.leftEnc->GetRaw() <= placeholder)
-					{
-						moveRobot(0.3, 0.3);
-						UpdateRobotStatus();
-					}
-					stopRobot();
-					UpdateRobotStatus();
-
-					while(crvbot.gyro->GetAngle() <= 90)
-					{
-						moveRobot(0.3, -0.3);
-						UpdateRobotStatus();
-					}
-					stopAndReset();
-					Wait(1);
-					UpdateRobotStatus();
-
-					while(crvbot.leftEnc->GetRaw() <= placeholder)
-					{
-						moveRobot(0.3, 0.3);
-						UpdateRobotStatus();
-					}
-					stopRobot();
-					Wait(3);
-					UpdateRobotStatus();
-
-					while(crvbot.leftEnc->GetRaw() >= 0)
-					{
-						moveRobot(-0.3, -0.3);
-						UpdateRobotStatus();
-					}
-					stopAndReset();
-					UpdateRobotStatus();
-
-					while(crvbot.gyro->GetAngle() <= 45)
-					{
-						moveRobot(0.3, -0.3);
-						UpdateRobotStatus();
-					}
-					UpdateRobotStatus();
-					autonSelect = AutonStates::Idle;
-					break;
-				}
-				case Idle:
-				{
-					SmartDashboard::PutString("Auton State : ", "Idling");
-					stopRobot();
-					crvbot.fuelShooterMaster->StopMotor();
-					crvbot.agitatorMotor->StopMotor();
-					break;
-				}
-
-			}
+			av.AutonStateProcess();
 		}
 
-		runTime->Stop();
-}
+			runTime->Stop();
+	}
+
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	double kP;
 	double kI;
@@ -268,32 +142,25 @@ public:
 	void TeleopInit() {
 
 		UpdateRobotStatus();
-		UpdateRobotPreference();
+		UpdateRobotChooser();
 
 		runTime->Reset();
 
+		//Reset all sensors for new run
 		crvbot.gyro->Reset();
-
 		crvbot.leftEnc->Reset();
 		crvbot.rightEnc->Reset();
 
+
 		crvbot.fuelShooterMaster->SelectProfileSlot(0);
-		crvbot.fuelShooterMaster->SetP(kP);
-		crvbot.fuelShooterMaster->SetI(kI);
-		crvbot.fuelShooterMaster->SetD(kD);
-		crvbot.fuelShooterMaster->SetF(kF);
+		crvbot.fuelShooterMaster->SetPID(kP, kI, kD, kF); //Now lets put those PID values for that Talon Shooter
 
-		std::cout << "_____________________________________________" << std::endl;
-		std::cout << "" << std::endl;
-		std::cout << "|| Crevobot || In TeleopPeriodic Mode" << std::endl;
-		std::cout << "_____________________________________________" << std::endl;
+		std::cout << "|| Crevobot || In TeleopPeriodic Mode" << std::endl; // Now lets update so we can see the robot status
+		SmartDashboard::PutString(CrevoRobotState, "In Teleop Periodic");
 
-		SmartDashboard::PutString("Crevobot State : ", "In Teleop Periodic");
 	}
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 	void TeleopPeriodic() {
-
-		runTime->Start();
 
 		while(IsOperatorControl() && IsEnabled())
 		{
@@ -307,13 +174,13 @@ public:
 			AgitatorCode();
 
 			/*_____INTAKE CODE_____*/
-			whilePressedAction(controllerButton(driverGamepad, Button::RightBumber), driverGamepad->GetRawAxis(2) > 0, crvbot.intakeRoller, 0.6);
+			IntakeCode();
 
 			/*_____HANGER CODE_____*/
 			HangerCode();
 
 			/*_____ALIGNMENT CODE_____*/
-			//AlineCheck();
+			AlignCheck();
 
 			/*_____UPDATING ROBOT STATUS_____*/
 			UpdateRobotStatus();
@@ -328,6 +195,8 @@ public:
 	void TestPeriodic() {
 		lw->Run();
 	}
+
+
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -336,14 +205,17 @@ private:
 
 	LiveWindow* lw = LiveWindow::GetInstance();
 
+	AutonVectors av;
 	CrevoRobot crvbot;
 	Vision vs;
-	FeedBack fdbk;
 	Joystick *driverGamepad;
 	Joystick *operatorGamepad;
 	Preferences *prefs;
 	Timer *runTime;
 	Timer *agitatorTimer;
+	Timer *shooterTimer;
+
+	std::string  CrevoRobotState = "Crevobot State : ";
 
 	bool ReverseDirection = false;
 	bool HighSpeed = true;
@@ -352,15 +224,14 @@ private:
 
 	void DriveCode(void) {
 
-	     double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);
-	     double Right_Y = controllerJoystick(driverGamepad, Axes::RIGHT_Y);
+	     double Left_Y  = controllerJoystick(driverGamepad, Axes::LEFT_Y);					 //Getting values from Driver game-pad joysticks
 		 double Right_X = TRN_SENIVITY * controllerJoystick(driverGamepad, Axes::RIGHT_X);
 
-		 if(controllerButton(driverGamepad, Button::A))  	  ReverseDirection = true;
-		 else if(controllerButton(driverGamepad, Button::B))  ReverseDirection = false;
+		 if(controllerButton(driverGamepad, Button::A))  	  	  ReverseDirection = true;   //Logic to change the drivetrain's direction
+		 else if(controllerButton(driverGamepad, Button::B))  	  ReverseDirection = false;
 
-		 if(controllerButton(driverGamepad, Button::LeftBumber)) { HighSpeed = false;}
-		 else 													 { HighSpeed = true; }
+		 if(controllerButton(driverGamepad, Button::LeftBumber))  HighSpeed = false; 		 //Logic to change the drivetrain's speed
+		 else 													  HighSpeed = true;
 
 		 if(!ReverseDirection)
 			 if(HighSpeed)
@@ -373,13 +244,6 @@ private:
 	    	 else
 	    		 crvbot.robotDrive->SetLeftRightMotorOutputs(0.5 * (LEFT_MULTIPLER*(-Left_Y - Right_X)), 0.5 * (RIGHT_MULTIPLER*(-Left_Y + Right_X)));
 
-
-	}
-
-	double hangerSpeed;
-
-	void HangerCode(void) {
-		whilePressedAction(controllerButton(operatorGamepad, Button::A), controllerButton(operatorGamepad, Button::Start), crvbot.hangerMotor, hangerSpeed);
 	}
 
 	double currentRPM;
@@ -393,91 +257,70 @@ private:
 	bool ReachedRPM;
 
 	void ShootingProcesses(void) {
-		currentRPM = crvbot.fuelShooterMaster->Get();
-	/*
- 	 *  Homemade PID control will add if Talon SRX PID fail
- 	 *
-		//Shooter is at negative RPM
-		Error = setRPM  + currentRPM;
-		IntergralError += Error;
 
-		if((currentRPM > setRPM*.8) && (currentRPM < setRPM*1.2)){
-			shooterMotorsSet( -(kI*IntergralError -kP*Error + setRPM));
-		}
-		else{
-
-		*/
+		//Activates Talon SRX PID control to set velcocity
 		if(operatorGamepad->GetRawAxis(3) > 0) {
 		//Switches the Talon SRXs to Velocity control for PID
 			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kSpeed);
 			crvbot.fuelShooterMaster->Set(-setRPM);
 
 		}
+		//Reverse option if shooter gets jammed
 		else if(operatorGamepad->GetRawAxis(2) > 0) {
 		//Switches the Talon SRXs to Voltage Percentage control
 			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kPercentVbus);
 
-			crvbot.fuelShooterMaster->Set(0.5);
+			crvbot.fuelShooterMaster->Set(0.75);
 		}
+		//No button action, no movement
 		else {
 		//Switches the Talon SRXs to Voltage Percentage control
 			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kPercentVbus);
 			crvbot.fuelShooterMaster->Set(0);
 		 }
 
+		currentRPM = crvbot.fuelShooterMaster->Get();
 
-
+		//Logic to tell operator if shooter reachd the given RPM
+		if(currentRPM >= (setRPM - 100)) ReachedRPM = true;
+		else 							 ReachedRPM = false;
 
 	}
 
-	bool Completed = false;
-
 	void AgitatorCode(void) {
-		//AgitatorEnabled =  (crvbot.fuelShooterMaster->Get() >= (setRPM - 100));
-/*
-		if(AgitatorEnabled){
-			ReachedRPM = true;
-			crvbot.agitatorMotor->Set(agitatorspeed);
-		}
-		else {
-		*/
-			whilePressedAction(controllerButton(operatorGamepad, Button::RightBumber),
-							   controllerButton(operatorGamepad, Button::LeftBumber),
-							   crvbot.agitatorMotor, agitatorspeed);
-			/*
-		}
-	*/
+		whilePressedAction(controllerButton(operatorGamepad, Button::RightBumber), controllerButton(operatorGamepad, Button::LeftBumber), crvbot.agitatorMotor, agitatorspeed);
+	}
 
-		/*
-		 * AGITATOR SPINS FOR 0.28 SECONDS EVERY .52 SECONDS
-		 * AGITATOR PULSE
-		if(controllerButton(operatorGamepad, Button::RightBumber)) {
+	void IntakeCode(void) {
+		whilePressedAction(controllerButton(driverGamepad, Button::RightBumber), driverGamepad->GetRawAxis(2) > 0, crvbot.intakeRoller, 0.6);
+	}
 
-			agitatorTimer->Start();
 
-			if(agitatorTimer->Get() < .28) {
-				crvbot.agitatorMotor->Set(agitatorspeed);
+	void HangerCode(void) {
+		whilePressedAction(controllerButton(operatorGamepad, Button::A), controllerButton(operatorGamepad, Button::Start), crvbot.hangerMotor, 1);
+	}
+
+	int boilerPosition;
+	int leftMost;
+	int rightMost;
+
+	bool BoilerInRange;
+	bool VisionTracking;
+
+	void AlignCheck(void) {
+		// Checks to see if operator selected to have vision tracking enabled
+		if(VisionTracking){
+
+			// Only runs if the operator pulls down the trigger a bit to aline robot
+			if((operatorGamepad->GetRawAxis(3) > 0) && (operatorGamepad->GetRawAxis(3) <= 0.5))
+			{
+				// Gets X value placement of teh boiler
+				boilerPosition = vs.alignmentToBoiler();
+				//Simple logic to tell if boiler is alingned or not
+				if(boilerPosition <= 0) BoilerInRange = false;
+				else                    BoilerInRange = true;
 			}
-			else {
-				if(agitatorTimer->Get() >= .28 && agitatorTimer->Get() < .9) {
-					crvbot.agitatorMotor->StopMotor();
-				}
-				else {
-					agitatorTimer->Reset();
-				}
-			}
-
 		}
-		else if(controllerButton(operatorGamepad, Button::LeftBumber)) {
-			crvbot.agitatorMotor->Set(-agitatorspeed);
-		}
-		else {
-			crvbot.agitatorMotor->StopMotor();
-			agitatorTimer->Reset();
-			Completed =false;
-		}
-		*/
-
 	}
 
 	void UpdateRobotStatus(void) {
@@ -501,51 +344,32 @@ private:
 		SmartDashboard::PutNumber(" fuelShooter Error:",              Error);
 		SmartDashboard::PutNumber(" Gyro Angle : ", 				  crvbot.gyro->GetAngle());
 		SmartDashboard::PutNumber(" Alignment : ",					  boilerPosition);
-		SmartDashboard::PutBoolean(" ReverseDirection ", 			  ReverseDirection);
 		SmartDashboard::PutNumber(" Agitator Timer :",                agitatorTimer->Get());
+		SmartDashboard::PutBoolean(" ReverseDirection ", 			  ReverseDirection);
 		SmartDashboard::PutBoolean(" Align to boiler ",               BoilerInRange);
 		SmartDashboard::PutBoolean(" Reached Set RPM ",               ReachedRPM);
 		SmartDashboard::PutBoolean(" Agitator Enabled ",              AgitatorEnabled);
 	}
 
-	void UpdateRobotPreference(void) {
+	void UpdateRobotChooser(void) {
 
 		leftMost 		  = prefs->GetInt("leftMost",     0);
 		rightMost 		  = prefs->GetInt("rightMost",    500);
 		allianceSide      = prefs->GetInt("Alliance Side", 0);
 		setRPM		      = prefs->GetDouble("shooterspeed", .75);
-		hangerSpeed       = prefs->GetDouble("Hanger Motor Speed", 0.75);
 		agitatorspeed     = prefs->GetDouble("agitatorspeed", 0.25);
 		kP	    		  = prefs->GetDouble("P", 0.1);
 		kI	      		  = prefs->GetDouble("I", 0.00000001);
 		kD	 			  = prefs->GetDouble("D", 0.0);
 		kF				  = prefs->GetDouble("F", 0.04);
-		TRN_SENIVITY      = prefs->GetDouble("Turn Sensitivity", 0.4);
+		TRN_SENIVITY      = prefs->GetDouble("Turn Sensitivity", 0.65);
+		VisionTracking    = prefs->GetBoolean("Vision Tracking", false);
+
+		av.autonSelected = av.chooser.GetSelected();
+
+
 	}
 
-	int allianceSide;
-
-	void AllianceLED(void){
-
-		if(allianceSide == AllianceSide::BLUE) { crvbot.BlueLED->Set(true); }
-		if(allianceSide == AllianceSide::RED)  { crvbot.RedLED->Set(true); }
-	}
-
-	int boilerPosition;
-	int leftMost;
-	int rightMost;
-
-	bool BoilerInRange = false;
-
-	void AlineCheck(void)
-	{
-		if((operatorGamepad->GetRawAxis(3) > 0) && (operatorGamepad->GetRawAxis(3) <= 0.5))
-		{
-			boilerPosition = vs.alignmentToBoiler();
-			if(boilerPosition <= 0) BoilerInRange = false;
-			else                    BoilerInRange = true;
-		}
-	}
 };
 
 START_ROBOT_CLASS(Robot)

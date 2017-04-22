@@ -3,6 +3,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
+#include <tables/ITable.h>
 
 Vision::Vision() {
 	// TODO Auto-generated constructor stub
@@ -18,7 +19,6 @@ void Vision::startStream(void)
 	/*_____ Select table object to revive the NetworkTable from GRIPn_____*/
 	table->Initialize();
 	table = NetworkTable::GetTable("GRIP/Crevo");
-
 
 	/*_____ Starts Instance for Gear stream _____*/
 	cs::UsbCamera camera2 = CameraServer::GetInstance()->StartAutomaticCapture(0);
@@ -86,12 +86,14 @@ double Vision::alignmentToBoiler(void)
 	std::vector<double> centerX  = table->GetNumberArray("centerX", llvm::ArrayRef<double>());
 	std::vector<double> area  = table->GetNumberArray("area", llvm::ArrayRef<double>());
 
+	if(centerX.size() > 0 && area.size() > 0)
+	{
 	/*_____ Checks to see if there is a countor detected and filers mixups _____*/
-	if(centerX.size() > 0 && area[0] > 100)
-		return centerX[0];
-	else
-		return 0;
-
+		if(centerX.size() > 0 && area[0] > 100)
+			return centerX[0];
+		else
+			return 0;
+	}
 	SmartDashboard::PutNumber("Robot Center X value:", difference);
 }
 

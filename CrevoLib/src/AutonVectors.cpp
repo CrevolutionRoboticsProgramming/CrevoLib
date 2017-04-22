@@ -16,12 +16,67 @@ AutonVectors::~AutonVectors() {
 	// TODO Auto-generated destructor stub
 }
 
-void AutonVectors::AutonSelect(AutonStratagey strat)
+void AutonVectors::AutonSelect()
 {
-	switch(strat)
+
+	SelectedAlliance = selectedAllianceSide.GetSelected();							//Get
+	frc::SmartDashboard::PutString(SmartDashbaordAllianceKey, SelectedAlliance);
+
+	autonSelected = chooser.GetSelected();
+
+	if(autonSelected == GearCenter) 	       AutonSelected = SCORE_GEAR_CENTER;
+	else if(autonSelected == GearLeft)		   AutonSelected = SCORE_GEAR_LEFT;
+	else if(autonSelected == GearRight)        AutonSelected = SCORE_GEAR_RIGHT;
+	else if(autonSelected == ShootFromWallRed) AutonSelected = SHOOT_FROM_WALL_CROSS_BASELINE;
+	else if(autonSelected == GearCenterTimed)  AutonSelected = SCORE_GEAR_CENTER_TMED;
+	else if(autonSelected == Baseline)	       AutonSelected = MOBILITY;
+	else if(autonSelected == idle)			   AutonSelected = IDLE;
+	else 									   AutonSelected = IDLE;
+
+	frc::SmartDashboard::PutString(SmartDashboardAutonKey, autonSelected);
+
+}
+
+void AutonVectors::AutonStateProcess(void)
+{
+
+	switch(AutonSelected)
 	{
+	case SHOOT_FROM_WALL_CROSS_BASELINE:
+	{
+		DoShoot(ON);									//Being shooting process
+		DoShoot(OFF);
+		if(SelectedAlliance == redAlliance) { 			//Check to see what alliance we are at, Shooter is on the left of the robot
+
+			crvbot.fuelShooterMaster->StopMotor();      //Stop shooter action
+			crvbot.agitatorMotor->StopMotor();			//Stop agitator action
+			drvt.driveByTime(.72, .5,-.5,Forward);		//Turn the robot out of the wall
+			drvt.driveByTime(.5,0,0,Reverse);			//Make the Right side go more for certaintly
+			drvt.driveByTime(3,.35,Reverse);			//Drive to the baseline
+		}
+		else if(SelectedAlliance == blueAlliance) {  	//Check to see what alliance we are at, Shooter is on the left of the robot
+
+			crvbot.fuelShooterMaster->StopMotor();		//Stop shooter action
+			crvbot.agitatorMotor->StopMotor();			//Stop agitator action
+			drvt.driveByTime(.72, -.5,.5,Forward);		//Turn the robot out of the wall
+			drvt.driveByTime(.5,0,0,Reverse);			//Make the Right side go more for certaintlY
+			drvt.driveByTime(3,.35,Reverse);			//Drive to the baseline
+			}
+		AutonSelected = IDLE;							//Make the robot Idle so we can break out of the loop when we are running in auton
+		break;
+	}
 	case SHOOT_FROM_HOPPER:
 	{
+		DoShoot(ON);									//Begin shooting process
+		drvt.turnToHeading(-60, 0.5);					//
+		drvt.moveRobot(1);
+
+		break;
+	}
+	case MOBILITY:
+	{
+		drvt.driveByTime(3,.3,Forward);             //Drive for 3 seconds so we can garentee we have crossed the baseline
+		AutonSelected = IDLE;                       //Make the robot Idle so we can break out of the loop when we are running in auton
 		break;
 	}
 	case SCORE_GEAR_CENTER_SHOOT_FROM_BASELINE:
@@ -29,57 +84,48 @@ void AutonVectors::AutonSelect(AutonStratagey strat)
 	{
 		SmartDashboard::PutString("Auton Selected : ", "Score Gear Center");
 		drvt.driveCountEncoder(A1_M1_LeftCount, A1_M1_Speed, Forward);
-		strat = IDLE;
+		AutonSelected = IDLE;
+		break;
+	}
+	case SCORE_GEAR_CENTER_TMED:
+	{
+		crvbot.agitatorMotor->Set(-.3); 			//Lets start the agitaor to release the ceral box
+		drvt.driveByTime(1.8,.35,.33, Forward);     //Now drive to the center peg
+		drvt.driveByTime(.2,0.15,0, Forward);		//Move that left motor a bit so we can make sure we are straight on
+		crvbot.agitatorMotor->StopMotor();			//Stop agitator motor so we can be safe that it has been released
+		AutonSelected = IDLE;						//Make the robot Idle so we can break out of the loop when we are running in auton
 		break;
 	}
 	case SCORE_GEAR_LEFT_SHOOT_FROM_BASELINE:
 	case SCORE_GEAR_LEFT_KNOCK_DOWN_HOPPER:
 	case SCORE_GEAR_LEFT:
 	{
-		SmartDashboard::PutString("Auton Selected : ", "Score Gear Left");
-		drvt.driveCountEncoder(A2_M1_LeftCount, A2_M1_Speed, Forward);
-		drvt.turnToHeading(A2_M2_GyroAngle, A2_M2_Speed);
-		drvt.resetEncouderCounts();
-		drvt.driveCountEncoder(A2_M3_LeftCount, A2_M3_Speed, Forward);
-		strat = IDLE;
+		drvt.driveCountEncoder(A2_M1_LeftCount, A2_M1_Speed, Forward);   //Start off the auton by driving to aline to the left peg
+		drvt.turnToHeading(A2_M2_GyroAngle, A2_M2_Speed);				 //Lets turn so the ceral box is facing towards the left peg
+		drvt.resetEncouderCounts();										 //Reset encoder counts so we can do our final action
+		drvt.driveCountEncoder(A2_M3_LeftCount, A2_M3_Speed, Forward);	 //Drive to the left peg so Megan can get the gear
+		AutonSelected = IDLE;											 //Make the robot Idle so we can break out of the loop when we are running in auton
 		break;
 	}
 	case SCORE_GEAR_RIGHT_SHOOT_FROM_LIFT:
 	case SCORE_GEAR_RIGHT:
 	{
-		SmartDashboard::PutString("Auton Selected : ", "Score Gear Right");
-		drvt.driveCountEncoder(A3_M1_LeftCount, A3_M1_Speed, Forward);
-		drvt.turnToHeading(A3_M2_GyroAngle, A3_M2_Speed);
-		drvt.resetEncouderCounts();
-		drvt.driveCountEncoder(A3_M3_LeftCount, A3_M3_Speed, Forward);
-		strat = IDLE;
+		drvt.driveCountEncoder(A3_M1_LeftCount, A3_M1_Speed, Forward);  //Start off the auton by driving to aline to the right peg
+		drvt.turnToHeading(A3_M2_GyroAngle, A3_M2_Speed);				//Lets turn so the ceral box is facing towards the right peg
+		drvt.resetEncouderCounts();										//Reset encoder counts so we can do our final action
+		drvt.driveCountEncoder(A3_M3_LeftCount, A3_M3_Speed, Forward);	//Drive to the right peg so Megan can get the gear
+		AutonSelected = IDLE;											//Make the robot Idle so we can break out of the loop when we are running in auton
 		break;
 	}
 	case IDLE:
-		SmartDashboard::PutString("Auton State : ", "Idling");
-		drvt.stopAndReset();
-		crvbot.fuelShooterMaster->StopMotor();
-		crvbot.agitatorMotor->StopMotor();
-		break;
-	}
-}
-
-bool AutonVectors::AutonStateProcess(void)
-{
-	DoMove();
-	switch(1)
 	{
-	case SHOOT:
-		DoShoot();
-		break;
-	case FIND_BOILER:
-		DoAline();
-		break;
-	case NOTHING:
-		StopMotors();
+		SmartDashboard::PutString(drvt.SmartDashbaordAction, "Idling");
+		drvt.stopAndReset();											//Stop and reset encoders and drivetrain
+		StopMotors();													//Stop all robot actions
 		break;
 	}
-	return true;
+	}
+
 }
 
 void AutonVectors::IntakeState(MotorState state)
@@ -88,8 +134,21 @@ void AutonVectors::IntakeState(MotorState state)
 	if(state == OFF) crvbot.intakeRoller->Set(0);
 }
 
-void AutonVectors::DoShoot(void)
+void AutonVectors::DoShoot(MotorState state)
 {
+	if(state == ON) {
+		while(1 < 10) {
+			crvbot.fuelShooterMaster->SetControlMode(CANSpeedController::kSpeed);
+			crvbot.fuelShooterMaster->Set(-3350);
+			Wait(2);
+			crvbot.agitatorMotor->Set(-.3);
+		}
+	}
+
+	else if(state == OFF) {
+		crvbot.fuelShooterMaster->StopMotor();
+		crvbot.agitatorMotor->StopMotor();
+	}
 
 }
 
@@ -105,7 +164,7 @@ void AutonVectors::DoAline(void)
 
 void AutonVectors::StopMotors(void)
 {
-	//drvt.stopRobot();
+	drvt.stopRobot();
 	crvbot.agitatorMotor->StopMotor();
 	crvbot.fuelShooterMaster->StopMotor();
 	crvbot.hangerMotor->StopMotor();
